@@ -1,10 +1,10 @@
-﻿using CoreAnimation;
+﻿using System;
+using System.Runtime.InteropServices;
+using CoreAnimation;
 using CoreGraphics;
 using Microsoft.Maui;
 using Microsoft.Maui.Graphics;
 using Microsoft.Maui.Platform;
-using System;
-using System.Runtime.InteropServices;
 using UIKit;
 
 namespace Berry.Maui.Controls;

@@ -39,7 +39,7 @@
 
   <ItemGroup>
     <PackageReference Include="CSharpier.MsBuild" Version="0.25.0" PrivateAssets="all" />
-    <PackageReference Include="M.BindableProperty.Generator" Version="0.11.1" />
+    <PackageReference Include="M.BindableProperty.Generator" Version="0.11.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" IsImplicitlyDefined="true" />
     <!--<PackageReference Include="System.Management" Version="7.0.0" Condition="$(TargetFramework.Contains('-windows')) == true" />-->
   </ItemGroup>
