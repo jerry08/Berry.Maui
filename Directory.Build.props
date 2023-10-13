@@ -1,0 +1,38 @@
+<Project>
+
+  <PropertyGroup>
+    <Version>1.0.0</Version>
+    <Company>Berry</Company>
+    <Copyright>Copyright (C) Jerry Berry</Copyright>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <!--<WarningsAsErrors>nullable</WarningsAsErrors>-->
+    <!--<TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
+    <IsPackable>false</IsPackable>
+    <NoWarn>CA1304,RCS1155</NoWarn>
+  </PropertyGroup>
+
+  <!-- Disable nullability warnings on frameworks where BCL is not annotated -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'net472'">
+    <Nullable>annotations</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>$(Company)</Authors>
+    <PackageTags>.net dotnet mvvm csharp xamarin maui behaviors effects</PackageTags>
+    <PackageProjectUrl>https://github.com/jerry08/Juro</PackageProjectUrl>
+    <!--<PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>favicon.png</PackageIcon>-->
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <!--<ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="" Visible="false" />
+    <None Include="../favicon.png" Pack="true" PackagePath="" Visible="false" />
+  </ItemGroup>-->
+
+</Project>

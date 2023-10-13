@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+    <TargetFrameworks>net6.0-android;net6.0-ios;net6.0-maccatalyst;net7.0-android;net7.0-ios;net7.0-maccatalyst</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net6.0-windows10.0.19041.0</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net7.0-windows10.0.19041.0</TargetFrameworks>
+		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
+		<!-- <TargetFrameworks>$(TargetFrameworks);net7.0-tizen</TargetFrameworks> -->
+		<UseMaui>true</UseMaui>
+		<SingleProject>true</SingleProject>
+		<Nullable>enable</Nullable>
+		<!--<ImplicitUsings>enable</ImplicitUsings>-->
+
+    <IsPackable>true</IsPackable>
+    <Description>A small collection of .NET MAUI controls, effects and behaviors.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">14.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
+		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
+	</PropertyGroup>
+
+  <PropertyGroup Condition="$(TargetFramework.Contains('-windows')) == true">
+    <PublishReadyToRun>false</PublishReadyToRun>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(TargetFramework.Contains('-windows')) != true">
+    <PublishReadyToRun>true</PublishReadyToRun>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Behaviors\Image\BlurBehavior\BlurBehavior.tizen.cs" />
+    <Compile Remove="Behaviors\Image\ChainBehavior\ChainBehavior.tizen.cs" />
+    <Compile Remove="Behaviors\Image\SaturationBehavior\SaturationBehavior.tizen.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CSharpier.MsBuild" Version="0.25.0" PrivateAssets="all" />
+    <PackageReference Include="M.BindableProperty.Generator" Version="0.11.1" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" IsImplicitlyDefined="true" />
+    <!--<PackageReference Include="System.Management" Version="7.0.0" Condition="$(TargetFramework.Contains('-windows')) == true" />-->
+  </ItemGroup>
+
+</Project>
