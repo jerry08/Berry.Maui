@@ -1,6 +1,9 @@
 ﻿using Berry.Maui.Controls;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Maui;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Hosting;
+using Microsoft.Maui.LifecycleEvents;
 
 namespace Berry.Maui;
 
@@ -44,6 +47,68 @@ public static class MauiAppBuilderExtensions
             }
         });
 #endif
+        return builder;
+    }
+
+    public static MauiAppBuilder UseInsets(this MauiAppBuilder builder)
+    {
+        builder.ConfigureLifecycleEvents(lifecycle =>
+        {
+#if ANDROID
+            lifecycle.AddAndroid(androidLifecycle =>
+            {
+                androidLifecycle.OnApplicationCreate((application) =>
+                {
+                    if (application is IPlatformApplication platformApp)
+                    {
+                        var appInterface = platformApp.Services.GetService<IApplication>();
+
+                        if (appInterface is Application app)
+                        {
+                            Insets.Current.Init(app.MainPage);
+                        }
+                    }
+                })
+                .OnPostCreate((activity, bundle) =>
+                {
+                    Insets.Current.InitActivity(activity);
+                });
+            });
+#elif IOS || MACCATALYST
+            lifecycle.AddiOS(iOSLifecycle =>
+            {
+                iOSLifecycle.FinishedLaunching((application, bundle) =>
+                {
+                    if (application.Delegate is IPlatformApplication platformApp)
+                    {
+                        var appInterface = platformApp.Services.GetService<IApplication>();
+
+                        if (appInterface is Application app)
+                        {
+                            Insets.Current.Init(app.MainPage);
+                        }
+                    }
+                    return true;
+                });
+            });
+#elif WINDOWS
+        lifecycle.AddWindows(windowsLifecycle =>
+            {
+                windowsLifecycle.OnLaunched((application, bundle) =>
+                {
+                    if (application is IPlatformApplication platformApp)
+                    {
+                        var appInterface = platformApp.Services.GetService<IApplication>();
+
+                        if (appInterface is Application app)
+                        {
+                            Insets.Current.Init(app.MainPage);
+                        }
+                    }
+                });
+            });
+#endif
+        });
         return builder;
     }
 }
