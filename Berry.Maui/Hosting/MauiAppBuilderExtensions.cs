@@ -6,6 +6,19 @@ namespace Berry.Maui;
 
 public static class MauiAppBuilderExtensions
 {
+    public static MauiAppBuilder UseBerry(this MauiAppBuilder builder)
+    {
+        builder.ConfigureMauiHandlers(handlers =>
+        {
+            handlers.AddPlainer();
+            handlers.AddHandler(typeof(AcrylicView), typeof(AcrylicViewHandler));
+        });
+
+        builder.UseMaterialSwitch();
+
+        return builder;
+    }
+
     public static MauiAppBuilder UseMauiPlainer(this MauiAppBuilder builder)
     {
         builder.ConfigureMauiHandlers(handlers => handlers.AddPlainer());

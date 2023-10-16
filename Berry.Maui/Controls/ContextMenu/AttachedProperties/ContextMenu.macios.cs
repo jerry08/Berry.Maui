@@ -14,12 +14,14 @@ namespace Berry.Maui.Controls;
 public static partial class ContextMenu
 {
     static IUIContextMenuInteractionDelegate _delegate = new ContextMenuInteractionDelegate();
+
     public static readonly BindableProperty InteractionProperty = BindableProperty.CreateAttached(
         "Interaction",
         typeof(IUIInteraction),
         typeof(VisualElement),
         null
     );
+
     public static readonly BindableProperty TapGestureRecognizerProperty =
         BindableProperty.CreateAttached(
             "TapGestureRecognizer",
@@ -38,7 +40,7 @@ public static partial class ContextMenu
             }
         }
         if (
-            bindable is not CollectionView collectionView && bindable is VisualElement visualElement
+            bindable is not CollectionView and VisualElement visualElement
         )
         {
             if (!GetShowMenuOnClick(visualElement))
@@ -59,7 +61,7 @@ public static partial class ContextMenu
     static partial void SetupClickCommand(BindableObject bindable)
     {
         if (
-            bindable is not CollectionView collectionView && bindable is VisualElement visualElement
+            bindable is not CollectionView and VisualElement visualElement
         )
         {
             // Already setup, the correct command is read on click, no need to re-setup

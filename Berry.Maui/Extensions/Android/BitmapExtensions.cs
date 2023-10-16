@@ -10,11 +10,6 @@ public static class BitmapExtensions
 {
     private static readonly float BITMAP_SCALE = 0.4f;
 
-    [SuppressMessage(
-        "Interoperability",
-        "CA1422:Validate platform compatibility",
-        Justification = "<Pending>"
-    )]
     public static Bitmap Blur(this Context context, Bitmap image, float radius = 25f)
     {
         var width = (int)Math.Round(image.Width * BITMAP_SCALE);
