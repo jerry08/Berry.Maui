@@ -78,8 +78,44 @@ public static class ApplicationEx
         return barNotifications?.ToArray() ?? emptyArray;
     }
 
-    public static int GetNavigationBarHeight() =>
-        GetNavigationBarHeight(Platform.CurrentActivity?.WindowManager);
+    public static int GetStatusBarHeight()
+    {
+        var statusBarHeight = -1;
+        var resourceId =
+            Platform.CurrentActivity?.Resources?.GetIdentifier(
+                "status_bar_height",
+                "dimen",
+                "android"
+            ) ?? 0;
+        if (resourceId > 0)
+        {
+            statusBarHeight = Platform.CurrentActivity!.Resources!.GetDimensionPixelSize(
+                resourceId
+            );
+        }
+        return statusBarHeight;
+    }
+
+    public static int GetNavigationBarHeight()
+    {
+        var navigationBarHeight = -1;
+        var resourceId =
+            Platform.CurrentActivity?.Resources?.GetIdentifier(
+                "navigation_bar_height",
+                "dimen",
+                "android"
+            ) ?? 0;
+        if (resourceId > 0)
+        {
+            navigationBarHeight = Platform.CurrentActivity!.Resources!.GetDimensionPixelSize(
+                resourceId
+            );
+        }
+        return navigationBarHeight;
+    }
+
+    //public static int GetNavigationBarHeight() =>
+    //    GetNavigationBarHeight(Platform.CurrentActivity?.WindowManager);
 
     public static int GetNavigationBarHeight(IWindowManager? windowManager)
     {
@@ -117,11 +153,11 @@ public static class ApplicationEx
         }
     }
 
-    public static int GetStatusBarHeight() =>
-        GetStatusBarHeight(
-            Platform.CurrentActivity?.WindowManager,
-            (ViewGroup?)Platform.CurrentActivity?.Window?.DecorView
-        );
+    //public static int GetStatusBarHeight() =>
+    //    GetStatusBarHeight(
+    //        Platform.CurrentActivity?.WindowManager,
+    //        (ViewGroup?)Platform.CurrentActivity?.Window?.DecorView
+    //    );
 
     public static int GetStatusBarHeight(IWindowManager? windowManager, ViewGroup? decorView)
     {
