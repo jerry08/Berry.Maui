@@ -1,6 +1,6 @@
 ﻿using UIKit;
 
-namespace Berry.Maui.Effects.Extensions;
+namespace Berry.Maui.Extensions;
 
 // Copied from https://github.com/dotnet/maui/blob/main/src/Core/src/Platform/iOS/ViewExtensions.cs
 public static partial class ViewExtensions

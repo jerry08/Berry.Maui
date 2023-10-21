@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <Version>1.0.6</Version>
+    <Version>1.0.8</Version>
     <Company>Berry</Company>
     <Copyright>Copyright (C) Jerry Berry</Copyright>
     <LangVersion>latest</LangVersion>
@@ -9,7 +9,7 @@
     <!--<WarningsAsErrors>nullable</WarningsAsErrors>-->
     <!--<TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
     <IsPackable>false</IsPackable>
-    <NoWarn>CA1304,RCS1155</NoWarn>
+    <NoWarn>CA1304,RCS1155,CS1591</NoWarn>
   </PropertyGroup>
 
   <!-- Disable nullability warnings on frameworks where BCL is not annotated -->

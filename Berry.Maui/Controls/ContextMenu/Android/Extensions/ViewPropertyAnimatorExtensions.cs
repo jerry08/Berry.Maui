@@ -3,7 +3,7 @@ using Java.Lang;
 
 namespace Berry.Maui.Controls;
 
-internal class ViewPropertyAnimatorRunnable : Java.Lang.Object, IRunnable
+internal class ViewPropertyAnimatorRunnable : Object, IRunnable
 {
     System.Action _action;
 

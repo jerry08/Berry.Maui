@@ -208,8 +208,8 @@ public static partial class ContextMenu
     {
         var matrix = new Matrix();
         matrix.SetRectToRect(
-            new Android.Graphics.RectF(0, 0, targetBmp.Width, targetBmp.Height),
-            new Android.Graphics.RectF(0, 0, reqWidthInPixels, reqHeightInPixels),
+            new RectF(0, 0, targetBmp.Width, targetBmp.Height),
+            new RectF(0, 0, reqWidthInPixels, reqHeightInPixels),
             Matrix.ScaleToFit.Center
         );
         var scaledBitmap = Bitmap.CreateBitmap(
@@ -345,7 +345,7 @@ public class MenuItemClickListener : Java.Lang.Object, IMenuItemOnMenuItemClickL
         _action = action;
     }
 
-    public bool OnMenuItemClick(Android.Views.IMenuItem item)
+    public bool OnMenuItemClick(IMenuItem item)
     {
         _action.Command?.Execute(_action.CommandParameter);
 

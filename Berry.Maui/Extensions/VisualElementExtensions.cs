@@ -4,7 +4,7 @@ using Microsoft.Maui;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Graphics;
 
-namespace CommunityToolkit.Maui.Extensions;
+namespace Berry.Maui.Extensions;
 
 static class VisualElementExtensions
 {

@@ -23,7 +23,7 @@ using PlatformView = System.Object;
 using ParentView = System.Object;
 #endif
 
-namespace Berry.Maui.Effects.Extensions;
+namespace Berry.Maui.Extensions;
 
 // Copied from https://github.com/dotnet/maui/blob/main/src/Core/src/Platform/ViewExtensions.cs
 public static partial class ViewExtensions

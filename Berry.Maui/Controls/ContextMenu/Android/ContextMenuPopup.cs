@@ -52,7 +52,7 @@ internal class ContextMenuItemView : LinearLayout
             true
         );
         Orientation = Orientation.Vertical;
-        LayoutParameters = new LinearLayout.LayoutParams(
+        LayoutParameters = new LayoutParams(
             LinearLayout.LayoutParams.MatchParent,
             LinearLayout.LayoutParams.WrapContent
         );
@@ -66,7 +66,7 @@ internal class ContextMenuItemView : LinearLayout
 
         AddView(
             _divider,
-            new LinearLayout.LayoutParams(
+            new LayoutParams(
                 LinearLayout.LayoutParams.MatchParent,
                 ViewUtils.DpToPx(1)
             )
@@ -78,7 +78,7 @@ internal class ContextMenuItemView : LinearLayout
 
         var layout = new LinearLayout(_context)
         {
-            LayoutParameters = new LinearLayout.LayoutParams(
+            LayoutParameters = new LayoutParams(
                 LinearLayout.LayoutParams.WrapContent,
                 LinearLayout.LayoutParams.WrapContent
             ),
@@ -96,7 +96,7 @@ internal class ContextMenuItemView : LinearLayout
         _text = new TextView(_context)
         {
             DuplicateParentStateEnabled = true,
-            LayoutParameters = new LinearLayout.LayoutParams(
+            LayoutParameters = new LayoutParams(
                 0,
                 LinearLayout.LayoutParams.WrapContent
             )
@@ -109,7 +109,7 @@ internal class ContextMenuItemView : LinearLayout
 
         layout.AddView(_text);
 
-        var p = new LinearLayout.LayoutParams(ViewUtils.DpToPx(24), ViewUtils.DpToPx(24))
+        var p = new LayoutParams(ViewUtils.DpToPx(24), ViewUtils.DpToPx(24))
         {
             MarginStart = ViewUtils.DpToPx(16),
             Gravity = GravityFlags.Right,
@@ -125,7 +125,7 @@ internal class ContextMenuItemView : LinearLayout
 
         AddView(
             layout,
-            new LinearLayout.LayoutParams(
+            new LayoutParams(
                 LinearLayout.LayoutParams.MatchParent,
                 LinearLayout.LayoutParams.WrapContent
             )
@@ -234,7 +234,7 @@ internal class ContextMenuViewAdapter : RecyclerView.Adapter
 
     public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
     {
-        if (holder is ContextMenuViewAdapter.ViewHolder h && h.ItemView is ContextMenuItemView view)
+        if (holder is ViewHolder h && h.ItemView is ContextMenuItemView view)
         {
             var item = _menu.GetItem(position);
             view.SetIsVisible(item.IsVisible);
@@ -264,7 +264,7 @@ internal class ContextMenuViewAdapter : RecyclerView.Adapter
 
     public override void OnViewRecycled(Java.Lang.Object holder)
     {
-        if (holder is ContextMenuViewAdapter.ViewHolder h)
+        if (holder is ViewHolder h)
         {
             h.Clicked -= OnItemClicked;
         }
@@ -286,7 +286,7 @@ internal class ContextMenuViewAdapter : RecyclerView.Adapter
 
         if (itemImpl.HasSubMenu)
         {
-            if (sender is ContextMenuViewAdapter.ViewHolder holder)
+            if (sender is ViewHolder holder)
             {
                 var subMenu = (SubMenuBuilder)itemImpl.SubMenu;
                 SubMenuSelected?.Invoke(
@@ -370,7 +370,7 @@ internal class ContextMenuPopup : PopupWindow
             new CornerRadius(18)
         );
 
-        var s = new Android.Graphics.Drawables.ShapeDrawable(
+        var s = new ShapeDrawable(
             new Android.Graphics.Drawables.Shapes.RoundRectShape(
                 new float[]
                 {

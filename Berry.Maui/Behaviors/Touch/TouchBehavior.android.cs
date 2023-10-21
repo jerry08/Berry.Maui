@@ -7,6 +7,7 @@ using Android.OS;
 using Android.Views;
 using Android.Views.Accessibility;
 using Android.Widget;
+using Berry.Maui.Extensions;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Compatibility.Platform.Android;
 using Microsoft.Maui.Graphics;
@@ -61,7 +62,7 @@ public partial class TouchBehavior
     {
         Element = bindable;
         view = platformView;
-        viewGroup = Berry.Maui.Effects.Extensions.ViewExtensions.GetParentOfType<ViewGroup>(
+        viewGroup = Berry.Maui.Extensions.ViewExtensions.GetParentOfType<ViewGroup>(
             platformView
         );
         if (IsDisabled)

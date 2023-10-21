@@ -1,4 +1,4 @@
-﻿namespace Berry.Maui.Effects.Extensions;
+﻿namespace Berry.Maui.Extensions;
 
 public class ViewExtensions
 {

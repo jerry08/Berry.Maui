@@ -315,7 +315,7 @@ public static partial class ContextMenu
     }
 }
 
-public class ContextMenuInteractionDelegate : UIKit.UIContextMenuInteractionDelegate
+public class ContextMenuInteractionDelegate : UIContextMenuInteractionDelegate
 {
     public override UIContextMenuConfiguration? GetConfigurationForMenu(
         UIContextMenuInteraction interaction,

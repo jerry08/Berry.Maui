@@ -10,9 +10,9 @@ using Microsoft.Maui.Graphics;
 using APoint = Android.Graphics.Point;
 using ARect = Android.Graphics.Rect;
 
-namespace Berry.Maui.Utils;
+namespace Berry.Maui;
 
-public static class ApplicationEx
+public static partial class ApplicationEx
 {
     static APoint realSize = new();
     static APoint displaySize = new();
@@ -78,6 +78,7 @@ public static class ApplicationEx
         return barNotifications?.ToArray() ?? emptyArray;
     }
 
+    // https://stackoverflow.com/questions/48276053/how-can-i-get-status-bar-height-in-xamarin-forms
     public static int GetStatusBarHeight()
     {
         var statusBarHeight = -1;

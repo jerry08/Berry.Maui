@@ -3,7 +3,7 @@ using UIKit;
 
 namespace Berry.Maui;
 
-public static class ApplicationEx
+public static partial class ApplicationEx
 {
     /// <summary>
     /// Checks if the app it fully visible (active) and running. (Foreground)
@@ -29,6 +29,7 @@ public static class ApplicationEx
         return UIApplication.SharedApplication.ApplicationState == UIApplicationState.Inactive;
     }
 
+    // https://stackoverflow.com/questions/57023899/how-to-get-the-status-bar-height-in-ios-13
     public static int GetStatusBarHeight() =>
         //(int)UIApplication.SharedApplication.StatusBarFrame.Height;
         (int)
