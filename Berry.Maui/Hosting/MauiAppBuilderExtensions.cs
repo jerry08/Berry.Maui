@@ -11,15 +11,30 @@ public static class MauiAppBuilderExtensions
 {
     public static MauiAppBuilder UseBerry(this MauiAppBuilder builder)
     {
-        builder.ConfigureMauiHandlers(handlers =>
-        {
-            handlers.AddPlainer();
-            handlers.AddHandler(typeof(AcrylicView), typeof(AcrylicViewHandler));
-        });
-
-        builder.UseMaterialSwitch();
+        builder
+            .UseBottomSheet()
+            .UseAcrylicView()
+            .UseMauiPlainer()
+            .UseInsets()
+            .UseMaterialSwitch();
 
         return builder;
+    }
+
+    public static MauiAppBuilder UseBottomSheet(this MauiAppBuilder builder)
+    {
+        return builder.ConfigureMauiHandlers(handlers =>
+        {
+            handlers.AddHandler<BottomSheet, BottomSheetHandler>();
+        });
+    }
+
+    public static MauiAppBuilder UseAcrylicView(this MauiAppBuilder builder)
+    {
+        return builder.ConfigureMauiHandlers(handlers =>
+        {
+            handlers.AddHandler(typeof(AcrylicView), typeof(AcrylicViewHandler));
+        });
     }
 
     public static MauiAppBuilder UseMauiPlainer(this MauiAppBuilder builder)
@@ -57,55 +72,64 @@ public static class MauiAppBuilderExtensions
 #if ANDROID
             lifecycle.AddAndroid(androidLifecycle =>
             {
-                androidLifecycle.OnApplicationCreate((application) =>
-                {
-                    if (application is IPlatformApplication platformApp)
-                    {
-                        var appInterface = platformApp.Services.GetService<IApplication>();
-
-                        if (appInterface is Application app)
+                androidLifecycle
+                    .OnApplicationCreate(
+                        (application) =>
                         {
-                            Insets.Current.Init(app.MainPage);
+                            if (application is IPlatformApplication platformApp)
+                            {
+                                var appInterface = platformApp.Services.GetService<IApplication>();
+
+                                if (appInterface is Application app)
+                                {
+                                    Insets.Current.Init(app.MainPage);
+                                }
+                            }
                         }
-                    }
-                })
-                .OnPostCreate((activity, bundle) =>
-                {
-                    Insets.Current.InitActivity(activity);
-                });
+                    )
+                    .OnPostCreate(
+                        (activity, bundle) =>
+                        {
+                            Insets.Current.InitActivity(activity);
+                        }
+                    );
             });
 #elif IOS || MACCATALYST
             lifecycle.AddiOS(iOSLifecycle =>
             {
-                iOSLifecycle.FinishedLaunching((application, bundle) =>
-                {
-                    if (application.Delegate is IPlatformApplication platformApp)
+                iOSLifecycle.FinishedLaunching(
+                    (application, bundle) =>
                     {
-                        var appInterface = platformApp.Services.GetService<IApplication>();
-
-                        if (appInterface is Application app)
+                        if (application.Delegate is IPlatformApplication platformApp)
                         {
-                            Insets.Current.Init(app.MainPage);
+                            var appInterface = platformApp.Services.GetService<IApplication>();
+
+                            if (appInterface is Application app)
+                            {
+                                Insets.Current.Init(app.MainPage);
+                            }
                         }
+                        return true;
                     }
-                    return true;
-                });
+                );
             });
 #elif WINDOWS
-        lifecycle.AddWindows(windowsLifecycle =>
+            lifecycle.AddWindows(windowsLifecycle =>
             {
-                windowsLifecycle.OnLaunched((application, bundle) =>
-                {
-                    if (application is IPlatformApplication platformApp)
+                windowsLifecycle.OnLaunched(
+                    (application, bundle) =>
                     {
-                        var appInterface = platformApp.Services.GetService<IApplication>();
-
-                        if (appInterface is Application app)
+                        if (application is IPlatformApplication platformApp)
                         {
-                            Insets.Current.Init(app.MainPage);
+                            var appInterface = platformApp.Services.GetService<IApplication>();
+
+                            if (appInterface is Application app)
+                            {
+                                Insets.Current.Init(app.MainPage);
+                            }
                         }
                     }
-                });
+                );
             });
 #endif
         });
