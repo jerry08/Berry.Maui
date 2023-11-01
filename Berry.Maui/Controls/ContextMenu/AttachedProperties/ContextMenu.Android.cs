@@ -359,7 +359,6 @@ public class OnClickListener : Java.Lang.Object, IOnClickListener
     private BindableObject _contextOwner;
 
     public OnClickListener(BindableObject propertyOnwer, BindableObject contextOwner)
-        : base()
     {
         _propertyOwner = propertyOnwer;
         _contextOwner = contextOwner;
@@ -386,7 +385,6 @@ public class MenuActionListener
         BindableObject contextOwner,
         AView target
     )
-        : base()
     {
         _propertyOwner = propertyOnwer;
         _contextOwner = contextOwner;

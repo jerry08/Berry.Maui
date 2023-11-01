@@ -17,5 +17,5 @@ public partial class Preview : Element
     Color backgroundColor;
 
     [AutoBindable]
-    Thickness padding = new Thickness();
+    Thickness padding = new();
 }

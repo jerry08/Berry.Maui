@@ -5,7 +5,6 @@ namespace Berry.Maui.Controls;
 public class InsetsView : ContentView
 {
     public InsetsView()
-        : base()
     {
         SetBinding(
             PaddingProperty,
@@ -17,7 +16,6 @@ public class InsetsView : ContentView
 public class TopInsetView : ContentView
 {
     public TopInsetView()
-        : base()
     {
         SetBinding(
             PaddingProperty,
@@ -29,7 +27,6 @@ public class TopInsetView : ContentView
 public class BottomInsetView : ContentView
 {
     public BottomInsetView()
-        : base()
     {
         SetBinding(
             PaddingProperty,

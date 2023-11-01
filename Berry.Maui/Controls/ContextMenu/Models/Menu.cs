@@ -11,7 +11,6 @@ public partial class Menu : MenuElement
     readonly ObservableCollection<MenuElement> children;
 
     public Menu()
-        : base()
     {
         Children = new ObservableCollection<MenuElement>();
     }

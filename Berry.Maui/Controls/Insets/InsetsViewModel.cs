@@ -118,9 +118,9 @@ public partial class Insets : BindableObject
 
     static partial void PlatformInit(Page page);
 
-    public static Insets Current = new Insets();
+    public static Insets Current = new();
 
-    Thickness _insets = new Thickness(0);
+    Thickness _insets = new(0);
 
     internal void SetEnabled(bool enabled)
     {

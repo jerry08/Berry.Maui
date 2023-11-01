@@ -7,7 +7,6 @@ namespace Berry.Maui.Controls;
 public class CollectionViewHandler : ReorderableItemsViewHandler<ReorderableItemsView>
 {
     public CollectionViewHandler()
-        : base()
     {
         ReorderableItemsViewMapper.ModifyMapping(
             SelectableItemsView.SelectionModeProperty.PropertyName,
@@ -33,5 +32,5 @@ public class CollectionViewHandler : ReorderableItemsViewHandler<ReorderableItem
     protected override CollectionViewController CreateController(
         ReorderableItemsView itemsView,
         ItemsViewLayout layout
-    ) => new CollectionViewController(itemsView, layout);
+    ) => new(itemsView, layout);
 }

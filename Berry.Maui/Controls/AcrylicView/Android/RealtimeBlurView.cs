@@ -461,11 +461,11 @@ public class RealtimeBlurView : View
                 // when taking screenshots, resulting in blurred edges.
                 var x =
                     _borderThickness.Left > 0
-                        ? (float)(locations[0] + _borderThickness.Left * _density)
+                        ? (float)(locations[0] + (_borderThickness.Left * _density))
                         : locations[0];
                 var y =
                     _borderThickness.Top > 0
-                        ? (float)(locations[1] + _borderThickness.Top * _density)
+                        ? (float)(locations[1] + (_borderThickness.Top * _density))
                         : locations[1];
 
                 // just erase transparent

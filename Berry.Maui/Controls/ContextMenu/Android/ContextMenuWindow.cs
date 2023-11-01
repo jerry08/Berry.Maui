@@ -36,7 +36,7 @@ internal class ContextMenuBackgroundView : FrameLayout
             .05f
         );
         Background = new ColorDrawable(color.ToPlatform());
-        Background.Alpha = (int)Math.Round(255 - opacity * 255);
+        Background.Alpha = (int)Math.Round(255 - (opacity * 255));
     }
 
     public override bool OnTouchEvent(MotionEvent e)
@@ -91,8 +91,8 @@ internal class CustomOutline : ViewOutlineProvider
             var bounds = new Microsoft.Maui.Graphics.Rect(
                 _preview.Padding.Left,
                 _preview.Padding.Top,
-                _width / density - _preview.Padding.HorizontalThickness,
-                _height / density - _preview.Padding.VerticalThickness
+                (_width / density) - _preview.Padding.HorizontalThickness,
+                (_height / density) - _preview.Padding.VerticalThickness
             );
             outline.SetPath(
                 _preview.VisiblePath.PathForBounds(bounds).AsAndroidPath(0, 0, density, density)
@@ -367,11 +367,11 @@ internal class ContextMenuWindow
         float x = pos[0];
         float y = pos[1];
 
-        var cX = (int)Math.Round(x + _parent.Width / 2);
-        var cY = (int)Math.Round(y + _parent.Height / 2);
+        var cX = (int)Math.Round(x + (_parent.Width / 2));
+        var cY = (int)Math.Round(y + (_parent.Height / 2));
 
-        _content.SetX(cX - _content.MeasuredWidth / 2);
-        _content.SetY(cY - _content.MeasuredHeight / 2);
+        _content.SetX(cX - (_content.MeasuredWidth / 2));
+        _content.SetY(cY - (_content.MeasuredHeight / 2));
     }
 }
 

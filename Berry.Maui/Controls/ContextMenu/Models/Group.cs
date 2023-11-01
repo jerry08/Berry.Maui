@@ -11,7 +11,6 @@ public partial class Group : MenuElement
     ObservableCollection<MenuElement> children;
 
     public Group()
-        : base()
     {
         Children = new ObservableCollection<MenuElement>();
     }

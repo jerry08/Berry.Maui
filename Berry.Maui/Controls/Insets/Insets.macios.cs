@@ -11,7 +11,7 @@ namespace Berry.Maui.Controls;
 public partial class Insets
 {
     public Thickness NegativeInsetsThickness =>
-        new Thickness(
+        new(
             -InsetsThickness.Left,
             -InsetsThickness.Top,
             -InsetsThickness.Right,
