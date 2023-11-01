@@ -819,7 +819,7 @@ sealed class GestureManager : IDisposable
         return element?.RotateYTo(rotationY, (uint)Abs(duration), easing) ?? Task.FromResult(false);
     }
 
-    Color? GetBackgroundColor(Color? color) => color is not null ? color : defaultBackgroundColor;
+    Color? GetBackgroundColor(Color? color) => color ?? defaultBackgroundColor;
 
     Task RunAnimationTask(
         TouchBehavior sender,
