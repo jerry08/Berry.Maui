@@ -3,7 +3,7 @@ using Android.Content;
 using Android.Graphics.Drawables;
 using AView = Android.Views.View;
 
-namespace Berry.Maui;
+namespace Berry.Maui.Controls;
 internal class BottomSheetBackdrop : AView
 {
     public BottomSheetBackdrop(Context context) : base(context)

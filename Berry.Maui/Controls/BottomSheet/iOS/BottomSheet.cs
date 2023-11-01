@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using UIKit;
 
-namespace Berry.Maui;
+namespace Berry.Maui.Controls;
 
 public partial class BottomSheet
 {

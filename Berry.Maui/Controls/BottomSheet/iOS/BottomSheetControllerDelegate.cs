@@ -1,7 +1,7 @@
 ﻿using System.Runtime.Versioning;
 using UIKit;
 
-namespace Berry.Maui;
+namespace Berry.Maui.Controls;
 
 [SupportedOSPlatform("ios15.0")]
 internal class BottomSheetControllerDelegate : UISheetPresentationControllerDelegate

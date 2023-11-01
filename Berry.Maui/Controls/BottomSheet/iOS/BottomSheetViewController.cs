@@ -8,7 +8,7 @@ using Microsoft.Maui.Graphics;
 using Microsoft.Maui.Platform;
 using UIKit;
 
-namespace Berry.Maui;
+namespace Berry.Maui.Controls;
 
 public class BottomSheetViewController : UIViewController
 {

@@ -1,7 +1,7 @@
 ﻿using Maui.BindableProperty.Generator.Core;
 using Microsoft.Maui.Controls;
 
-namespace Berry.Maui;
+namespace Berry.Maui.Controls;
 
 [ContentProperty(nameof(Ratio))]
 public partial class RatioDetent : Detent

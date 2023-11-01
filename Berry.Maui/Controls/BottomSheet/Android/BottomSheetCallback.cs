@@ -1,8 +1,8 @@
-﻿using AView = Android.Views.View;
+﻿using System;
 using Google.Android.Material.BottomSheet;
-using System;
+using AView = Android.Views.View;
 
-namespace Berry.Maui;
+namespace Berry.Maui.Controls;
 
 public class BottomSheetCallback : BottomSheetBehavior.BottomSheetCallback
 {

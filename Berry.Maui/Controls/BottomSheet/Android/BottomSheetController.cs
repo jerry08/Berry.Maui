@@ -1,25 +1,24 @@
-﻿using Android.Views;
-using Microsoft.Maui.Platform;
-using Google.Android.Material.BottomSheet;
-using Android.Widget;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Android.Content;
 using Android.Content.Res;
+using Android.Graphics.Drawables;
+using Android.Views;
+using Android.Widget;
+using AndroidX.AppCompat.App;
+using AndroidX.Core.View;
+using Google.Android.Material.BottomSheet;
+using Google.Android.Material.Color;
+using Google.Android.Material.Internal;
+using Microsoft.Maui;
+using Microsoft.Maui.Devices;
+using Microsoft.Maui.Graphics;
+using Microsoft.Maui.Platform;
 using AView = Android.Views.View;
 using AWindow = Android.Views.Window;
-using AndroidX.Core.View;
-using AndroidX.AppCompat.App;
-using Google.Android.Material.Internal;
-using Google.Android.Material.Color;
-using Android.Graphics.Drawables;
-using Android.Content;
-using Insets = AndroidX.Core.Graphics.Insets;
-using System;
-using System.Collections.Generic;
-using Microsoft.Maui;
-using System.Linq;
-using Microsoft.Maui.Graphics;
-using Microsoft.Maui.Devices;
 
-namespace Berry.Maui;
+namespace Berry.Maui.Controls;
 
 public class BottomSheetController
 {
@@ -421,7 +420,7 @@ public class BottomSheetController
         }
     }
 
-    Insets Insets
+    AndroidX.Core.Graphics.Insets Insets
     {
         get
         {
@@ -431,7 +430,7 @@ public class BottomSheetController
                 return insets.GetInsetsIgnoringVisibility(Android.Views.WindowInsets.Type.SystemBars());
             }
 #pragma warning disable CS0618
-            return Insets.Of(insets.StableInsetLeft, insets.StableInsetTop, insets.StableInsetRight, insets.StableInsetBottom);
+            return AndroidX.Core.Graphics.Insets.Of(insets.StableInsetLeft, insets.StableInsetTop, insets.StableInsetRight, insets.StableInsetBottom);
 #pragma warning restore CS0618
         }
     }

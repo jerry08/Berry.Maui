@@ -1,6 +1,6 @@
 ﻿using Microsoft.Maui.Controls;
 
-namespace Berry.Maui;
+namespace Berry.Maui.Controls;
 
 internal partial class BottomSheetManager
 {

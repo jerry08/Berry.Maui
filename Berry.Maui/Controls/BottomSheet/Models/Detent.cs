@@ -1,7 +1,7 @@
 ﻿using Maui.BindableProperty.Generator.Core;
 using Microsoft.Maui.Controls;
 
-namespace Berry.Maui;
+namespace Berry.Maui.Controls;
 
 public abstract partial class Detent : BindableObject
 {

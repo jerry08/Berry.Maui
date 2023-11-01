@@ -3,7 +3,7 @@ using CoreGraphics;
 using Microsoft.Maui.Platform;
 using UIKit;
 
-namespace Berry.Maui;
+namespace Berry.Maui.Controls;
 
 internal class BottomSheetContainer : UIView
 {

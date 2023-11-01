@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Graphics;
 
-namespace Berry.Maui;
+namespace Berry.Maui.Controls;
 
 public enum DismissOrigin
 {

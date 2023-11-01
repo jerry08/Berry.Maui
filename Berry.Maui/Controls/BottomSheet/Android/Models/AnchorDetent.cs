@@ -2,7 +2,7 @@
 using Microsoft.Maui.Devices;
 using AView = Android.Views.View;
 
-namespace Berry.Maui;
+namespace Berry.Maui.Controls;
 
 public partial class AnchorDetent : Detent
 {

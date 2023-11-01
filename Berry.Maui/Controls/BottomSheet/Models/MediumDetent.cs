@@ -1,4 +1,4 @@
-﻿namespace Berry.Maui;
+﻿namespace Berry.Maui.Controls;
 
 public class MediumDetent : RatioDetent
 {

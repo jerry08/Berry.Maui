@@ -1,6 +1,6 @@
 ﻿using Android.Graphics.Drawables;
 
-namespace Berry.Maui;
+namespace Berry.Maui.Controls;
 
 internal class SheetRadiusDrawable: GradientDrawable
 {

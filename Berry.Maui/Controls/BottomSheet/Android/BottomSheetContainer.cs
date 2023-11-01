@@ -1,9 +1,9 @@
-﻿using Android.Views;
+﻿using Android.Content;
+using Android.Views;
 using Android.Widget;
 using AView = Android.Views.View;
-using Android.Content;
 
-namespace Berry.Maui;
+namespace Berry.Maui.Controls;
 
 internal class BottomSheetContainer : FrameLayout
 {

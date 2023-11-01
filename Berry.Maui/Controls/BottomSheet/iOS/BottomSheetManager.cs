@@ -1,12 +1,12 @@
-﻿using Foundation;
-using Microsoft.Maui.ApplicationModel;
-using Microsoft.Maui.Controls;
-using System;
+﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Foundation;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Controls;
 using UIKit;
 
-namespace Berry.Maui;
+namespace Berry.Maui.Controls;
 
 internal partial class BottomSheetManager
 {

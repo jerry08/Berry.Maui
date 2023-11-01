@@ -1,7 +1,7 @@
 ﻿using Microsoft.Maui.Graphics;
 using AView = Android.Views.View;
 
-namespace Berry.Maui;
+namespace Berry.Maui.Controls;
 
 internal static class ViewExtensions
 {

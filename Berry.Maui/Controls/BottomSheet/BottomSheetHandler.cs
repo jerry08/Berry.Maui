@@ -11,7 +11,7 @@ using PlatformView = System.Object;
 #endif
 
 
-namespace Berry.Maui;
+namespace Berry.Maui.Controls;
 
 public partial class BottomSheetHandler : ContentViewHandler
 {
