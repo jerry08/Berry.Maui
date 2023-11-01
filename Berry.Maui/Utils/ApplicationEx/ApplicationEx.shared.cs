@@ -1,10 +1,13 @@
 ﻿using Microsoft.Maui;
+using Microsoft.Maui.Devices;
 
 namespace Berry.Maui;
 
 // Copied from https://github.com/dotnet/maui/blob/main/src/Controls/src/Core/Application/Application.cs
 public static partial class ApplicationEx
 {
+    public static partial void SetOrientation(DisplayOrientation orientation);
+
     public static bool IsApplicationOrNull(object? element) =>
         element is null or IApplication;
 

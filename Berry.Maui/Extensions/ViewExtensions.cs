@@ -31,7 +31,7 @@ public static partial class ViewExtensions
     internal static Vector3 ExtractPosition(this Matrix4x4 matrix) => matrix.Translation;
 
     internal static Vector3 ExtractScale(this Matrix4x4 matrix) =>
-        new Vector3(matrix.M11, matrix.M22, matrix.M33);
+        new(matrix.M11, matrix.M22, matrix.M33);
 
     internal static double ExtractAngleInRadians(this Matrix4x4 matrix) =>
         Math.Atan2(matrix.M21, matrix.M11);

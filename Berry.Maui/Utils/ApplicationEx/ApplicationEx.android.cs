@@ -2,10 +2,12 @@
 using System.Linq;
 using Android.App;
 using Android.Content;
+using Android.Content.PM;
 using Android.OS;
 using Android.Service.Notification;
 using Android.Views;
 using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Devices;
 using Microsoft.Maui.Graphics;
 using APoint = Android.Graphics.Point;
 using ARect = Android.Graphics.Rect;
@@ -17,6 +19,24 @@ public static partial class ApplicationEx
     static APoint realSize = new();
     static APoint displaySize = new();
     static ARect contentRect = new();
+
+    public static partial void SetOrientation(DisplayOrientation orientation)
+    {
+        if (
+            Platform.CurrentActivity is null
+            || Build.VERSION.SdkInt >= BuildVersionCodes.Gingerbread
+        )
+        {
+            return;
+        }
+
+        Platform.CurrentActivity.RequestedOrientation = orientation switch
+        {
+            DisplayOrientation.Landscape => ScreenOrientation.Landscape,
+            DisplayOrientation.Portrait => ScreenOrientation.Portrait,
+            _ => ScreenOrientation.Unspecified
+        };
+    }
 
     /// <summary>
     /// Checks if the app it fully visible (active) and running. (Foreground)
