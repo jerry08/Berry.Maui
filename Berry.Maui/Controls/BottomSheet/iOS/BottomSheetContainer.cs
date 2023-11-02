@@ -24,8 +24,11 @@ internal class BottomSheetContainer : UIView
         var window = UIApplication.SharedApplication.KeyWindow;
         var topPadding = window?.SafeAreaInsets.Top ?? 0;
         var maximumDetentValue = heightConstraint - topPadding - SheetTopSpacing;
-        
-        return _sheet.GetEnabledDetents().Select(d => d.GetHeight(_sheet, maximumDetentValue)).Max();
+
+        return _sheet
+            .GetEnabledDetents()
+            .Select(d => d.GetHeight(_sheet, maximumDetentValue))
+            .Max();
     }
 
     internal BottomSheetContainer(BottomSheet sheet, UIView view)
@@ -34,6 +37,7 @@ internal class BottomSheetContainer : UIView
         _view = view;
         AddSubview(_view);
     }
+
     public override void LayoutSubviews()
     {
         base.LayoutSubviews();
@@ -43,4 +47,3 @@ internal class BottomSheetContainer : UIView
         _sheet.Controller.Layout();
     }
 }
-

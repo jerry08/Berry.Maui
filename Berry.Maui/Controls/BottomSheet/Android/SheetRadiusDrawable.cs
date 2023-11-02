@@ -2,12 +2,9 @@
 
 namespace Berry.Maui.Controls;
 
-internal class SheetRadiusDrawable: GradientDrawable
+internal class SheetRadiusDrawable : GradientDrawable
 {
-    public SheetRadiusDrawable()
-    {
-        
-    }
+    public SheetRadiusDrawable() { }
 
     internal void SetCornerRadius(int radius)
     {

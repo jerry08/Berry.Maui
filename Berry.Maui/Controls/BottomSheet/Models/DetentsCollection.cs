@@ -2,6 +2,4 @@
 
 namespace Berry.Maui.Controls;
 
-public class DetentsCollection: List<Detent>
-{
-}
+public class DetentsCollection : List<Detent> { }

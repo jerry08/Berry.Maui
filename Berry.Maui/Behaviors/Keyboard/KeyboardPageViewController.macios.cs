@@ -11,8 +11,7 @@ namespace Berry.Maui.Behaviors;
 public class KeyboardPageViewController : PageViewController
 {
     bool _hasRegistrations;
-    readonly List<WeakReference<KeyboardBehavior>> _keyboardBehaviors =
-        new();
+    readonly List<WeakReference<KeyboardBehavior>> _keyboardBehaviors = new();
 
     internal KeyboardPageViewController(IView page, IMauiContext mauiContext)
         : base(page, mauiContext) { }

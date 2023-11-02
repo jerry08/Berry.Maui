@@ -66,10 +66,7 @@ internal class ContextMenuItemView : LinearLayout
 
         AddView(
             _divider,
-            new LayoutParams(
-                LinearLayout.LayoutParams.MatchParent,
-                ViewUtils.DpToPx(1)
-            )
+            new LayoutParams(LinearLayout.LayoutParams.MatchParent, ViewUtils.DpToPx(1))
             {
                 TopMargin = ViewUtils.DpToPx(4),
                 BottomMargin = ViewUtils.DpToPx(4),
@@ -96,10 +93,7 @@ internal class ContextMenuItemView : LinearLayout
         _text = new TextView(_context)
         {
             DuplicateParentStateEnabled = true,
-            LayoutParameters = new LayoutParams(
-                0,
-                LinearLayout.LayoutParams.WrapContent
-            )
+            LayoutParameters = new LayoutParams(0, LinearLayout.LayoutParams.WrapContent)
             {
                 Weight = 1
             },

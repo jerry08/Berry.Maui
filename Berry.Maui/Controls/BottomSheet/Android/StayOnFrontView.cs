@@ -7,7 +7,8 @@ namespace Berry.Maui.Controls;
 
 internal class StayOnFrontView : FrameLayout
 {
-    public StayOnFrontView(Context context) : base(context) {}
+    public StayOnFrontView(Context context)
+        : base(context) { }
 
     protected override void OnAttachedToWindow()
     {
@@ -19,11 +20,12 @@ internal class StayOnFrontView : FrameLayout
         }
     }
 
-    void ParentChildViewAdded(object sender, ViewGroup.ChildViewAddedEventArgs e)
+    void ParentChildViewAdded(object? sender, ViewGroup.ChildViewAddedEventArgs e)
     {
         BringToFront();
     }
-    void ParentChildViewRemoved(object sender, ViewGroup.ChildViewRemovedEventArgs e)
+
+    void ParentChildViewRemoved(object? sender, ViewGroup.ChildViewRemovedEventArgs e)
     {
         BringToFront();
     }

@@ -3,7 +3,7 @@ using Microsoft.Maui.Controls;
 
 namespace Berry.Maui.Controls;
 
-public partial class AnchorDetent: Detent
+public partial class AnchorDetent : Detent
 {
     double _height = 0;
 #pragma warning disable CS0169

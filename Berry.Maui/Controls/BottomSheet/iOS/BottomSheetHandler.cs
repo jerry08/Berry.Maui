@@ -8,6 +8,7 @@ public partial class BottomSheetHandler
     {
         view.Controller.UpdateBackground();
     }
+
     partial void PlatformUpdateHandleColor(BottomSheet view)
     {
         // Not supported on iOS
@@ -34,6 +35,7 @@ public partial class BottomSheetHandler
             view.Controller.UpdateSelectedDetent();
         }
     }
+
     partial void PlatformUpdateCornerRadius(BottomSheet view)
     {
         view.Controller.UpdateCornerRadius(view.CornerRadius);

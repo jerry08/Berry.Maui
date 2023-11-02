@@ -38,13 +38,15 @@ public class BottomSheetViewController : UIViewController
 
         cv.TranslatesAutoresizingMaskIntoConstraints = false;
 
-        NSLayoutConstraint.ActivateConstraints(new[]
-        {
-            cv.TopAnchor.ConstraintEqualTo(View.TopAnchor),
-            cv.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
-            cv.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
-            cv.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
-        });
+        NSLayoutConstraint.ActivateConstraints(
+            new[]
+            {
+                cv.TopAnchor.ConstraintEqualTo(View.TopAnchor),
+                cv.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
+                cv.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
+                cv.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
+            }
+        );
 
         UpdateBackground();
         _sheet.NotifyShowing();
@@ -68,6 +70,7 @@ public class BottomSheetViewController : UIViewController
             SheetPresentationController.InvalidateDetents();
         }
     }
+
     internal void UpdateBackground()
     {
         if (_sheet?.BackgroundBrush != null)
@@ -83,6 +86,7 @@ public class BottomSheetViewController : UIViewController
             }
         }
     }
+
     public override void ViewDidLayoutSubviews()
     {
         base.ViewDidLayoutSubviews();
@@ -112,7 +116,9 @@ public class BottomSheetViewController : UIViewController
         }
         SheetPresentationController.AnimateChanges(() =>
         {
-            SheetPresentationController.SelectedDetentIdentifier = GetIdentifierForDetent(_sheet.SelectedDetent);
+            SheetPresentationController.SelectedDetentIdentifier = GetIdentifierForDetent(
+                _sheet.SelectedDetent
+            );
         });
     }
 
@@ -126,8 +132,12 @@ public class BottomSheetViewController : UIViewController
         var detents = _sheet.GetEnabledDetents();
         return SheetPresentationController.SelectedDetentIdentifier switch
         {
-            UISheetPresentationControllerDetentIdentifier.Medium => detents.FirstOrDefault(d => d is RatioDetent ratioDetent && ratioDetent.Ratio == .5f),
-            UISheetPresentationControllerDetentIdentifier.Large => detents.FirstOrDefault(d => d is FullscreenDetent),
+            UISheetPresentationControllerDetentIdentifier.Medium
+                => detents.FirstOrDefault(
+                    d => d is RatioDetent ratioDetent && ratioDetent.Ratio == .5f
+                ),
+            UISheetPresentationControllerDetentIdentifier.Large
+                => detents.FirstOrDefault(d => d is FullscreenDetent),
             UISheetPresentationControllerDetentIdentifier.Unknown or _ => null,
         };
     }
@@ -147,4 +157,3 @@ public class BottomSheetViewController : UIViewController
         SheetPresentationController.PreferredCornerRadius = (NFloat)cornerRadius;
     }
 }
-

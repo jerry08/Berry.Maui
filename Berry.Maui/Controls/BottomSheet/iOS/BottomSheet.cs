@@ -8,6 +8,4 @@ public partial class BottomSheet
 
     // Cache the calculated detents as iOS likes to ask for detents often
     internal readonly IDictionary<int, float> CachedDetents = new Dictionary<int, float>();
-
-    
 }

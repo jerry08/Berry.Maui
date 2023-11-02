@@ -13,7 +13,8 @@ internal class BottomSheetContainer : FrameLayout
     public AView ContentView => _contentView;
     public BottomSheetBackdrop Backdrop => _backdrop;
 
-    public BottomSheetContainer(Context context, AView contentView) : base(context)
+    public BottomSheetContainer(Context context, AView contentView)
+        : base(context)
     {
         _contentView = contentView;
         _backdrop = new BottomSheetBackdrop(context);

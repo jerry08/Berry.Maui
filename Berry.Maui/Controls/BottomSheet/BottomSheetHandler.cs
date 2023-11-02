@@ -10,20 +10,21 @@ using PlatformView = Android.Views.View;
 using PlatformView = System.Object;
 #endif
 
-
 namespace Berry.Maui.Controls;
 
 public partial class BottomSheetHandler : ContentViewHandler
 {
-    public static new IPropertyMapper<BottomSheet, BottomSheetHandler> Mapper =
-        new PropertyMapper<BottomSheet, BottomSheetHandler>(ContentViewHandler.Mapper)
-        {
-            [nameof(IContentView.Background)] = MapBackground,
-            [nameof(BottomSheet.HandleColor)] = MapHandleColor,
-            [nameof(BottomSheet.HasBackdrop)] = MapHasBackdrop,
-            [nameof(BottomSheet.SelectedDetent)] = MapSelectedDetent,
-            [nameof(BottomSheet.CornerRadius)] = MapCornerRadius,
-        };
+    public static new IPropertyMapper<BottomSheet, BottomSheetHandler> Mapper = new PropertyMapper<
+        BottomSheet,
+        BottomSheetHandler
+    >(ContentViewHandler.Mapper)
+    {
+        [nameof(IContentView.Background)] = MapBackground,
+        [nameof(BottomSheet.HandleColor)] = MapHandleColor,
+        [nameof(BottomSheet.HasBackdrop)] = MapHasBackdrop,
+        [nameof(BottomSheet.SelectedDetent)] = MapSelectedDetent,
+        [nameof(BottomSheet.CornerRadius)] = MapCornerRadius,
+    };
 
     static void MapCornerRadius(BottomSheetHandler handler, BottomSheet sheet)
     {
@@ -41,10 +42,7 @@ public partial class BottomSheetHandler : ContentViewHandler
     }
 
     public static new CommandMapper<BottomSheet, BottomSheetHandler> CommandMapper =
-        new(ContentViewHandler.CommandMapper)
-        {
-            [nameof(BottomSheet.DismissAsync)] = MapDismiss,
-        };
+        new(ContentViewHandler.CommandMapper) { [nameof(BottomSheet.DismissAsync)] = MapDismiss, };
 
     static void MapDismiss(BottomSheetHandler handler, BottomSheet view, object? request)
     {
@@ -62,27 +60,26 @@ public partial class BottomSheetHandler : ContentViewHandler
     }
 
     partial void PlatformMapSelectedDetent(BottomSheet view);
+
     partial void PlatformUpdateHandleColor(BottomSheet view);
+
     partial void PlatformUpdateHasBackdrop(BottomSheet view);
+
     partial void PlatformUpdateSelectedDetent(BottomSheet view);
+
     partial void PlatformUpdateCornerRadius(BottomSheet view);
+
     partial void Dismiss(BottomSheet view, object request);
 
-    public BottomSheetHandler() : base(Mapper, CommandMapper)
-    {
-    }
+    public BottomSheetHandler()
+        : base(Mapper, CommandMapper) { }
 
     public BottomSheetHandler(IPropertyMapper? mapper)
-        : base(mapper ?? Mapper, CommandMapper)
-    {
-    }
+        : base(mapper ?? Mapper, CommandMapper) { }
 
     public BottomSheetHandler(IPropertyMapper? mapper, CommandMapper? commandMapper)
-        : base(mapper ?? Mapper, commandMapper ?? CommandMapper)
-    {
-    }
+        : base(mapper ?? Mapper, commandMapper ?? CommandMapper) { }
 
     new BottomSheet? VirtualView { get; }
     new PlatformView? PlatformView { get; }
-
 }

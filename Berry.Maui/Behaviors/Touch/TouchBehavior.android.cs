@@ -62,9 +62,7 @@ public partial class TouchBehavior
     {
         Element = bindable;
         view = platformView;
-        viewGroup = Berry.Maui.Extensions.ViewExtensions.GetParentOfType<ViewGroup>(
-            platformView
-        );
+        viewGroup = Berry.Maui.Extensions.ViewExtensions.GetParentOfType<ViewGroup>(platformView);
         if (IsDisabled)
         {
             return;

@@ -8,8 +8,7 @@ public static partial class ApplicationEx
 {
     public static partial void SetOrientation(DisplayOrientation orientation);
 
-    public static bool IsApplicationOrNull(object? element) =>
-        element is null or IApplication;
+    public static bool IsApplicationOrNull(object? element) => element is null or IApplication;
 
     public static bool IsApplicationOrWindowOrNull(object? element) =>
         element is null or IApplication or IWindow;

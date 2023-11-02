@@ -11,12 +11,7 @@ public static class MauiAppBuilderExtensions
 {
     public static MauiAppBuilder UseBerry(this MauiAppBuilder builder)
     {
-        builder
-            .UseBottomSheet()
-            .UseAcrylicView()
-            .UseMauiPlainer()
-            .UseInsets()
-            .UseMaterialSwitch();
+        builder.UseBottomSheet().UseAcrylicView().UseMauiPlainer().UseInsets().UseMaterialSwitch();
 
         return builder;
     }

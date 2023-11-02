@@ -7,10 +7,10 @@ internal static class ViewExtensions
 {
     internal static Point GetLocationOnScreen(this AView view)
     {
-        int[] location = new int[2];
+        var location = new int[2];
         view.GetLocationOnScreen(location);
-        int x = location[0];
-        int y = location[1];
+        var x = location[0];
+        var y = location[1];
 
         return new Point(x, y);
     }

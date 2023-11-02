@@ -10,10 +10,17 @@ namespace Berry.Maui.Extensions;
 // Copied from https://github.com/dotnet/maui/blob/main/src/Controls/src/Core/ViewExtensions.cs
 public static partial class ViewExtensions
 {
-    public static IMauiContext RequireMauiContext(this Element element, bool fallbackToAppMauiContext = false)
-        => element.FindMauiContext(fallbackToAppMauiContext) ?? throw new InvalidOperationException($"{nameof(IMauiContext)} not found.");
+    public static IMauiContext RequireMauiContext(
+        this Element element,
+        bool fallbackToAppMauiContext = false
+    ) =>
+        element.FindMauiContext(fallbackToAppMauiContext)
+        ?? throw new InvalidOperationException($"{nameof(IMauiContext)} not found.");
 
-    public static IMauiContext? FindMauiContext(this Element element, bool fallbackToAppMauiContext = false)
+    public static IMauiContext? FindMauiContext(
+        this Element element,
+        bool fallbackToAppMauiContext = false
+    )
     {
         if (element is IElement fe && fe.Handler?.MauiContext != null)
             return fe.Handler.MauiContext;
@@ -27,13 +34,22 @@ public static partial class ViewExtensions
         return fallbackToAppMauiContext ? Application.Current?.FindMauiContext() : default;
     }
 
-    public static IFontManager RequireFontManager(this Element element, bool fallbackToAppMauiContext = false)
-        => element.RequireMauiContext(fallbackToAppMauiContext).Services.GetRequiredService<IFontManager>();
+    public static IFontManager RequireFontManager(
+        this Element element,
+        bool fallbackToAppMauiContext = false
+    ) =>
+        element
+            .RequireMauiContext(fallbackToAppMauiContext)
+            .Services.GetRequiredService<IFontManager>();
 
-    public static double GetDefaultFontSize(this Element element)
-        => element.FindMauiContext()?.Services?.GetService<IFontManager>()?.DefaultFontSize ?? 0d;
+    public static double GetDefaultFontSize(this Element element) =>
+        element.FindMauiContext()?.Services?.GetService<IFontManager>()?.DefaultFontSize ?? 0d;
 
-    internal static Element? FindParentWith(this Element element, Func<Element, bool> withMatch, bool includeThis = false)
+    internal static Element? FindParentWith(
+        this Element element,
+        Func<Element, bool> withMatch,
+        bool includeThis = false
+    )
     {
         if (includeThis && withMatch(element))
             return element;

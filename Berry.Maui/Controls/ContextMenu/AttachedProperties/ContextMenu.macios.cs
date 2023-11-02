@@ -39,9 +39,7 @@ public static partial class ContextMenu
                 AttachControlMenu(button, ve);
             }
         }
-        if (
-            bindable is not CollectionView and VisualElement visualElement
-        )
+        if (bindable is not CollectionView and VisualElement visualElement)
         {
             if (!GetShowMenuOnClick(visualElement))
             {
@@ -60,9 +58,7 @@ public static partial class ContextMenu
 
     static partial void SetupClickCommand(BindableObject bindable)
     {
-        if (
-            bindable is not CollectionView and VisualElement visualElement
-        )
+        if (bindable is not CollectionView and VisualElement visualElement)
         {
             // Already setup, the correct command is read on click, no need to re-setup
             if (bindable.GetValue(TapGestureRecognizerProperty) != null)

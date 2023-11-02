@@ -17,5 +17,6 @@ internal partial class BottomSheetManager
     }
 
     static partial void PlatformShow(Window window, BottomSheet sheet, bool animated);
+
     static partial void PlatformLayout(BottomSheet sheet);
 }

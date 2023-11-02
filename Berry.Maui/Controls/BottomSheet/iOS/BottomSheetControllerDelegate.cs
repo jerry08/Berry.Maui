@@ -12,15 +12,17 @@ internal class BottomSheetControllerDelegate : UISheetPresentationControllerDele
     {
         _sheet = sheet;
     }
+
     public override void DidDismiss(UIPresentationController presentationController)
     {
         _sheet.CachedDetents.Clear();
         _sheet.NotifyDismissed();
     }
 
-    public override void DidChangeSelectedDetentIdentifier(UISheetPresentationController sheetPresentationController)
+    public override void DidChangeSelectedDetentIdentifier(
+        UISheetPresentationController sheetPresentationController
+    )
     {
         ((BottomSheetHandler)_sheet.Handler).UpdateSelectedDetent(_sheet);
     }
 }
-
