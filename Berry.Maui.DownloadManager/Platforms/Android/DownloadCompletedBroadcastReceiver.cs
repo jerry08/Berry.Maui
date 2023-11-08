@@ -14,7 +14,7 @@ public class DownloadCompletedBroadcastReceiver : BroadcastReceiver
     {
         var reference = intent?.GetLongExtra(Android.App.DownloadManager.ExtraDownloadId, -1);
 
-        var downloadFile = CrossDownloadManager.Current.Queue
+        var downloadFile = DownloadCenter.Current.Queue
             .Cast<DownloadFileImplementation>()
             .FirstOrDefault(f => f.Id == reference);
         if (downloadFile == null)
@@ -31,7 +31,7 @@ public class DownloadCompletedBroadcastReceiver : BroadcastReceiver
 
             while (cursor?.MoveToNext() == true)
             {
-                ((DownloadManagerImplementation)CrossDownloadManager.Current).UpdateFileProperties(
+                ((DownloadManagerImplementation)DownloadCenter.Current).UpdateFileProperties(
                     cursor,
                     downloadFile
                 );

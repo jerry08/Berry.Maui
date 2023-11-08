@@ -6,7 +6,7 @@ namespace Berry.Maui;
 /// <summary>
 /// Cross platform DownloadManager implemenations
 /// </summary>
-public static class CrossDownloadManager
+public static class DownloadCenter
 {
     private static readonly Lazy<IDownloadManager?> Implementation =
         new(CreateDownloadManager, System.Threading.LazyThreadSafetyMode.PublicationOnly);

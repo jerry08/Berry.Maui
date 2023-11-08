@@ -152,10 +152,10 @@ public class UrlSessionDownloadDelegate : NSUrlSessionDownloadDelegate
 
     public override void DidFinishEventsForBackgroundSession(NSUrlSession session)
     {
-        var handler = CrossDownloadManager.BackgroundSessionCompletionHandler;
+        var handler = DownloadCenter.BackgroundSessionCompletionHandler;
         if (handler != null)
         {
-            CrossDownloadManager.BackgroundSessionCompletionHandler = null;
+            DownloadCenter.BackgroundSessionCompletionHandler = null;
             handler();
         }
     }
