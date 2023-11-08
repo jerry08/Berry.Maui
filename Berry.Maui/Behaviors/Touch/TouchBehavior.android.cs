@@ -36,8 +36,7 @@ public partial class TouchBehavior
     private AccessibilityListener? accessibilityListener;
 
     private bool IsAccessibilityMode =>
-        accessibilityManager is not null
-        && accessibilityManager.IsEnabled
+        accessibilityManager?.IsEnabled == true
         && accessibilityManager.IsTouchExplorationEnabled;
 
     private readonly bool isAtLeastM = IsAndroidVersionAtLeast((int)BuildVersionCodes.M);
@@ -248,7 +247,7 @@ public partial class TouchBehavior
 
     private void UpdateClickHandler()
     {
-        if (view is null || !view.IsAlive())
+        if (view?.IsAlive() != true)
         {
             return;
         }

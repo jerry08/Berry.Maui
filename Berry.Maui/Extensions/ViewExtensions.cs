@@ -119,7 +119,7 @@ public static partial class ViewExtensions
 
     internal static bool IsThisMyPlatformView(this IElement? element, PlatformView platformView)
     {
-        if (element is not null && element.Handler is IPlatformViewHandler pvh)
+        if (element?.Handler is IPlatformViewHandler pvh)
         {
             return pvh.PlatformView == platformView || pvh.ContainerView == platformView;
         }

@@ -272,7 +272,7 @@ internal class ContextMenuViewAdapter : RecyclerView.Adapter
 
         var itemImpl = (MenuItemImpl)item;
 
-        if (itemImpl == null || !itemImpl.IsEnabled)
+        if (itemImpl?.IsEnabled != true)
         {
             return;
         }

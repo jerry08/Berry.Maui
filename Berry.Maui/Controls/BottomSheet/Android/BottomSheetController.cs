@@ -374,7 +374,7 @@ public class BottomSheetController
 
     static void EnsureStayOnFrontView(Context context)
     {
-        if (_stayOnFront is null || !_stayOnFront.IsAttachedToWindow)
+        if (_stayOnFront?.IsAttachedToWindow != true)
         {
             _stayOnFront = new StayOnFrontView(context);
             var window = ((AppCompatActivity)context).Window;

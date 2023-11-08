@@ -14,6 +14,9 @@ public static class BitmapExtensions
         var width = (int)Math.Round(image.Width * BITMAP_SCALE);
         var height = (int)Math.Round(image.Height * BITMAP_SCALE);
 
+        if (width <= 0 || height <= 0)
+            return image;
+
         //int width = image.Width;
         //int height = image.Height;
 
