@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Berry.Maui.DownloadManager", "Berry.Maui.DownloadManager\Berry.Maui.DownloadManager.csproj", "{D57AB6AA-8F05-48C3-9D9A-864AD02DB9F0}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Berry.Maui.MediaElement", "Berry.Maui.MediaElement\Berry.Maui.MediaElement.csproj", "{34EB28E3-605A-4889-A543-3F8C6521E450}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +32,10 @@ Global
 		{D57AB6AA-8F05-48C3-9D9A-864AD02DB9F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D57AB6AA-8F05-48C3-9D9A-864AD02DB9F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D57AB6AA-8F05-48C3-9D9A-864AD02DB9F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34EB28E3-605A-4889-A543-3F8C6521E450}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34EB28E3-605A-4889-A543-3F8C6521E450}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34EB28E3-605A-4889-A543-3F8C6521E450}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34EB28E3-605A-4889-A543-3F8C6521E450}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
