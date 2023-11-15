@@ -1,4 +1,4 @@
-﻿using Tizen.NUI;
+﻿using Microsoft.Maui.Controls;
 using Tizen.NUI.BaseComponents;
 
 namespace Berry.Maui.Behaviors;
