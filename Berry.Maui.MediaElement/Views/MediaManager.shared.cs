@@ -11,6 +11,7 @@ global using PlatformMediaElement = Berry.Maui.Core.Views.TizenPlayer;
 #endif
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -32,6 +33,10 @@ public partial class MediaManager
     /// <param name="dispatcher">The <see cref="IDispatcher"/> instance that allows propagation to the main thread.</param>
     public MediaManager(IMauiContext context, IMediaElement mediaElement, IDispatcher dispatcher)
     {
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(mediaElement);
+        ArgumentNullException.ThrowIfNull(dispatcher);
+
         MauiContext = context;
         Dispatcher = dispatcher;
         MediaElement = mediaElement;
@@ -58,6 +63,7 @@ public partial class MediaManager
     /// Gets the <see cref="ILogger"/> instance for logging purposes.
     /// </summary>
     protected ILogger Logger { get; }
+
 
 #if ANDROID || IOS || MACCATALYST || WINDOWS || TIZEN
     /// <summary>
@@ -86,9 +92,10 @@ public partial class MediaManager
     /// Invokes the seek operation on the platform element.
     /// </summary>
     /// <param name="position">The position to seek to.</param>
-    public ValueTask Seek(TimeSpan position)
+    /// <param name="token"><see cref="CancellationToken"/> ></param>
+    public Task Seek(TimeSpan position, CancellationToken token = default)
     {
-        return PlatformSeek(position);
+        return PlatformSeek(position, token);
     }
 
     /// <summary>
@@ -186,7 +193,8 @@ public partial class MediaManager
     /// Invokes the platform seek functionality and seeks to a specific position.
     /// </summary>
     /// <param name="position">The position to seek to.</param>
-    protected virtual partial ValueTask PlatformSeek(TimeSpan position);
+    /// <param name="token"><see cref="CancellationToken"/></param>
+    protected virtual partial Task PlatformSeek(TimeSpan position, CancellationToken token);
 
     /// <summary>
     /// Invokes the platform stop functionality and stops media playback.
@@ -238,23 +246,29 @@ public partial class MediaManager
     /// Invokes the platform functionality to update the media playback volume.
     /// </summary>
     protected virtual partial void PlatformUpdateVolume();
+
+    static bool AreFloatingPointNumbersEqual(in double number1, in double number2, double tolerance = 0.01) => Math.Abs(number1 - number2) > tolerance;
 }
 
 #if !(WINDOWS || ANDROID || IOS || MACCATALYST || TIZEN)
 partial class MediaManager
 {
-    protected virtual partial ValueTask PlatformSeek(TimeSpan position) => ValueTask.CompletedTask;
-    protected virtual partial void PlatformPlay() { }
-    protected virtual partial void PlatformPause() { }
-    protected virtual partial void PlatformStop() { }
-    protected virtual partial void PlatformUpdateAspect() { }
-    protected virtual partial void PlatformUpdateSource() { }
-    protected virtual partial void PlatformUpdateSpeed() { }
-    protected virtual partial void PlatformUpdateShouldShowPlaybackControls() { }
-    protected virtual partial void PlatformUpdatePosition() { }
-    protected virtual partial void PlatformUpdateVolume() { }
-    protected virtual partial void PlatformUpdateShouldKeepScreenOn() { }
-    protected virtual partial void PlatformUpdateShouldMute() { }
-    protected virtual partial void PlatformUpdateShouldLoopPlayback() { }
+	protected virtual partial Task PlatformSeek(TimeSpan position, CancellationToken token)
+	{
+		token.ThrowIfCancellationRequested();
+		return Task.CompletedTask;
+	}
+	protected virtual partial void PlatformPlay() { }
+	protected virtual partial void PlatformPause() { }
+	protected virtual partial void PlatformStop() { }
+	protected virtual partial void PlatformUpdateAspect() { }
+	protected virtual partial void PlatformUpdateSource() { }
+	protected virtual partial void PlatformUpdateSpeed() { }
+	protected virtual partial void PlatformUpdateShouldShowPlaybackControls() { }
+	protected virtual partial void PlatformUpdatePosition() { }
+	protected virtual partial void PlatformUpdateVolume() { }
+	protected virtual partial void PlatformUpdateShouldKeepScreenOn() { }
+	protected virtual partial void PlatformUpdateShouldMute() { }
+	protected virtual partial void PlatformUpdateShouldLoopPlayback() { }
 }
 #endif

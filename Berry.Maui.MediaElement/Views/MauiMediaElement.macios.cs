@@ -30,7 +30,7 @@ public class MauiMediaElement : UIView
         if (viewController?.View is not null)
         {
             // Zero out the safe area insets of the AVPlayerViewController
-            UIEdgeInsets insets = viewController.View.SafeAreaInsets;
+            var insets = viewController.View.SafeAreaInsets;
             playerViewController.AdditionalSafeAreaInsets =
                 new UIEdgeInsets(insets.Top * -1, insets.Left, insets.Bottom * -1, insets.Right);
 

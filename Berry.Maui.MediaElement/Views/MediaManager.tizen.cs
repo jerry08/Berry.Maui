@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Berry.Maui.Core.Primitives;
 using Berry.Maui.Views;
@@ -84,20 +85,21 @@ public partial class MediaManager : IDisposable
         }
     }
 
-    protected virtual partial ValueTask PlatformSeek(TimeSpan position)
+    protected virtual async partial Task PlatformSeek(TimeSpan position, CancellationToken token)
     {
         if (Player is null)
         {
-            return ValueTask.CompletedTask;
+            throw new InvalidOperationException($"{nameof(CommunityToolkit.Maui.Core.Views.TizenPlayer)} is not yet initialized");
         }
 
-        if (Player.State is PlayerState.Ready or PlayerState.Playing or PlayerState.Paused)
+        if (Player.State is not (PlayerState.Ready or PlayerState.Playing or PlayerState.Paused))
         {
-            Player.SetPlayPositionAsync((int)position.TotalMilliseconds, false);
-            MediaElement.SeekCompleted();
+            throw new InvalidOperationException($"{nameof(CommunityToolkit.Maui.Core.Views.TizenPlayer)}.{nameof(CommunityToolkit.Maui.Core.Views.TizenPlayer.State)} must first be set to {PlayerState.Ready}, {PlayerState.Playing} or {PlayerState.Paused}");
         }
 
-        return ValueTask.CompletedTask;
+        await Player.SetPlayPositionAsync((int)position.TotalMilliseconds, false).WaitAsync(token);
+
+        MediaElement.SeekCompleted();
     }
 
     protected virtual partial void PlatformStop()
@@ -119,7 +121,7 @@ public partial class MediaManager : IDisposable
 
     protected virtual partial void PlatformUpdateAspect()
     {
-        if (Player is null || MediaElement is null)
+        if (Player is null)
         {
             return;
         }
@@ -192,23 +194,14 @@ public partial class MediaManager : IDisposable
 
     protected virtual partial void PlatformUpdateSpeed()
     {
-        if (MediaElement is null || Player is null)
+        if (Player is null)
         {
             return;
         }
 
-        if (
-            !IsUriStreaming
-            && MediaElement.Speed <= 5.0f
-            && MediaElement.Speed >= -5.0f
-            && MediaElement.Speed != 0
-        )
+        if (!IsUriStreaming && MediaElement.Speed <= 5.0f && MediaElement.Speed >= -5.0f && MediaElement.Speed != 0)
         {
-            if (
-                Player.State is PlayerState.Ready
-                || Player.State is PlayerState.Playing
-                || Player.State is PlayerState.Paused
-            )
+            if (Player.State is PlayerState.Ready || Player.State is PlayerState.Playing || Player.State is PlayerState.Paused)
             {
                 Player.SetPlaybackRate((float)MediaElement.Speed);
             }
@@ -217,7 +210,7 @@ public partial class MediaManager : IDisposable
 
     protected virtual partial void PlatformUpdateShouldShowPlaybackControls()
     {
-        if (MediaElement is null || VideoView is null)
+        if (VideoView is null)
         {
             return;
         }
@@ -225,16 +218,12 @@ public partial class MediaManager : IDisposable
 
     protected virtual partial void PlatformUpdatePosition()
     {
-        if (MediaElement is null || Player is null)
+        if (Player is null)
         {
             return;
         }
 
-        if (
-            Player.State is PlayerState.Ready
-            || Player.State is PlayerState.Playing
-            || Player.State is PlayerState.Paused
-        )
+        if (Player.State is PlayerState.Ready || Player.State is PlayerState.Playing || Player.State is PlayerState.Paused)
         {
             MediaElement.Duration = TimeSpan.FromMilliseconds(Player.StreamInfo.GetDuration());
             MediaElement.Position = TimeSpan.FromMilliseconds(Player.GetPlayPosition());
@@ -247,7 +236,7 @@ public partial class MediaManager : IDisposable
 
     protected virtual partial void PlatformUpdateVolume()
     {
-        if (MediaElement is null || Player is null)
+        if (Player is null)
         {
             return;
         }
@@ -281,7 +270,7 @@ public partial class MediaManager : IDisposable
 
     protected virtual partial void PlatformUpdateShouldMute()
     {
-        if (Player is null || MediaElement is null)
+        if (Player is null)
         {
             return;
         }
@@ -291,12 +280,13 @@ public partial class MediaManager : IDisposable
 
     protected virtual partial void PlatformUpdateShouldLoopPlayback()
     {
-        if (MediaElement is null || Player is null || VideoView is null)
+        if (Player is null || VideoView is null)
         {
             return;
         }
 
         Player.IsLooping = MediaElement.ShouldLoopPlayback;
+
     }
 
     /// <summary>
@@ -314,7 +304,10 @@ public partial class MediaManager : IDisposable
                 Player.BufferingProgressChanged -= OnBufferingProgressChanged;
                 Player.Dispose();
             }
-            VideoView?.Dispose();
+            if (VideoView is not null)
+            {
+                VideoView.Dispose();
+            }
         }
     }
 

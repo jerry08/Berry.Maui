@@ -1,4 +1,5 @@
-﻿using Berry.Maui.Views;
+﻿using System;
+using Berry.Maui.Views;
 using Microsoft.UI.Xaml.Controls;
 using Grid = Microsoft.UI.Xaml.Controls.Grid;
 
@@ -7,25 +8,51 @@ namespace Berry.Maui.Core.Views;
 /// <summary>
 /// The user-interface element that represents the <see cref="MediaElement"/> on Windows.
 /// </summary>
-public class MauiMediaElement : Grid
+public class MauiMediaElement : Grid, IDisposable
 {
-    readonly MediaPlayerElement mediaElement;
+    readonly MediaPlayerElement mediaPlayerElement;
+
+    bool isDisposed;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MauiMediaElement"/> class.
     /// </summary>
-    /// <param name="mediaElementElement"></param>
-    public MauiMediaElement(MediaPlayerElement mediaElementElement)
+    /// <param name="mediaPlayerElement"></param>
+    public MauiMediaElement(MediaPlayerElement mediaPlayerElement)
     {
-        this.mediaElement = mediaElementElement;
-        Children.Add(this.mediaElement);
+        this.mediaPlayerElement = mediaPlayerElement;
+        Children.Add(this.mediaPlayerElement);
     }
+
+    /// <summary>
+    /// Finalizer
+    /// </summary>
+    ~MauiMediaElement() => Dispose(false);
 
     /// <summary>
     /// Releases the managed and unmanaged resources used by the <see cref="MauiMediaElement"/>.
     /// </summary>
     public void Dispose()
     {
-        mediaElement?.MediaPlayer.Dispose();
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Releases the managed and unmanaged resources used by the <see cref="MauiMediaElement"/>.
+    /// </summary>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (isDisposed)
+        {
+            return;
+        }
+
+        if (disposing)
+        {
+            mediaPlayerElement.MediaPlayer.Dispose();
+        }
+
+        isDisposed = true;
     }
 }

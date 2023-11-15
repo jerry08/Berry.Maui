@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Threading.Tasks;
+using System.Threading;
 using Berry.Maui.Core.Primitives;
+using Berry.Maui.Interfaces;
 using Berry.Maui.Views;
 using Microsoft.Maui;
 
@@ -8,7 +11,7 @@ namespace Berry.Maui.Core;
 /// <summary>
 /// With MediaElement you can play multimedia inside of your app.
 /// </summary>
-public interface IMediaElement : IView
+public interface IMediaElement : IView, IAsynchronousMediaElementHandler
 {
     /// <summary>
     /// Gets the media aspect ratio.
@@ -129,8 +132,9 @@ public interface IMediaElement : IView
     /// Seek to a specific position in the currently playing media.
     /// </summary>
     /// <param name="position">The requested position to seek to.</param>
+    /// <param name="token"><see cref="CancellationToken"/>.</param>
     /// <remarks>If <paramref name="position"/> is outside of the range of the current media item, nothing will happen.</remarks>
-    void SeekTo(TimeSpan position);
+    Task SeekTo(TimeSpan position, CancellationToken token = default);
 
     /// <summary>
     /// Stops playing the currently playing media and resets the <see cref="Position"/>.

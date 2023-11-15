@@ -1,16 +1,17 @@
 ﻿using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Berry.Maui.Core.Primitives;
 using Berry.Maui.Views;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui;
-using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Dispatching;
+using Microsoft.UI.Xaml.Controls;
 using Windows.Media.Playback;
-using Windows.Media.Streaming.Adaptive;
 using Windows.Storage;
 using Windows.System.Display;
 using WindowsMediaElement = Windows.Media.Playback.MediaPlayer;
@@ -20,6 +21,14 @@ namespace Berry.Maui.Core.Views;
 
 partial class MediaManager : IDisposable
 {
+    // States that allow changing position
+    readonly FrozenSet<MediaElementState> allowUpdatePositionStates = new[]
+    {
+        MediaElementState.Playing,
+        MediaElementState.Paused,
+        MediaElementState.Stopped,
+    }.ToFrozenSet();
+
     // The requests to keep display active are cumulative, this bool makes sure it only gets requested once
     bool displayActiveRequested;
 
@@ -87,19 +96,22 @@ partial class MediaManager : IDisposable
         }
     }
 
-    protected virtual async partial ValueTask PlatformSeek(TimeSpan position)
+    protected virtual async partial Task PlatformSeek(TimeSpan position, CancellationToken token)
     {
-        if (Player?.MediaPlayer.CanSeek ?? false)
+        if (Player?.MediaPlayer.CanSeek is true)
         {
             if (Dispatcher.IsDispatchRequired)
             {
-                await Dispatcher.DispatchAsync(() => Player.MediaPlayer.Position = position);
+                await Dispatcher.DispatchAsync(() => UpdatePosition(Player, position)).WaitAsync(token);
             }
             else
             {
-                Player.MediaPlayer.Position = position;
+                token.ThrowIfCancellationRequested();
+                UpdatePosition(Player, position);
             }
         }
+
+        static void UpdatePosition(in MediaPlayerElement mediaPlayerElement, in TimeSpan position) => mediaPlayerElement.MediaPlayer.Position = position;
     }
 
     protected virtual partial void PlatformStop()
@@ -124,7 +136,7 @@ partial class MediaManager : IDisposable
 
     protected virtual partial void PlatformUpdateAspect()
     {
-        if (Player is null || MediaElement is null)
+        if (Player is null)
         {
             return;
         }
@@ -172,8 +184,8 @@ partial class MediaManager : IDisposable
 
     protected virtual partial void PlatformUpdatePosition()
     {
-        if (MediaElement is not null && Player is not null
-            && MediaElement.CurrentState == MediaElementState.Playing)
+        if (Player is not null
+            && allowUpdatePositionStates.Contains(MediaElement.CurrentState))
         {
             MediaElement.Position = Player.MediaPlayer.Position;
         }
@@ -181,7 +193,7 @@ partial class MediaManager : IDisposable
 
     protected virtual partial void PlatformUpdateVolume()
     {
-        if (Player is null || MediaElement is null)
+        if (Player is null)
         {
             return;
         }
@@ -192,22 +204,24 @@ partial class MediaManager : IDisposable
             return;
         }
 
-        MainThread.BeginInvokeOnMainThread(() =>
+        if (Dispatcher.IsDispatchRequired)
         {
-            Player.MediaPlayer.Volume = MediaElement.Volume;
-        });
+            Dispatcher.Dispatch(() => UpdateVolume(Player, MediaElement.Volume));
+        }
+        else
+        {
+            UpdateVolume(Player, MediaElement.Volume);
+        }
+
+        static void UpdateVolume(in MediaPlayerElement mediaPlayerElement, in double volume) => mediaPlayerElement.MediaPlayer.Volume = volume;
     }
 
     protected virtual partial void PlatformUpdateShouldKeepScreenOn()
     {
-        if (MediaElement is null)
-        {
-            return;
-        }
-
         if (MediaElement.ShouldKeepScreenOn)
         {
-            if (MediaElement?.CurrentState == MediaElementState.Playing
+            if (MediaElement != null
+                && allowUpdatePositionStates.Contains(MediaElement.CurrentState)
                 && !displayActiveRequested)
             {
                 DisplayRequest.RequestActive();
@@ -226,7 +240,7 @@ partial class MediaManager : IDisposable
 
     protected virtual partial void PlatformUpdateShouldMute()
     {
-        if (MediaElement is null || Player?.MediaPlayer is null)
+        if (Player?.MediaPlayer is null)
         {
             return;
         }
@@ -236,7 +250,7 @@ partial class MediaManager : IDisposable
 
     protected virtual async partial void PlatformUpdateSource()
     {
-        if (MediaElement is null || Player is null)
+        if (Player is null)
         {
             return;
         }
@@ -309,13 +323,13 @@ partial class MediaManager : IDisposable
             var filename = fileMediaSource.Path;
             if (!string.IsNullOrWhiteSpace(filename))
             {
-                StorageFile storageFile = await StorageFile.GetFileFromPathAsync(filename);
+                var storageFile = await StorageFile.GetFileFromPathAsync(filename);
                 Player.Source = WinMediaSource.CreateFromStorageFile(storageFile);
             }
         }
         else if (MediaElement.Source is ResourceMediaSource resourceMediaSource)
         {
-            string path = "ms-appx:///" + resourceMediaSource.Path;
+            var path = "ms-appx:///" + resourceMediaSource.Path;
             if (!string.IsNullOrWhiteSpace(path))
             {
                 Player.Source = WinMediaSource.CreateFromUri(new Uri(path));
@@ -325,7 +339,7 @@ partial class MediaManager : IDisposable
 
     protected virtual partial void PlatformUpdateShouldLoopPlayback()
     {
-        if (MediaElement is null || Player is null)
+        if (Player is null)
         {
             return;
         }
@@ -367,19 +381,24 @@ partial class MediaManager : IDisposable
 
     void OnMediaElementMediaOpened(WindowsMediaElement sender, object args)
     {
-        if (MediaElement is null || Player is null)
+        if (Player is null)
         {
             return;
         }
 
-        MainThread.BeginInvokeOnMainThread(() =>
+        if (Dispatcher.IsDispatchRequired)
         {
-            MediaElement.Duration = Player.MediaPlayer.NaturalDuration == TimeSpan.MaxValue ?
-                TimeSpan.Zero
-                : Player.MediaPlayer.NaturalDuration;
+            Dispatcher.Dispatch(() => SetDuration(MediaElement, Player));
+        }
+        else
+        {
+            SetDuration(MediaElement, Player);
+        }
+        MediaElement.MediaOpened();
 
-            MediaElement.MediaOpened();
-        });
+        static void SetDuration(in IMediaElement mediaElement, in MediaPlayerElement mediaPlayerElement) => mediaElement.Duration = mediaPlayerElement.MediaPlayer.NaturalDuration == TimeSpan.MaxValue
+                                                                                                                                        ? TimeSpan.Zero
+                                                                                                                                        : mediaPlayerElement.MediaPlayer.NaturalDuration;
     }
 
     void OnMediaElementMediaEnded(WindowsMediaElement sender, object args)
@@ -389,9 +408,9 @@ partial class MediaManager : IDisposable
 
     void OnMediaElementMediaFailed(WindowsMediaElement sender, MediaPlayerFailedEventArgs args)
     {
-        string errorMessage = string.Empty;
-        string errorCode = string.Empty;
-        string error = args.Error.ToString();
+        var errorMessage = string.Empty;
+        var errorCode = string.Empty;
+        var error = args.Error.ToString();
 
         if (!string.IsNullOrWhiteSpace(args.ErrorMessage))
         {
@@ -414,34 +433,29 @@ partial class MediaManager : IDisposable
 
     void OnMediaElementIsMutedChanged(WindowsMediaElement sender, object args)
     {
-        if (MediaElement is not null)
-        {
-            MediaElement.ShouldMute = sender.IsMuted;
-        }
+        MediaElement.ShouldMute = sender.IsMuted;
     }
 
     void OnMediaElementVolumeChanged(WindowsMediaElement sender, object args)
     {
-        if (MediaElement is not null)
-        {
-            MediaElement.Volume = sender.Volume;
-        }
+        MediaElement.Volume = sender.Volume;
     }
 
     void OnPlaybackSessionPlaybackRateChanged(MediaPlaybackSession sender, object args)
     {
-        if (MediaElement is null)
-        {
-            return;
-        }
-
         if (MediaElement.Speed != sender.PlaybackRate)
         {
-            MainThread.BeginInvokeOnMainThread(() =>
+            if (Dispatcher.IsDispatchRequired)
             {
-                MediaElement.Speed = sender.PlaybackRate;
-            });
+                Dispatcher.Dispatch(() => UpdateSpeed(MediaElement, sender.PlaybackRate));
+            }
+            else
+            {
+                UpdateSpeed(MediaElement, sender.PlaybackRate);
+            }
         }
+
+        static void UpdateSpeed(in IMediaElement mediaElement, in double playbackRate) => mediaElement.Speed = playbackRate;
     }
 
     void OnPlaybackSessionPlaybackStateChanged(MediaPlaybackSession sender, object args)
@@ -459,7 +473,7 @@ partial class MediaManager : IDisposable
 
         if (sender.PlaybackState == MediaPlaybackState.Playing && sender.PlaybackRate == 0)
         {
-            MainThread.BeginInvokeOnMainThread(() =>
+            Dispatcher.Dispatch(() =>
             {
                 sender.PlaybackRate = 1;
             });

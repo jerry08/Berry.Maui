@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Android.Support.V4.Media.Session;
 using Android.Widget;
@@ -31,8 +33,12 @@ namespace Berry.Maui.Core.Views;
 
 public partial class MediaManager : Java.Lang.Object, IPlayer.IListener
 {
-    double previousSpeed = -1;
+    readonly SemaphoreSlim seekToSemaphoreSlim = new(1, 1);
+
+    double? previousSpeed;
     float volumeBeforeMute = 1;
+    TaskCompletionSource? seekToTaskCompletionSource;
+
 
     /// <summary>
     /// The platform native counterpart of <see cref="MediaElement"/>.
@@ -70,14 +76,14 @@ public partial class MediaManager : Java.Lang.Object, IPlayer.IListener
     /// </remarks>
     public void OnPlaybackParametersChanged(PlaybackParameters? playbackParameters)
     {
-        if (playbackParameters is null || MediaElement is null)
+        if (playbackParameters is null)
         {
             return;
         }
 
-        if ((double)playbackParameters.Speed != MediaElement.Speed)
+        if (!AreFloatingPointNumbersEqual(playbackParameters.Speed, MediaElement.Speed, 0.01))
         {
-            MediaElement.Speed = (double)playbackParameters.Speed;
+            MediaElement.Speed = playbackParameters.Speed;
         }
     }
 
@@ -145,7 +151,7 @@ public partial class MediaManager : Java.Lang.Object, IPlayer.IListener
             return;
         }
 
-        MediaElementState newState = MediaElement.CurrentState;
+        var newState = MediaElement.CurrentState;
 
         switch (playbackState)
         {
@@ -155,6 +161,9 @@ public partial class MediaManager : Java.Lang.Object, IPlayer.IListener
             case IPlayer.StateEnded:
                 newState = MediaElementState.Stopped;
                 MediaElement.MediaEnded();
+                break;
+            case IPlayer.StateReady:
+                seekToTaskCompletionSource?.TrySetResult();
                 break;
         }
 
@@ -171,11 +180,6 @@ public partial class MediaManager : Java.Lang.Object, IPlayer.IListener
     /// </remarks>
     public void OnPlayerError(PlaybackException? error)
     {
-        if (MediaElement is null)
-        {
-            return;
-        }
-
         var errorMessage = string.Empty;
         var errorCode = string.Empty;
         var errorCodeName = string.Empty;
@@ -195,7 +199,12 @@ public partial class MediaManager : Java.Lang.Object, IPlayer.IListener
             errorCode = $"Error codename: {error?.ErrorCodeName}";
         }
 
-        var message = string.Join(", ", new[] { errorCodeName, errorCode, errorMessage }.Where(s => !string.IsNullOrEmpty(s)));
+        var message = string.Join(", ", new[]
+        {
+            errorCodeName,
+            errorCode,
+            errorMessage
+        }.Where(s => !string.IsNullOrEmpty(s)));
 
         MediaElement.MediaFailed(new MediaFailedEventArgs(message));
 
@@ -211,7 +220,8 @@ public partial class MediaManager : Java.Lang.Object, IPlayer.IListener
     /// </remarks>
     public void OnSeekProcessed()
     {
-        MediaElement?.SeekCompleted();
+        // Deprecated in ExoPlayer v2.12.0
+        // Use OnPlaybackStateChanged with STATE_READY instead: https://stackoverflow.com/a/65745607/5953643
     }
 
     /// <summary>
@@ -224,7 +234,7 @@ public partial class MediaManager : Java.Lang.Object, IPlayer.IListener
     /// </remarks>
     public void OnVolumeChanged(float volume)
     {
-        if (Player is null || MediaElement is null)
+        if (Player is null)
         {
             return;
         }
@@ -259,17 +269,34 @@ public partial class MediaManager : Java.Lang.Object, IPlayer.IListener
         Player.Pause();
     }
 
-    protected virtual partial ValueTask PlatformSeek(TimeSpan position)
+    protected virtual async partial Task PlatformSeek(TimeSpan position, CancellationToken token)
     {
-        Player?.SeekTo((long)position.TotalMilliseconds);
+        if (Player is null)
+        {
+            throw new InvalidOperationException($"{nameof(IExoPlayer)} is not yet initialized");
+        }
 
-        return ValueTask.CompletedTask;
+        await seekToSemaphoreSlim.WaitAsync(token);
+
+        seekToTaskCompletionSource = new();
+
+        try
+        {
+            Player.SeekTo((long)position.TotalMilliseconds);
+
+            await seekToTaskCompletionSource.Task.WaitAsync(token);
+
+            MediaElement.SeekCompleted();
+        }
+        finally
+        {
+            seekToSemaphoreSlim.Release();
+        }
     }
 
     protected virtual partial void PlatformStop()
     {
-        if (Player is null || MediaElement is null
-             || MediaElement.Source is null)
+        if (Player is null || MediaElement.Source is null)
         {
             return;
         }
@@ -401,7 +428,7 @@ public partial class MediaManager : Java.Lang.Object, IPlayer.IListener
             var path = resourceMediaSource.Path;
             if (!string.IsNullOrWhiteSpace(path))
             {
-                string assetFilePath = "asset://" + package + "/" + path;
+                var assetFilePath = $"asset://{package}{Path.PathSeparator}{path}";
 
                 Player.SetMediaItem(MediaItem.FromUri(assetFilePath));
                 Player.Prepare();
@@ -427,23 +454,20 @@ public partial class MediaManager : Java.Lang.Object, IPlayer.IListener
         {
             Aspect.AspectFill => AspectRatioFrameLayout.ResizeModeZoom,
             Aspect.Fill => AspectRatioFrameLayout.ResizeModeFill,
-            _ => AspectRatioFrameLayout.ResizeModeFit,
-
+            Aspect.Center or Aspect.AspectFit => AspectRatioFrameLayout.ResizeModeFit,
+            _ => throw new NotSupportedException($"{nameof(Aspect)}: {MediaElement.Aspect} is not yet supported")
         };
     }
 
     protected virtual partial void PlatformUpdateSpeed()
     {
-        if (MediaElement is null || Player is null)
+        if (Player is null)
         {
             return;
         }
 
         // First time we're getting a playback speed, set initial value
-        if (previousSpeed == -1)
-        {
-            previousSpeed = MediaElement.Speed;
-        }
+        previousSpeed ??= MediaElement.Speed;
 
         if (MediaElement.Speed > 0)
         {
@@ -465,7 +489,7 @@ public partial class MediaManager : Java.Lang.Object, IPlayer.IListener
 
     protected virtual partial void PlatformUpdateShouldShowPlaybackControls()
     {
-        if (MediaElement is null || PlayerView is null)
+        if (PlayerView is null)
         {
             return;
         }
@@ -475,7 +499,7 @@ public partial class MediaManager : Java.Lang.Object, IPlayer.IListener
 
     protected virtual partial void PlatformUpdatePosition()
     {
-        if (MediaElement is null || Player is null)
+        if (Player is null)
         {
             return;
         }
@@ -488,7 +512,7 @@ public partial class MediaManager : Java.Lang.Object, IPlayer.IListener
 
     protected virtual partial void PlatformUpdateVolume()
     {
-        if (MediaElement is null || Player is null)
+        if (Player is null)
         {
             return;
         }
@@ -516,7 +540,7 @@ public partial class MediaManager : Java.Lang.Object, IPlayer.IListener
 
     protected virtual partial void PlatformUpdateShouldMute()
     {
-        if (Player is null || MediaElement is null)
+        if (Player is null)
         {
             return;
         }
@@ -527,7 +551,7 @@ public partial class MediaManager : Java.Lang.Object, IPlayer.IListener
         {
             volumeBeforeMute = Player.Volume;
         }
-        else if (volumeBeforeMute != Player.Volume && Player.Volume > 0)
+        else if (!AreFloatingPointNumbersEqual(volumeBeforeMute, Player.Volume) && Player.Volume > 0)
         {
             volumeBeforeMute = Player.Volume;
         }
@@ -537,7 +561,7 @@ public partial class MediaManager : Java.Lang.Object, IPlayer.IListener
 
     protected virtual partial void PlatformUpdateShouldLoopPlayback()
     {
-        if (MediaElement is null || Player is null)
+        if (Player is null)
         {
             return;
         }
@@ -546,6 +570,7 @@ public partial class MediaManager : Java.Lang.Object, IPlayer.IListener
     }
 
     #region IPlayer.IListener implementation method stubs
+
     public void OnAudioAttributesChanged(AudioAttributes? audioAttributes) { }
     public void OnAudioSessionIdChanged(int audioSessionId) { }
     public void OnAvailableCommandsChanged(IPlayer.Commands? availableCommands) { }
@@ -578,5 +603,6 @@ public partial class MediaManager : Java.Lang.Object, IPlayer.IListener
     public void OnTracksChanged(Tracks? tracks) { }
     public void OnTrackSelectionParametersChanged(TrackSelectionParameters? trackSelectionParameters) { }
     public void OnVideoSizeChanged(VideoSize? videoSize) { }
+
     #endregion
 }
