@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using Foundation;
 using Berry.Maui.Abstractions;
+using Foundation;
 
 namespace Berry.Maui;
 

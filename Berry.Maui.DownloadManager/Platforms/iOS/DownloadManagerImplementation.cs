@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using Foundation;
 using Berry.Maui.Abstractions;
+using Foundation;
 using UIKit;
 
 namespace Berry.Maui;
@@ -86,24 +86,27 @@ public class DownloadManagerImplementation : IDownloadManager
 
         AddFile(file);
 
-        NSOperationQueue.MainQueue.BeginInvokeOnMainThread(() =>
-        {
-            NSUrlSession session;
-
-            var inBackground =
-                UIApplication.SharedApplication.ApplicationState == UIApplicationState.Background;
-
-            if (_avoidDiscretionaryDownloadInBackground && inBackground)
+        NSOperationQueue
+            .MainQueue
+            .BeginInvokeOnMainThread(() =>
             {
-                session = _session;
-            }
-            else
-            {
-                session = _backgroundSession;
-            }
+                NSUrlSession session;
 
-            file.StartDownload(session, mobileNetworkAllowed);
-        });
+                var inBackground =
+                    UIApplication.SharedApplication.ApplicationState
+                    == UIApplicationState.Background;
+
+                if (_avoidDiscretionaryDownloadInBackground && inBackground)
+                {
+                    session = _session;
+                }
+                else
+                {
+                    session = _backgroundSession;
+                }
+
+                file.StartDownload(session, mobileNetworkAllowed);
+            });
     }
 
     public void Abort(IDownloadFile i)

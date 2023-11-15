@@ -1,6 +1,6 @@
 ﻿using System.Linq;
-using Foundation;
 using Berry.Maui.Abstractions;
+using Foundation;
 
 namespace Berry.Maui;
 
@@ -10,7 +10,8 @@ public class UrlSessionDownloadDelegate : NSUrlSessionDownloadDelegate
 
     protected DownloadFileImplementation GetDownloadFileByTask(NSUrlSessionTask downloadTask)
     {
-        return Controller.Queue
+        return Controller
+            .Queue
             .Cast<DownloadFileImplementation>()
             .FirstOrDefault(
                 i =>

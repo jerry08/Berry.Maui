@@ -6,6 +6,7 @@ namespace Berry.Maui.Controls;
 
 public class CollectionViewHandler : ReorderableItemsViewHandler<ReorderableItemsView>
 {
+#if IOS
     public CollectionViewHandler()
     {
         ReorderableItemsViewMapper.ModifyMapping(
@@ -17,11 +18,11 @@ public class CollectionViewHandler : ReorderableItemsViewHandler<ReorderableItem
     private void MapSelectionMode(
         ReorderableItemsViewHandler<ReorderableItemsView> handler,
         ReorderableItemsView view,
-        System.Action<IElementHandler, IElement> action
+        System.Action<IElementHandler, IElement>? action
     )
     {
         var ctrl = (handler.ViewController as SelectableItemsViewController<ReorderableItemsView>);
-        if (ctrl == null)
+        if (ctrl is null)
         {
             return;
         }
@@ -33,4 +34,5 @@ public class CollectionViewHandler : ReorderableItemsViewHandler<ReorderableItem
         ReorderableItemsView itemsView,
         ItemsViewLayout layout
     ) => new(itemsView, layout);
+#endif
 }
