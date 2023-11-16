@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <Version>1.1.0</Version>
+    <NetVersion>net8.0</NetVersion>
     <Company>Berry</Company>
     <Copyright>Copyright (C) Jerry Berry</Copyright>
     <LangVersion>latest</LangVersion>
