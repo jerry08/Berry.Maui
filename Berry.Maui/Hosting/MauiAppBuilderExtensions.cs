@@ -13,20 +13,11 @@ public static class MauiAppBuilderExtensions
     {
         builder.UseBottomSheet()
             .UseAcrylicView()
-            .UseContextMenu()
             .UseMauiPlainer()
             .UseInsets()
             .UseMaterialSwitch();
 
         return builder;
-    }
-
-    public static MauiAppBuilder UseContextMenu(this MauiAppBuilder builder)
-    {
-        return builder.ConfigureMauiHandlers(handlers =>
-        {
-            handlers.AddHandler<CollectionView, CollectionViewHandler>();
-        });
     }
 
     public static MauiAppBuilder UseBottomSheet(this MauiAppBuilder builder)
