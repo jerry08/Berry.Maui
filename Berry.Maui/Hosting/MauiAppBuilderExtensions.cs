@@ -1,4 +1,5 @@
-﻿using Berry.Maui.Controls;
+﻿using System;
+using Berry.Maui.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui;
 using Microsoft.Maui.Controls;
@@ -9,18 +10,27 @@ namespace Berry.Maui;
 
 public static class MauiAppBuilderExtensions
 {
-    public static MauiAppBuilder UseBerry(this MauiAppBuilder builder)
+    public static MauiAppBuilder UseBerry(
+        this MauiAppBuilder builder,
+        Action<HostingBuilder>? configureDelegate = null
+    )
     {
-        builder.UseBottomSheet()
-            .UseAcrylicView()
-            .UseMauiPlainer()
-            .UseInsets()
-            .UseMaterialSwitch();
+        if (configureDelegate is not null)
+        {
+            configureDelegate(new HostingBuilder(builder));
+        }
 
         return builder;
     }
 
-    public static MauiAppBuilder UseBottomSheet(this MauiAppBuilder builder)
+    public static MauiAppBuilder UseBerry(this MauiAppBuilder builder)
+    {
+        builder.UseBottomSheet().UseAcrylicView().UseMauiPlainer().UseInsets().UseMaterialSwitch();
+
+        return builder;
+    }
+
+    internal static MauiAppBuilder UseBottomSheet(this MauiAppBuilder builder)
     {
         return builder.ConfigureMauiHandlers(handlers =>
         {
@@ -28,7 +38,15 @@ public static class MauiAppBuilderExtensions
         });
     }
 
-    public static MauiAppBuilder UseAcrylicView(this MauiAppBuilder builder)
+    internal static MauiAppBuilder UseContextMenu(this MauiAppBuilder builder)
+    {
+        return builder.ConfigureMauiHandlers(handlers =>
+        {
+            handlers.AddHandler<CollectionView, CollectionViewHandler>();
+        });
+    }
+
+    internal static MauiAppBuilder UseAcrylicView(this MauiAppBuilder builder)
     {
         return builder.ConfigureMauiHandlers(handlers =>
         {
@@ -36,14 +54,14 @@ public static class MauiAppBuilderExtensions
         });
     }
 
-    public static MauiAppBuilder UseMauiPlainer(this MauiAppBuilder builder)
+    internal static MauiAppBuilder UseMauiPlainer(this MauiAppBuilder builder)
     {
         builder.ConfigureMauiHandlers(handlers => handlers.AddPlainer());
 
         return builder;
     }
 
-    public static MauiAppBuilder UseMaterialSwitch(
+    internal static MauiAppBuilder UseMaterialSwitch(
         this MauiAppBuilder builder,
         bool applyToAll = true
     )
@@ -64,7 +82,7 @@ public static class MauiAppBuilderExtensions
         return builder;
     }
 
-    public static MauiAppBuilder UseInsets(this MauiAppBuilder builder)
+    internal static MauiAppBuilder UseInsets(this MauiAppBuilder builder)
     {
         builder.ConfigureLifecycleEvents(lifecycle =>
         {
