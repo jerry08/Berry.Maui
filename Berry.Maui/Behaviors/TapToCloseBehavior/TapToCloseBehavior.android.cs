@@ -67,13 +67,15 @@ public partial class TapToCloseBehavior
         if (_platformView != null)
         {
             //_platformView.FocusChange -= OnFocusChanged;
-            _view.Focused -= OnFocusChanged;
-            _view.Unfocused -= OnFocusChanged;
-
             _platformView = null;
         }
 
-        _view = null;
+        if (_view is not null)
+        {
+            _view.Focused -= OnFocusChanged;
+            _view.Unfocused -= OnFocusChanged;
+            _view = null;
+        }
     }
 
     //void OnFocusChanged(object? sender, AView.FocusChangeEventArgs e) => SetupFocus(e.HasFocus);
@@ -113,7 +115,8 @@ public partial class TapToCloseBehavior
         if (!_hasFocus || _platformPageView == null || _platformView == null || _view == null)
             return;
 
-        _gestureDetector?.OnTouchEvent(e);
+        if (e is not null)
+            _gestureDetector?.OnTouchEvent(e);
     }
 
     static Page GetPage(Element? view)
@@ -147,14 +150,14 @@ public partial class TapToCloseBehavior
             return false;
         }
 
-        public bool OnFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY)
+        public bool OnFling(MotionEvent? e1, MotionEvent e2, float velocityX, float velocityY)
         {
             return false;
         }
 
         public void OnLongPress(MotionEvent e) { }
 
-        public bool OnScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY)
+        public bool OnScroll(MotionEvent? e1, MotionEvent e2, float distanceX, float distanceY)
         {
             return false;
         }
@@ -163,6 +166,9 @@ public partial class TapToCloseBehavior
 
         public bool OnSingleTapUp(MotionEvent e)
         {
+            if (_platformView is null)
+                return false;
+
             var location = GetBoundingBox(_platformView);
             var point = new Point(e.RawX, e.RawY);
 
@@ -180,15 +186,15 @@ public partial class TapToCloseBehavior
 
         Rect GetBoundingBox(AView view)
         {
-            var context = view.Context;
+            //var context = view.Context;
             var rect = new Android.Graphics.Rect();
             view.GetGlobalVisibleRect(rect);
 
             return new Rect(
                 rect.ExactCenterX() - (rect.Width() / 2),
                 rect.ExactCenterY() - (rect.Height() / 2),
-                (float)rect.Width(),
-                (float)rect.Height()
+                rect.Width(),
+                rect.Height()
             );
         }
     }
