@@ -2,6 +2,7 @@
 using System.Linq;
 using Android.Widget;
 using Google.Android.Material.TextField;
+using Microsoft.Maui;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Graphics;
 using Microsoft.Maui.Handlers;
@@ -45,10 +46,14 @@ public partial class TapToCloseBehavior
             _platformView = textInputLayout.EditText;
         else if (platformView is AViewGroup vg)
         {
+            var gg = vg.GetChildrenOfType<EditText>().FirstOrDefault();
             _platformView = vg.GetChildrenOfType<EditText>().FirstOrDefault() ?? _platformView;
         }
 
-        //_platformView.FocusChange += OnFocusChanged;
+        if (_platformView is null)
+            return;
+
+        _platformView.FocusChange += OnFocusChanged2;
 
         bindable.Focused += OnFocusChanged;
         bindable.Unfocused += OnFocusChanged;
@@ -78,7 +83,7 @@ public partial class TapToCloseBehavior
         }
     }
 
-    //void OnFocusChanged(object? sender, AView.FocusChangeEventArgs e) => SetupFocus(e.HasFocus);
+    void OnFocusChanged2(object? sender, AView.FocusChangeEventArgs e) => SetupFocus(e.HasFocus);
     void OnFocusChanged(object? sender, FocusEventArgs e) => SetupFocus(e.IsFocused);
 
     void SetupFocus(bool hasFocus)
@@ -179,7 +184,17 @@ public partial class TapToCloseBehavior
             //    KeyboardManager.HideKeyboard(_view);
 
             //KeyboardManager.HideKeyboard(_view);
-            _view?.HideKeyboard();
+
+            //_view?.HideKeyboard();
+            //_view?.Unfocus();
+
+            var inputView = _view?.GetVisualTreeDescendants()
+                .OfType<InputView>()
+                .Where(x => x is Entry or Editor)
+                .FirstOrDefault();
+
+            inputView?.HideKeyboard();
+            inputView?.Unfocus();
 
             return true;
         }
