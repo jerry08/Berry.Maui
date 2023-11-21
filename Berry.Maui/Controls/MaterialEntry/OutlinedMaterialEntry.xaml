@@ -1,0 +1,183 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="Berry.Maui.Controls.OutlinedMaterialEntry"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:berry="clr-namespace:Berry.Maui.Behaviors"
+    xmlns:local="clr-namespace:Berry.Maui.Controls"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    x:Name="this"
+    x:DataType="{x:Type local:OutlinedMaterialEntry}">
+    <Grid
+        Margin="0"
+        Padding="0,5,0,10"
+        ColumnDefinitions="*, Auto"
+        RowDefinitions="Auto, Auto">
+        <!--  To activate animation when entry is clicked  -->
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OutlinedMaterialEntryTapped" />
+        </Grid.GestureRecognizers>
+
+        <Border
+            x:Name="containerBorder"
+            Grid.Row="0"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            Padding="{OnPlatform Android='1.5',
+                                 iOS='1.5',
+                                 WinUI='5'}"
+            Stroke="Gray">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="10" />
+            </Border.StrokeShape>
+            <StackLayout Orientation="Horizontal">
+
+                <!--  Leading icon  -->
+                <Image
+                    x:Name="leadingIcon"
+                    Margin="18,0,0,0"
+                    HeightRequest="24"
+                    HorizontalOptions="Start"
+                    IsVisible="False">
+                    <Image.Triggers>
+                        <Trigger TargetType="Image" Property="IsVisible" Value="True">
+                            <Setter Property="WidthRequest" Value="24" />
+                        </Trigger>
+                        <Trigger TargetType="Image" Property="IsVisible" Value="False">
+                            <Setter Property="WidthRequest" Value="0" />
+                        </Trigger>
+                    </Image.Triggers>
+                </Image>
+
+                <!--  The Entry  -->
+                <Entry
+                    x:Name="customEntry"
+                    Margin="{OnPlatform Android='18, 0, 18, 0',
+                                        iOS='18, 10, 0, 10'}"
+                    Focused="CustomEntryFocused"
+                    HorizontalOptions="FillAndExpand"
+                    Unfocused="CustomEntryUnfocused">
+                    <!--<Entry.Effects>
+                    <effects:RemoveEntryBordersEffect />
+                    <effects:RemoveEntryUnderline />
+                </Entry.Effects>-->
+                </Entry>
+
+                <!--  Trailing icon  -->
+                <Image
+                    x:Name="trailingIcon"
+                    Margin="0,0,18,0"
+                    HeightRequest="24"
+                    HorizontalOptions="End"
+                    WidthRequest="24" />
+
+                <!--  Eye icon for password  -->
+                <Image
+                    x:Name="passwordIcon"
+                    Margin="0,0,18,0"
+                    HeightRequest="24"
+                    HorizontalOptions="End"
+                    IsVisible="False"
+                    WidthRequest="24">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="PasswordEyeTapped" />
+                    </Image.GestureRecognizers>
+                    <Image.Triggers>
+                        <DataTrigger
+                            Binding="{Binding Source={x:Reference customEntry}, Path=IsPassword}"
+                            TargetType="Image"
+                            Value="True">
+                            <Setter Property="Source" Value="eye_password_hide.svg" />
+                        </DataTrigger>
+                        <DataTrigger
+                            Binding="{Binding Source={x:Reference customEntry}, Path=IsPassword}"
+                            TargetType="Image"
+                            Value="False">
+                            <Setter Property="Source" Value="eye_password_show.svg" />
+                        </DataTrigger>
+                    </Image.Triggers>
+                </Image>
+
+                <!--  Clear button icon  -->
+                <Border
+                    Margin="0,0,10,0"
+                    StrokeThickness="0"
+                    VerticalOptions="Center">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="20" />
+                    </Border.StrokeShape>
+                    <Grid x:Name="clearButtonImage" IsVisible="False">
+                        <Grid.Behaviors>
+                            <berry:TouchBehavior Command="{Binding ClearCommand, Source={x:Reference this}}" NativeAnimation="True" />
+                        </Grid.Behaviors>
+                        <Image
+                            Margin="6"
+                            HeightRequest="24"
+                            HorizontalOptions="Center"
+                            Source="close.svg"
+                            VerticalOptions="Center"
+                            WidthRequest="24" />
+                    </Grid>
+                </Border>
+            </StackLayout>
+        </Border>
+
+        <!--  Placeholder  -->
+        <StackLayout
+            x:Name="placeholderContainer"
+            Padding="5,0"
+            HorizontalOptions="Start"
+            VerticalOptions="Center">
+            <StackLayout.Triggers>
+                <DataTrigger
+                    Binding="{Binding Source={x:Reference leadingIcon}, Path=IsVisible}"
+                    TargetType="StackLayout"
+                    Value="True">
+                    <Setter Property="Margin" Value="45, 10, 36, 0" />
+                </DataTrigger>
+                <DataTrigger
+                    Binding="{Binding Source={x:Reference leadingIcon}, Path=IsVisible}"
+                    TargetType="StackLayout"
+                    Value="False">
+                    <Setter Property="Margin" Value="15, 0, 40, 0" />
+                </DataTrigger>
+            </StackLayout.Triggers>
+            <Label
+                x:Name="placeholderText"
+                FontSize="12"
+                VerticalOptions="CenterAndExpand"
+                VerticalTextAlignment="Center" />
+        </StackLayout>
+
+        <!--  Helper text  -->
+        <Label
+            x:Name="helperText"
+            Grid.Row="1"
+            Grid.Column="0"
+            Margin="18,0,0,0"
+            FontSize="12"
+            IsVisible="false"
+            LineBreakMode="WordWrap" />
+
+        <!--  Char counter  -->
+        <Label
+            x:Name="charCounterText"
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="0,0,18,0"
+            FontSize="12"
+            HorizontalTextAlignment="End"
+            IsVisible="false" />
+
+        <!--  Error text  -->
+        <Label
+            x:Name="errorText"
+            Grid.Row="1"
+            Grid.Column="0"
+            Margin="18,0,0,0"
+            FontSize="12"
+            IsVisible="false"
+            LineBreakMode="WordWrap"
+            TextColor="Red" />
+    </Grid>
+</ContentView>

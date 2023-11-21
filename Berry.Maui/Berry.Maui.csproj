@@ -21,6 +21,11 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
+  <ItemGroup>
+    <!-- Images -->
+    <MauiImage Include="Resources\Images\*" />
+  </ItemGroup>
+
   <PropertyGroup Condition="$(TargetFramework.Contains('-windows')) == true OR $(TargetFramework.Contains('-tizen')) == true">
     <PublishReadyToRun>false</PublishReadyToRun>
   </PropertyGroup>
