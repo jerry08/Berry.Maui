@@ -12,6 +12,7 @@ using Microsoft.Maui;
 using Microsoft.Maui.Dispatching;
 using Microsoft.UI.Xaml.Controls;
 using Windows.Media.Playback;
+using Windows.Media.Streaming.Adaptive;
 using Windows.Storage;
 using Windows.System.Display;
 using WindowsMediaElement = Windows.Media.Playback.MediaPlayer;
@@ -278,10 +279,10 @@ partial class MediaManager : IDisposable
             var uri = uriMediaSource.Uri?.AbsoluteUri;
             if (!string.IsNullOrWhiteSpace(uri))
             {
-                var httpClient = new Windows.Web.Http.HttpClient();
-
-                if (uriMediaSource.Headers is not null)
+                if (uriMediaSource.Headers?.Count > 0)
                 {
+                    var httpClient = new Windows.Web.Http.HttpClient();
+
                     foreach (var (key, value) in uriMediaSource.Headers)
                     {
                         try
@@ -293,29 +294,44 @@ partial class MediaManager : IDisposable
                             Debug.WriteLine(e);
                         }
                     }
+
+                    //var stream = await HttpRandomAccessStream.CreateAsync(httpClient, new Uri(uri));
+                    //
+                    //Player.Source = WinMediaSource.CreateFromStream(stream, stream.ContentType);
+                    //return;
+
+                    var result = await AdaptiveMediaSource.CreateFromUriAsync(new Uri(uri), httpClient);
+                    if (result.Status == AdaptiveMediaSourceCreationStatus.Success)
+                    {
+                        //var stream = await HttpRandomAccessStream.CreateAsync(httpClient, new Uri(uri));
+                        //
+                        //Player.Source = WinMediaSource.CreateFromStream(stream, stream.ContentType);
+
+                        Player.Source = WinMediaSource.CreateFromAdaptiveMediaSource(result.MediaSource);
+                        return;
+                    }
+
+                    //return;
+                    //
+                    //var result = await AdaptiveMediaSource.CreateFromUriAsync(new Uri(uri), httpClient);
+                    //
+                    //if (result.Status == AdaptiveMediaSourceCreationStatus.Success)
+                    //{
+                    //    var ams = result.MediaSource;
+                    //    ams.DownloadRequested += (s, e) =>
+                    //    {
+                    //    };
+                    //
+                    //    var ms = WinMediaSource.CreateFromAdaptiveMediaSource(ams);
+                    //
+                    //    var playbackItem = new MediaPlaybackItem(ms);
+                    //
+                    //    Player.Source = playbackItem;
+                    //}
                 }
 
-                var stream = await HttpRandomAccessStream.CreateAsync(httpClient, new Uri(uri));
-
-                Player.Source = WinMediaSource.CreateFromStream(stream, stream.ContentType);
-
-                //return;
-                //
-                //var result = await AdaptiveMediaSource.CreateFromUriAsync(new Uri(uri), httpClient);
-                //
-                //if (result.Status == AdaptiveMediaSourceCreationStatus.Success)
-                //{
-                //    var ams = result.MediaSource;
-                //    ams.DownloadRequested += (s, e) =>
-                //    {
-                //    };
-                //
-                //    var ms = WinMediaSource.CreateFromAdaptiveMediaSource(ams);
-                //
-                //    var playbackItem = new MediaPlaybackItem(ms);
-                //
-                //    Player.Source = playbackItem;
-                //}
+                Player.Source = WinMediaSource.CreateFromUri(new Uri(uri));
+                return;
             }
         }
         else if (MediaElement.Source is FileMediaSource fileMediaSource)

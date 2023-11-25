@@ -69,7 +69,7 @@ internal sealed class HttpRandomAccessStream : IRandomAccessStreamWithContentTyp
         //    ContentType = response.Content.Headers.ContentType.MediaType;
         //}
 
-        size = response.Content.Headers.ContentLength!.Value;
+        size = response.Content.Headers.ContentLength ?? 0;
 
         if (response.StatusCode != HttpStatusCode.PartialContent && requestedPosition != 0)
         {
