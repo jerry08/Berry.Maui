@@ -29,7 +29,7 @@ public partial class AcrylicViewHandler : ViewHandler<IAcrylicView, FrameLayout>
     {
         colorBlendLayer = new View(Context);
 
-        realtimeBlurView = new RealtimeBlurView(Context, SetContentVisibel);
+        realtimeBlurView = new RealtimeBlurView(Context, SetContentVisible);
         realtimeBlurView.SetBlurRadius(120);
         realtimeBlurView.SetOverlayColor(Colors.Transparent.ToAndroid());
         realtimeBlurView.SetDownsampleFactor(4);
@@ -51,15 +51,16 @@ public partial class AcrylicViewHandler : ViewHandler<IAcrylicView, FrameLayout>
     /// <summary>
     /// Controls the transparency of the top-level view when obtaining the view layer
     /// </summary>
-    /// <param name="isVisibel"></param>
-    private void SetContentVisibel(bool isVisibel)
+    /// <param name="isVisible"></param>
+    private void SetContentVisible(bool isVisible)
     {
         if (borderViewGroup is null)
             return;
-        borderViewGroup.Alpha = isVisibel ? 1f : 0f;
+
+        borderViewGroup.Alpha = isVisible ? 1f : 0f;
     }
 
-    private static void MapTintColor(AcrylicViewHandler handler, IAcrylicView view)
+    private static void MapTintColor(AcrylicViewHandler? handler, IAcrylicView view)
     {
         if (view.EffectStyle != EffectStyle.Custom)
             return;
@@ -141,13 +142,13 @@ public partial class AcrylicViewHandler : ViewHandler<IAcrylicView, FrameLayout>
         PropertyChanged(handler, view);
     }
 
-    private static void MapCornerRadius(AcrylicViewHandler handler, IAcrylicView view)
+    private static void MapCornerRadius(AcrylicViewHandler? handler, IAcrylicView view)
     {
         var nativeView = handler?.PlatformView;
         if (nativeView is null)
             return;
 
-        handler.UpdateColorblendLayer(view);
+        handler!.UpdateColorblendLayer(view);
 
         var thickness = nativeView.Context.ToPixels(view.CornerRadius);
 
@@ -168,12 +169,13 @@ public partial class AcrylicViewHandler : ViewHandler<IAcrylicView, FrameLayout>
         PropertyChanged(handler, view);
     }
 
-    private static void PropertyChanged(AcrylicViewHandler handler, IAcrylicView view)
+    private static void PropertyChanged(AcrylicViewHandler? handler, IAcrylicView view)
     {
         var nativeView = handler?.PlatformView;
         if (nativeView is null)
             return;
-        handler.borderViewGroup.BorderDrawable = new BorderDrawable(nativeView.Context, view);
+
+        handler!.borderViewGroup.BorderDrawable = new BorderDrawable(nativeView.Context, view);
     }
 
     private void UpdateColorblendLayer(IAcrylicView view)

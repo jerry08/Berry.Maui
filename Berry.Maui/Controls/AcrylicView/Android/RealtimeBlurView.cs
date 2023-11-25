@@ -56,14 +56,14 @@ public class RealtimeBlurView : View
     private static int BLUR_IMPL;
     private Thickness borderThickness;
 
-    public delegate void SetContentVisibel(bool visible);
+    public delegate void SetContentVisible(bool visible);
 
-    private readonly SetContentVisibel _contentSetVisibel;
+    private readonly SetContentVisible _contentSetVisible;
 
     [Obsolete(
         "This type of library is no longer used in >= Android 12. Google has updated a new set of fuzzy operation libraries."
     )]
-    public RealtimeBlurView(Context context, SetContentVisibel visibel, string? formsId = null)
+    public RealtimeBlurView(Context context, SetContentVisible visible, string? formsId = null)
         : base(context)
     {
         // provide your own by override getBlurImpl()
@@ -76,7 +76,7 @@ public class RealtimeBlurView : View
         _autoUpdate = true;
 
         preDrawListener = new PreDrawListener(this);
-        _contentSetVisibel = visibel;
+        _contentSetVisible = visible;
     }
 
     public RealtimeBlurView(IntPtr javaReference, JniHandleOwnership transfer)
@@ -89,7 +89,7 @@ public class RealtimeBlurView : View
     public void SetBorderThickness(Thickness borderThickness)
     {
         this.borderThickness = borderThickness;
-        preDrawListener.OnPreDraw(borderThickness, _contentSetVisibel);
+        preDrawListener.OnPreDraw(borderThickness, _contentSetVisible);
     }
 
     protected IBlurImpl GetBlurImpl()
@@ -414,12 +414,12 @@ public class RealtimeBlurView : View
         /// <summary>
         /// Control top view transparency
         /// </summary>
-        private SetContentVisibel _setContentVisibel;
+        private SetContentVisible _setContentVisible;
 
-        public void OnPreDraw(Thickness thickness, SetContentVisibel setContentvisibel)
+        public void OnPreDraw(Thickness thickness, SetContentVisible setContentvisible)
         {
             _borderThickness = thickness;
-            _setContentVisibel = setContentvisibel;
+            _setContentVisible = setContentvisible;
             OnPreDraw();
         }
 
@@ -432,7 +432,7 @@ public class RealtimeBlurView : View
                 i = 0;
                 return true;
             }
-            _setContentVisibel(false);
+            _setContentVisible(false);
             i++;
             if (!_weakBlurView.TryGetTarget(out var blurView))
             {
@@ -503,7 +503,7 @@ public class RealtimeBlurView : View
                 }
             }
 
-            _setContentVisibel(true);
+            _setContentVisible(true);
             return true;
         }
     }
@@ -627,6 +627,6 @@ public class RealtimeBlurView : View
     {
         base.OnSizeChanged(w, h, oldw, oldh);
         if (w > 0 && h > 0)
-            preDrawListener.OnPreDraw(borderThickness, _contentSetVisibel);
+            preDrawListener.OnPreDraw(borderThickness, _contentSetVisible);
     }
 }
