@@ -391,7 +391,7 @@ public class BottomSheetController
             var container = (FrameLayout)
                 AView.Inflate(
                     _mauiContext.Context,
-                    Resource.Layout.the49_maui_bottom_sheet_design,
+                    Resource.Layout.berry_maui_bottom_sheet_design,
                     null
                 );
 
