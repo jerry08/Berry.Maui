@@ -334,8 +334,8 @@ public partial class TouchBehavior : PlatformBehavior<VisualElement>
     /// </summary>
     public HoverStatus HoverStatus
     {
-        get => (HoverStatus)GetValue(HoverStateProperty);
-        set => SetValue(HoverStateProperty, value);
+        get => (HoverStatus)GetValue(HoverStatusProperty);
+        set => SetValue(HoverStatusProperty, value);
     }
 
     /// <summary>
