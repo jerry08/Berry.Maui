@@ -26,7 +26,8 @@ public static class MauiAppBuilderExtensions
             .UseBottomSheet()
             .UseInsets()
             .UseMaterialSwitch()
-            .UseMaterialEntry();
+            .UseMaterialEntry()
+            .UseTabs();
 
         return builder;
     }

@@ -1,9 +1,11 @@
 ﻿using Berry.Maui.Behaviors;
 using Berry.Maui.Controls;
+using Berry.Maui.Controls.Effects;
 using Berry.Maui.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls.Hosting;
 using Microsoft.Maui.Hosting;
 using Microsoft.Maui.LifecycleEvents;
 
@@ -50,15 +52,6 @@ public class HostingBuilder
         return this;
     }
 
-    public HostingBuilder UseContextMenu()
-    {
-        _builder.ConfigureMauiHandlers(handlers =>
-        {
-            handlers.AddHandler<CollectionView, CollectionViewHandler>();
-        });
-        return this;
-    }
-
     public HostingBuilder UseAcrylicView()
     {
         _builder.ConfigureMauiHandlers(handlers =>
@@ -71,6 +64,24 @@ public class HostingBuilder
     public HostingBuilder UseMauiPlainer()
     {
         _builder.ConfigureMauiHandlers(handlers => handlers.AddPlainer());
+        return this;
+    }
+
+    public HostingBuilder UseTabs()
+    {
+        _builder.ConfigureEffects(x =>
+        {
+#if ANDROID
+            x.Add<CommandsRoutingEffect, Berry.Maui.Controls.Effects.Droid.CommandsPlatform>();
+            x.Add<TouchRoutingEffect, Berry.Maui.Controls.Effects.Droid.TouchEffectPlatform>();
+            x.Add<TintableImageEffect, Berry.Maui.Controls.Droid.AndroidTintableImageEffect>();
+#elif IOS
+            x.Add<CommandsRoutingEffect, Berry.Maui.Controls.Effects.iOS.CommandsPlatform>();
+            x.Add<TouchRoutingEffect, Berry.Maui.Controls.Effects.iOS.TouchEffectPlatform>();
+            x.Add<TintableImageEffect, Berry.Maui.Controls.iOS.iOSTintableImageEffect>();
+#endif
+        });
+
         return this;
     }
 
