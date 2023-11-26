@@ -17,9 +17,11 @@ public partial class TimePickerViewHandler : TimePickerHandler
         {
             gradientDrawable.SetColor(Android.Graphics.Color.Transparent);
             nativeView.SetBackground(gradientDrawable);
-            nativeView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(
-                Colors.Transparent.ToAndroid()
-            );
+            nativeView.BackgroundTintList = Android
+                .Content
+                .Res
+                .ColorStateList
+                .ValueOf(Colors.Transparent.ToAndroid());
         }
 
         return nativeView;

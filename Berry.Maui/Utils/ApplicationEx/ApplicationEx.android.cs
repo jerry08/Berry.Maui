@@ -103,16 +103,16 @@ public static partial class ApplicationEx
     {
         var statusBarHeight = -1;
         var resourceId =
-            Platform.CurrentActivity?.Resources?.GetIdentifier(
-                "status_bar_height",
-                "dimen",
-                "android"
-            ) ?? 0;
+            Platform
+                .CurrentActivity
+                ?.Resources
+                ?.GetIdentifier("status_bar_height", "dimen", "android") ?? 0;
         if (resourceId > 0)
         {
-            statusBarHeight = Platform.CurrentActivity!.Resources!.GetDimensionPixelSize(
-                resourceId
-            );
+            statusBarHeight = Platform
+                .CurrentActivity!
+                .Resources!
+                .GetDimensionPixelSize(resourceId);
         }
         return statusBarHeight;
     }
@@ -121,16 +121,16 @@ public static partial class ApplicationEx
     {
         var navigationBarHeight = -1;
         var resourceId =
-            Platform.CurrentActivity?.Resources?.GetIdentifier(
-                "navigation_bar_height",
-                "dimen",
-                "android"
-            ) ?? 0;
+            Platform
+                .CurrentActivity
+                ?.Resources
+                ?.GetIdentifier("navigation_bar_height", "dimen", "android") ?? 0;
         if (resourceId > 0)
         {
-            navigationBarHeight = Platform.CurrentActivity!.Resources!.GetDimensionPixelSize(
-                resourceId
-            );
+            navigationBarHeight = Platform
+                .CurrentActivity!
+                .Resources!
+                .GetDimensionPixelSize(resourceId);
         }
         return navigationBarHeight;
     }
@@ -148,9 +148,9 @@ public static partial class ApplicationEx
         if (OperatingSystem.IsAndroidVersionAtLeast((int)BuildVersionCodes.R))
         {
             var windowMetrics = windowManager.CurrentWindowMetrics;
-            var windowInsets = windowMetrics.WindowInsets.GetInsetsIgnoringVisibility(
-                WindowInsets.Type.SystemBars()
-            );
+            var windowInsets = windowMetrics
+                .WindowInsets
+                .GetInsetsIgnoringVisibility(WindowInsets.Type.SystemBars());
             windowWidth = windowMetrics.Bounds.Width();
             windowHeight = windowMetrics.Bounds.Height();
             return windowHeight < windowWidth
@@ -188,9 +188,9 @@ public static partial class ApplicationEx
         if (OperatingSystem.IsAndroidVersionAtLeast((int)BuildVersionCodes.R))
         {
             var windowMetrics = windowManager.CurrentWindowMetrics;
-            var windowInsets = windowMetrics.WindowInsets.GetInsetsIgnoringVisibility(
-                WindowInsets.Type.SystemBars()
-            );
+            var windowInsets = windowMetrics
+                .WindowInsets
+                .GetInsetsIgnoringVisibility(WindowInsets.Type.SystemBars());
             return windowInsets.Top;
         }
         else if (windowManager.DefaultDisplay is null)
@@ -218,9 +218,9 @@ public static partial class ApplicationEx
         if (OperatingSystem.IsAndroidVersionAtLeast((int)BuildVersionCodes.R))
         {
             var windowMetrics = windowManager.CurrentWindowMetrics;
-            var windowInsets = windowMetrics.WindowInsets.GetInsetsIgnoringVisibility(
-                WindowInsets.Type.SystemBars()
-            );
+            var windowInsets = windowMetrics
+                .WindowInsets
+                .GetInsetsIgnoringVisibility(WindowInsets.Type.SystemBars());
             windowWidth = windowMetrics.Bounds.Width();
             windowHeight = windowMetrics.Bounds.Height();
             statusBarHeight = windowInsets.Top;

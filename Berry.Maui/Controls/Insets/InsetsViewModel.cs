@@ -141,23 +141,25 @@ public partial class Insets : BindableObject
 
     internal void Init(Page mainPage)
     {
-        PageHandler.Mapper.PrependToMapping(
-            "_",
-            (h, v) =>
-            {
-                var page = (Page)v;
-                if (page.Window is not null)
+        PageHandler
+            .Mapper
+            .PrependToMapping(
+                "_",
+                (h, v) =>
                 {
-                    UpdateEdgeToEdge(page);
-                    UpdateStatusBarStyle(page);
+                    var page = (Page)v;
+                    if (page.Window is not null)
+                    {
+                        UpdateEdgeToEdge(page);
+                        UpdateStatusBarStyle(page);
+                    }
+                    page.Appearing += (s, e) =>
+                    {
+                        UpdateEdgeToEdge(page);
+                        UpdateStatusBarStyle(page);
+                    };
                 }
-                page.Appearing += (s, e) =>
-                {
-                    UpdateEdgeToEdge(page);
-                    UpdateStatusBarStyle(page);
-                };
-            }
-        );
+            );
         PlatformInit(mainPage);
     }
 

@@ -16,10 +16,12 @@ public static partial class ApplicationEx
             _ => UIInterfaceOrientation.Unknown
         };
 
-        UIDevice.CurrentDevice.SetValueForKey(
-            NSNumber.FromNInt((int)platformOrientation),
-            new NSString("orientation")
-        );
+        UIDevice
+            .CurrentDevice
+            .SetValueForKey(
+                NSNumber.FromNInt((int)platformOrientation),
+                new NSString("orientation")
+            );
     }
 
     /// <summary>
@@ -52,7 +54,12 @@ public static partial class ApplicationEx
         (int)
             Platform
                 .GetCurrentUIViewController()!
-                .View!.Window.WindowScene!.StatusBarManager!.StatusBarFrame.Height;
+                .View!
+                .Window
+                .WindowScene!
+                .StatusBarManager!
+                .StatusBarFrame
+                .Height;
 
     public static int GetNavigationBarHeight() =>
         (int)

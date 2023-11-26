@@ -84,6 +84,7 @@ public partial class TapToCloseBehavior
     }
 
     void OnFocusChanged2(object? sender, AView.FocusChangeEventArgs e) => SetupFocus(e.HasFocus);
+
     void OnFocusChanged(object? sender, FocusEventArgs e) => SetupFocus(e.IsFocused);
 
     void SetupFocus(bool hasFocus)
@@ -188,7 +189,8 @@ public partial class TapToCloseBehavior
             //_view?.HideKeyboard();
             //_view?.Unfocus();
 
-            var inputView = _view?.GetVisualTreeDescendants()
+            var inputView = _view
+                ?.GetVisualTreeDescendants()
                 .OfType<InputView>()
                 .Where(x => x is Entry or Editor)
                 .FirstOrDefault();

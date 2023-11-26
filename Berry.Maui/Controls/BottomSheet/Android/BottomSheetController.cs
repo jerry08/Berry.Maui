@@ -56,10 +56,7 @@ public class BottomSheetController
             _window = window;
             if (window != null)
             {
-                var insetsController = WindowCompat.GetInsetsController(
-                    window,
-                    window.DecorView
-                );
+                var insetsController = WindowCompat.GetInsetsController(window, window.DecorView);
                 _isStatusBarLight = insetsController.AppearanceLightStatusBars;
             }
         }
@@ -439,7 +436,10 @@ public class BottomSheetController
     {
         get
         {
-            if (OperatingSystem.IsAndroidVersionAtLeast(23) && _windowContainer.RootWindowInsets is not null)
+            if (
+                OperatingSystem.IsAndroidVersionAtLeast(23)
+                && _windowContainer.RootWindowInsets is not null
+            )
             {
                 return WindowInsetsCompat.ToWindowInsetsCompat(_windowContainer.RootWindowInsets);
                 //return WindowInsetsCompat.ToWindowInsetsCompat(Platform.CurrentActivity.Window.DecorView.RootWindowInsets);
@@ -462,12 +462,16 @@ public class BottomSheetController
                 );
             }
 #pragma warning disable CS0618
-            return AndroidX.Core.Graphics.Insets.Of(
-                insets.StableInsetLeft,
-                insets.StableInsetTop,
-                insets.StableInsetRight,
-                insets.StableInsetBottom
-            );
+            return AndroidX
+                .Core
+                .Graphics
+                .Insets
+                .Of(
+                    insets.StableInsetLeft,
+                    insets.StableInsetTop,
+                    insets.StableInsetRight,
+                    insets.StableInsetBottom
+                );
 #pragma warning restore CS0618
         }
     }
@@ -616,43 +620,47 @@ public class BottomSheetController
             _behavior.State = BottomSheetBehavior.StateHidden;
         }
 
-        _sheet.Dispatcher.Dispatch(() =>
-        {
-            ResizeVirtualView();
-
-            CalculateHeights(GetAvailableHeight());
-            CalculateStates();
-            Layout();
-            UpdateBackground();
-
-            var state = GetStateForDetent(_sheet.SelectedDetent);
-
-            var defaultDetent = _sheet.GetDefaultDetent();
-            if (state is -1)
+        _sheet
+            .Dispatcher
+            .Dispatch(() =>
             {
-                state = Behavior.SkipCollapsed
-                    ? BottomSheetBehavior.StateExpanded
-                    : BottomSheetBehavior.StateCollapsed;
-            }
+                ResizeVirtualView();
 
-            Behavior.State = state;
+                CalculateHeights(GetAvailableHeight());
+                CalculateStates();
+                Layout();
+                UpdateBackground();
 
-            containerView.LayoutChange += OnLayoutChange;
+                var state = GetStateForDetent(_sheet.SelectedDetent);
 
-            _sheet.NotifyShowing();
-        });
+                var defaultDetent = _sheet.GetDefaultDetent();
+                if (state is -1)
+                {
+                    state = Behavior.SkipCollapsed
+                        ? BottomSheetBehavior.StateExpanded
+                        : BottomSheetBehavior.StateCollapsed;
+                }
+
+                Behavior.State = state;
+
+                containerView.LayoutChange += OnLayoutChange;
+
+                _sheet.NotifyShowing();
+            });
     }
 
     void OnLayoutChange(object sender, AView.LayoutChangeEventArgs e)
     {
         // Added Dispatcher here to fix issue when changing orientations
-        _sheet.Dispatcher.Dispatch(() =>
-        {
-            CalculateHeights(GetAvailableHeight());
-            CalculateStates();
-            ResizeVirtualView();
-            Layout();
-        });
+        _sheet
+            .Dispatcher
+            .Dispatch(() =>
+            {
+                CalculateHeights(GetAvailableHeight());
+                CalculateStates();
+                ResizeVirtualView();
+                Layout();
+            });
     }
 
     void Callback_StateChanged(object? sender, EventArgs e)

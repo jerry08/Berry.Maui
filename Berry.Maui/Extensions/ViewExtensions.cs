@@ -2,7 +2,6 @@
 using System.Numerics;
 using Microsoft.Maui;
 using Microsoft.Maui.Platform;
-
 #if (NETSTANDARD || !PLATFORM) || (NET6_0_OR_GREATER && !IOS && !ANDROID)
 using IPlatformViewHandler = Microsoft.Maui.IViewHandler;
 #endif

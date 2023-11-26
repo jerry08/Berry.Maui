@@ -55,10 +55,9 @@ public partial class Insets
 
         if (edgeToEdge)
         {
-            activity.Window.SetFlags(
-                WindowManagerFlags.LayoutNoLimits,
-                WindowManagerFlags.LayoutNoLimits
-            );
+            activity
+                .Window
+                .SetFlags(WindowManagerFlags.LayoutNoLimits, WindowManagerFlags.LayoutNoLimits);
             Current.SetEnabled(true);
         }
         else
@@ -140,9 +139,12 @@ public partial class Insets
             return true;
         }
 
-        System.Diagnostics.Debug.WriteLine(
-            $"This functionality is not available. Minimum supported API is {(int)BuildVersionCodes.M}"
-        );
+        System
+            .Diagnostics
+            .Debug
+            .WriteLine(
+                $"This functionality is not available. Minimum supported API is {(int)BuildVersionCodes.M}"
+            );
         return false;
     }
 }

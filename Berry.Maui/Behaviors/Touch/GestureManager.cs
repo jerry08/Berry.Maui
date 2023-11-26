@@ -534,7 +534,8 @@ sealed class GestureManager : IDisposable
             opacity = pressedOpacity;
         }
         else if (
-            hoverState == HoverState.Hovered && sender.IsSet(TouchBehavior.HoveredOpacityProperty)
+            hoverState == HoverState.Hovered
+            && sender.IsSet(TouchBehavior.HoveredOpacityProperty)
         )
         {
             opacity = hoveredOpacity;
@@ -581,7 +582,8 @@ sealed class GestureManager : IDisposable
             scale = pressedScale;
         }
         else if (
-            hoverState == HoverState.Hovered && sender.IsSet(TouchBehavior.HoveredScaleProperty)
+            hoverState == HoverState.Hovered
+            && sender.IsSet(TouchBehavior.HoveredScaleProperty)
         )
         {
             scale = hoveredScale;
@@ -712,7 +714,8 @@ sealed class GestureManager : IDisposable
             rotation = pressedRotation;
         }
         else if (
-            hoverState == HoverState.Hovered && sender.IsSet(TouchBehavior.HoveredRotationProperty)
+            hoverState == HoverState.Hovered
+            && sender.IsSet(TouchBehavior.HoveredRotationProperty)
         )
         {
             rotation = hoveredRotation;
@@ -757,7 +760,8 @@ sealed class GestureManager : IDisposable
             rotationX = pressedRotationX;
         }
         else if (
-            hoverState == HoverState.Hovered && sender.IsSet(TouchBehavior.HoveredRotationXProperty)
+            hoverState == HoverState.Hovered
+            && sender.IsSet(TouchBehavior.HoveredRotationXProperty)
         )
         {
             rotationX = hoveredRotationX;
@@ -802,7 +806,8 @@ sealed class GestureManager : IDisposable
             rotationY = pressedRotationY;
         }
         else if (
-            hoverState == HoverState.Hovered && sender.IsSet(TouchBehavior.HoveredRotationYProperty)
+            hoverState == HoverState.Hovered
+            && sender.IsSet(TouchBehavior.HoveredRotationYProperty)
         )
         {
             rotationY = hoveredRotationY;

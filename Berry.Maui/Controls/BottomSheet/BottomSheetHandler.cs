@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using Microsoft.Maui;
 using Microsoft.Maui.Handlers;
-
 #if IOS
 using PlatformView = UIKit.UIView;
 #elif ANDROID

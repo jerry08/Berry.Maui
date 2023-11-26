@@ -36,8 +36,7 @@ public partial class TouchBehavior
     private AccessibilityListener? accessibilityListener;
 
     private bool IsAccessibilityMode =>
-        accessibilityManager?.IsEnabled == true
-        && accessibilityManager.IsTouchExplorationEnabled;
+        accessibilityManager?.IsEnabled == true && accessibilityManager.IsTouchExplorationEnabled;
 
     private readonly bool isAtLeastM = IsAndroidVersionAtLeast((int)BuildVersionCodes.M);
 

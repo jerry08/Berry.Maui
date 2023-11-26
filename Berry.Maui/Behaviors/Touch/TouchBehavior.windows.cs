@@ -43,9 +43,14 @@ public partial class TouchBehavior
 
                 Storyboard.SetTargetName(downThemeAnimation, platformView.Name);
                 pointerDownStoryboard.Children.Add(downThemeAnimation);
-                platformView.Resources.Add(
-                    new KeyValuePair<object, object>(pointerDownAnimationKey, pointerDownStoryboard)
-                );
+                platformView
+                    .Resources
+                    .Add(
+                        new KeyValuePair<object, object>(
+                            pointerDownAnimationKey,
+                            pointerDownStoryboard
+                        )
+                    );
             }
 
             if (platformView.Resources.ContainsKey(pointerUpAnimationKey))
@@ -61,9 +66,11 @@ public partial class TouchBehavior
 
                 pointerUpStoryboard.Children.Add(upThemeAnimation);
 
-                platformView.Resources.Add(
-                    new KeyValuePair<object, object>(pointerUpAnimationKey, pointerUpStoryboard)
-                );
+                platformView
+                    .Resources
+                    .Add(
+                        new KeyValuePair<object, object>(pointerUpAnimationKey, pointerUpStoryboard)
+                    );
             }
 
             platformView.PointerPressed += OnPointerPressed;

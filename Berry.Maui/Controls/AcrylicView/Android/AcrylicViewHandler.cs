@@ -153,12 +153,14 @@ public partial class AcrylicViewHandler : ViewHandler<IAcrylicView, FrameLayout>
         var thickness = nativeView.Context.ToPixels(view.CornerRadius);
 
         // Acrylic layer rounded corners
-        handler.realtimeBlurView.SetCornerRadius(
-            (float)thickness.Left,
-            (float)thickness.Top,
-            (float)thickness.Right,
-            (float)thickness.Bottom
-        );
+        handler
+            .realtimeBlurView
+            .SetCornerRadius(
+                (float)thickness.Left,
+                (float)thickness.Top,
+                (float)thickness.Right,
+                (float)thickness.Bottom
+            );
 
         // Border layer
         PropertyChanged(handler, view);
