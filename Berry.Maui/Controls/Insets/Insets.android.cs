@@ -55,9 +55,10 @@ public partial class Insets
 
         if (edgeToEdge)
         {
-            activity
-                .Window
-                .SetFlags(WindowManagerFlags.LayoutNoLimits, WindowManagerFlags.LayoutNoLimits);
+            activity.Window.SetFlags(
+                WindowManagerFlags.LayoutNoLimits,
+                WindowManagerFlags.LayoutNoLimits
+            );
             Current.SetEnabled(true);
         }
         else
@@ -122,6 +123,41 @@ public partial class Insets
         windowController.AppearanceLightStatusBars = isLightStatusBars;
     }
 
+    static partial void UpdateNavigationBarStyle(Page page)
+    {
+        var edgeToEdge = GetEdgeToEdge(page);
+        if (!IsSupported() || !edgeToEdge)
+        {
+            return;
+        }
+
+        var style = GetNavigationBarStyle(page);
+
+        switch (style)
+        {
+            case NavigationBarStyle.DarkContent:
+                SetNavigationBarAppearance(Platform.CurrentActivity, true);
+                break;
+
+            case NavigationBarStyle.Default:
+            case NavigationBarStyle.LightContent:
+                SetNavigationBarAppearance(Platform.CurrentActivity, false);
+                break;
+
+            default:
+                throw new NotSupportedException(
+                    $"{nameof(NavigationBarStyle)} {style} is not yet supported on Android"
+                );
+        }
+    }
+
+    static void SetNavigationBarAppearance(Activity activity, bool isLightNavigationBar)
+    {
+        var window = GetCurrentWindow(activity);
+        var windowController = WindowCompat.GetInsetsController(window, window.DecorView);
+        windowController.AppearanceLightNavigationBars = isLightNavigationBar;
+    }
+
     static AWindow GetCurrentWindow(Activity activity)
     {
         var window =
@@ -139,12 +175,9 @@ public partial class Insets
             return true;
         }
 
-        System
-            .Diagnostics
-            .Debug
-            .WriteLine(
-                $"This functionality is not available. Minimum supported API is {(int)BuildVersionCodes.M}"
-            );
+        System.Diagnostics.Debug.WriteLine(
+            $"This functionality is not available. Minimum supported API is {(int)BuildVersionCodes.M}"
+        );
         return false;
     }
 }

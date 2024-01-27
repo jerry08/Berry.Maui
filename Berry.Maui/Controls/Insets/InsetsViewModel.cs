@@ -12,6 +12,13 @@ public enum StatusBarStyle
     DarkContent = 2
 }
 
+public enum NavigationBarStyle
+{
+    Default = 0,
+    LightContent = 1,
+    DarkContent = 2
+}
+
 public partial class Insets : BindableObject
 {
     bool _enabled = false;
@@ -31,6 +38,15 @@ public partial class Insets : BindableObject
             typeof(Insets),
             StatusBarStyle.Default,
             propertyChanged: StatusBarStyleChanged
+        );
+
+    public static readonly BindableProperty NavigationBarStyleProperty =
+        BindableProperty.CreateAttached(
+            "NavigationBarStyle",
+            typeof(NavigationBarStyle),
+            typeof(Insets),
+            NavigationBarStyle.Default,
+            propertyChanged: NavigationBarStyleChanged
         );
 
     public static readonly BindableProperty CancelIOSPaddingProperty =
@@ -62,6 +78,14 @@ public partial class Insets : BindableObject
         }
     }
 
+    static void NavigationBarStyleChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is Page page && page.Window != null)
+        {
+            UpdateNavigationBarStyle(page);
+        }
+    }
+
     static void EdgeToEdgeChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is Page page)
@@ -70,6 +94,7 @@ public partial class Insets : BindableObject
             {
                 UpdateEdgeToEdge(page);
                 UpdateStatusBarStyle(page);
+                UpdateNavigationBarStyle(page);
             }
             else
             {
@@ -108,6 +133,7 @@ public partial class Insets : BindableObject
     {
         UpdateEdgeToEdge(page);
         UpdateStatusBarStyle(page);
+        UpdateNavigationBarStyle(page);
     }
 
     static partial void UpdateEdgeToEdge(Page page);
@@ -115,6 +141,8 @@ public partial class Insets : BindableObject
     static partial void UpdateIOSPadding(Layout layout);
 
     static partial void UpdateStatusBarStyle(Page page);
+
+    static partial void UpdateNavigationBarStyle(Page page);
 
     static partial void PlatformInit(Page page);
 
@@ -141,25 +169,25 @@ public partial class Insets : BindableObject
 
     internal void Init(Page mainPage)
     {
-        PageHandler
-            .Mapper
-            .PrependToMapping(
-                "_",
-                (h, v) =>
+        PageHandler.Mapper.PrependToMapping(
+            "_",
+            (h, v) =>
+            {
+                var page = (Page)v;
+                if (page.Window is not null)
                 {
-                    var page = (Page)v;
-                    if (page.Window is not null)
-                    {
-                        UpdateEdgeToEdge(page);
-                        UpdateStatusBarStyle(page);
-                    }
-                    page.Appearing += (s, e) =>
-                    {
-                        UpdateEdgeToEdge(page);
-                        UpdateStatusBarStyle(page);
-                    };
+                    UpdateEdgeToEdge(page);
+                    UpdateStatusBarStyle(page);
+                    UpdateNavigationBarStyle(page);
                 }
-            );
+                page.Appearing += (s, e) =>
+                {
+                    UpdateEdgeToEdge(page);
+                    UpdateStatusBarStyle(page);
+                    UpdateNavigationBarStyle(page);
+                };
+            }
+        );
         PlatformInit(mainPage);
     }
 
@@ -188,6 +216,16 @@ public partial class Insets : BindableObject
     public static void SetStatusBarStyle(BindableObject target, StatusBarStyle value)
     {
         target.SetValue(StatusBarStyleProperty, value);
+    }
+
+    public static NavigationBarStyle GetNavigationBarStyle(BindableObject target)
+    {
+        return (NavigationBarStyle)target.GetValue(NavigationBarStyleProperty);
+    }
+
+    public static void SetNavigationBarStyle(BindableObject target, NavigationBarStyle value)
+    {
+        target.SetValue(NavigationBarStyleProperty, value);
     }
 
     public static bool GetCancelIOSPadding(BindableObject target)

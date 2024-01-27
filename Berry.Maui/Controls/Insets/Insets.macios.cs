@@ -85,17 +85,15 @@ public partial class Insets
         }
         else
         {
-            UIApplication
-                .SharedApplication
-                .SetStatusBarStyle(
-                    style switch
-                    {
-                        StatusBarStyle.LightContent => UIStatusBarStyle.LightContent,
-                        StatusBarStyle.DarkContent => UIStatusBarStyle.DarkContent,
-                        StatusBarStyle.Default or _ => UIStatusBarStyle.Default,
-                    },
-                    false
-                );
+            UIApplication.SharedApplication.SetStatusBarStyle(
+                style switch
+                {
+                    StatusBarStyle.LightContent => UIStatusBarStyle.LightContent,
+                    StatusBarStyle.DarkContent => UIStatusBarStyle.DarkContent,
+                    StatusBarStyle.Default or _ => UIStatusBarStyle.Default,
+                },
+                false
+            );
         }
         UpdateStatusBarAppearance();
     }
