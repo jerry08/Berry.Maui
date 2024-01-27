@@ -462,16 +462,12 @@ public class BottomSheetController
                 );
             }
 #pragma warning disable CS0618
-            return AndroidX
-                .Core
-                .Graphics
-                .Insets
-                .Of(
-                    insets.StableInsetLeft,
-                    insets.StableInsetTop,
-                    insets.StableInsetRight,
-                    insets.StableInsetBottom
-                );
+            return AndroidX.Core.Graphics.Insets.Of(
+                insets.StableInsetLeft,
+                insets.StableInsetTop,
+                insets.StableInsetRight,
+                insets.StableInsetBottom
+            );
 #pragma warning restore CS0618
         }
     }
@@ -620,47 +616,43 @@ public class BottomSheetController
             _behavior.State = BottomSheetBehavior.StateHidden;
         }
 
-        _sheet
-            .Dispatcher
-            .Dispatch(() =>
+        _sheet.Dispatcher.Dispatch(() =>
+        {
+            ResizeVirtualView();
+
+            CalculateHeights(GetAvailableHeight());
+            CalculateStates();
+            Layout();
+            UpdateBackground();
+
+            var state = GetStateForDetent(_sheet.SelectedDetent);
+
+            var defaultDetent = _sheet.GetDefaultDetent();
+            if (state is -1)
             {
-                ResizeVirtualView();
+                state = Behavior.SkipCollapsed
+                    ? BottomSheetBehavior.StateExpanded
+                    : BottomSheetBehavior.StateCollapsed;
+            }
 
-                CalculateHeights(GetAvailableHeight());
-                CalculateStates();
-                Layout();
-                UpdateBackground();
+            Behavior.State = state;
 
-                var state = GetStateForDetent(_sheet.SelectedDetent);
+            containerView.LayoutChange += OnLayoutChange;
 
-                var defaultDetent = _sheet.GetDefaultDetent();
-                if (state is -1)
-                {
-                    state = Behavior.SkipCollapsed
-                        ? BottomSheetBehavior.StateExpanded
-                        : BottomSheetBehavior.StateCollapsed;
-                }
-
-                Behavior.State = state;
-
-                containerView.LayoutChange += OnLayoutChange;
-
-                _sheet.NotifyShowing();
-            });
+            _sheet.NotifyShowing();
+        });
     }
 
     void OnLayoutChange(object sender, AView.LayoutChangeEventArgs e)
     {
         // Added Dispatcher here to fix issue when changing orientations
-        _sheet
-            .Dispatcher
-            .Dispatch(() =>
-            {
-                CalculateHeights(GetAvailableHeight());
-                CalculateStates();
-                ResizeVirtualView();
-                Layout();
-            });
+        _sheet.Dispatcher.Dispatch(() =>
+        {
+            CalculateHeights(GetAvailableHeight());
+            CalculateStates();
+            ResizeVirtualView();
+            Layout();
+        });
     }
 
     void Callback_StateChanged(object? sender, EventArgs e)

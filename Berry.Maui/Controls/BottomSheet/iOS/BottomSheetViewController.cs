@@ -133,8 +133,8 @@ public class BottomSheetViewController : UIViewController
         return SheetPresentationController.SelectedDetentIdentifier switch
         {
             UISheetPresentationControllerDetentIdentifier.Medium
-                => detents.FirstOrDefault(
-                    d => d is RatioDetent ratioDetent && ratioDetent.Ratio == .5f
+                => detents.FirstOrDefault(d =>
+                    d is RatioDetent ratioDetent && ratioDetent.Ratio == .5f
                 ),
             UISheetPresentationControllerDetentIdentifier.Large
                 => detents.FirstOrDefault(d => d is FullscreenDetent),

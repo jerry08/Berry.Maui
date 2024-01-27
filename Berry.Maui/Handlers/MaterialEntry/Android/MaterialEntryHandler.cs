@@ -102,13 +102,10 @@ public class MaterialEntryHandler : ViewHandler<Entry, TextInputLayout>, IEntryH
 
         //platformView.LayoutChange += PlatformView_LayoutChange;
 
-        Application
-            .Current
-            ?.Dispatcher
-            .Dispatch(() =>
-            {
-                PlatformView.EditText?.SetWidth(PlatformView.Width);
-            });
+        Application.Current?.Dispatcher.Dispatch(() =>
+        {
+            PlatformView.EditText?.SetWidth(PlatformView.Width);
+        });
     }
 
     protected override void DisconnectHandler(TextInputLayout platformView)

@@ -40,8 +40,7 @@ public static partial class ViewExtensions
     ) =>
         element
             .RequireMauiContext(fallbackToAppMauiContext)
-            .Services
-            .GetRequiredService<IFontManager>();
+            .Services.GetRequiredService<IFontManager>();
 
     public static double GetDefaultFontSize(this Element element) =>
         element.FindMauiContext()?.Services?.GetService<IFontManager>()?.DefaultFontSize ?? 0d;

@@ -481,12 +481,10 @@ public class RealtimeBlurView : View
                     var _borderHeight = (float)(
                         _density * (_borderThickness.Top + _borderThickness.Bottom)
                     );
-                    blurView
-                        .mBlurringCanvas
-                        .Scale(
-                            (blurView.mBitmapToBlur.Width + _borderWidth) / blurView.Width,
-                            (blurView.mBitmapToBlur.Height + _borderHeight) / blurView.Height
-                        );
+                    blurView.mBlurringCanvas.Scale(
+                        (blurView.mBitmapToBlur.Width + _borderWidth) / blurView.Width,
+                        (blurView.mBitmapToBlur.Height + _borderHeight) / blurView.Height
+                    );
                     blurView.mBlurringCanvas.Translate(-x, -y);
                     decor.Background?.Draw(blurView.mBlurringCanvas);
                     decor.Draw(blurView.mBlurringCanvas);

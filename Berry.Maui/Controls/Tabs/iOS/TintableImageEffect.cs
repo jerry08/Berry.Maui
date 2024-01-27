@@ -44,9 +44,9 @@ public class iOSTintableImageEffect : PlatformEffect
         _tintAttempts = 0;
         if (Control is UIImageView { Image: { } } imageView)
         {
-            imageView.Image = imageView
-                .Image
-                .ImageWithRenderingMode(UIImageRenderingMode.Automatic);
+            imageView.Image = imageView.Image.ImageWithRenderingMode(
+                UIImageRenderingMode.Automatic
+            );
         }
     }
 
@@ -87,9 +87,9 @@ public class iOSTintableImageEffect : PlatformEffect
         }
 
         _tintAttempts = 0;
-        imageView.Image = imageView
-            .Image
-            .ImageWithRenderingMode(UIImageRenderingMode.AlwaysTemplate);
+        imageView.Image = imageView.Image.ImageWithRenderingMode(
+            UIImageRenderingMode.AlwaysTemplate
+        );
     }
 
     private async Task DelayedPost(int milliseconds, Action action)

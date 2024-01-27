@@ -71,16 +71,14 @@ internal partial class BottomSheetManager
                             {
                                 if (!sheet.CachedDetents.ContainsKey(index))
                                 {
-                                    sheet
-                                        .CachedDetents
-                                        .Add(
-                                            index,
-                                            (float)
-                                                d.GetHeight(
-                                                    sheet,
-                                                    context.MaximumDetentValue - _keyboardHeight
-                                                )
-                                        );
+                                    sheet.CachedDetents.Add(
+                                        index,
+                                        (float)
+                                            d.GetHeight(
+                                                sheet,
+                                                context.MaximumDetentValue - _keyboardHeight
+                                            )
+                                    );
                                 }
                                 return sheet.CachedDetents[index];
                             }

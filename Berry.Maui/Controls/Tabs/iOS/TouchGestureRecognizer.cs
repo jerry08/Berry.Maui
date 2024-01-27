@@ -47,15 +47,13 @@ public class TouchGestureRecognizer : UIGestureRecognizer
         _startCalled = false;
 
         await Task.Delay(125);
-        DispatchQueue
-            .MainQueue
-            .DispatchAsync(() =>
-            {
-                if (!Processing || _disposed)
-                    return;
-                OnTouch?.Invoke(this, new TouchArgs(TouchState.Started, true));
-                _startCalled = true;
-            });
+        DispatchQueue.MainQueue.DispatchAsync(() =>
+        {
+            if (!Processing || _disposed)
+                return;
+            OnTouch?.Invoke(this, new TouchArgs(TouchState.Started, true));
+            _startCalled = true;
+        });
     }
 
     public override void TouchesMoved(NSSet touches, UIEvent evt)

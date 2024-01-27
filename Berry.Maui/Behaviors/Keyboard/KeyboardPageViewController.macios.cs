@@ -99,13 +99,11 @@ public class KeyboardPageViewController : PageViewController
         var trigger = targets.First().Triggers.First();
 
         var matchingRegistrations = targets
-            .Where(
-                i =>
-                    i.Triggers.Any(
-                        i =>
-                            (i.PlatformModifiers) == presses.Modifiers
-                            && i.PlatformKeys.SequenceEqual(presses.Keys)
-                    )
+            .Where(i =>
+                i.Triggers.Any(i =>
+                    (i.PlatformModifiers) == presses.Modifiers
+                    && i.PlatformKeys.SequenceEqual(presses.Keys)
+                )
             )
             .ToArray();
 

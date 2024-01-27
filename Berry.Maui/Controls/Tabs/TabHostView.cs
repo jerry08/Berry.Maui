@@ -740,15 +740,13 @@ public class TabHostView : Shadows
 
         if (Device.RuntimePlatform == Device.UWP)
         {
-            tabItem
-                .GestureRecognizers
-                .Add(
-                    new TapGestureRecognizer
-                    {
-                        Command = TabItemTappedCommand,
-                        CommandParameter = tabItem
-                    }
-                );
+            tabItem.GestureRecognizers.Add(
+                new TapGestureRecognizer
+                {
+                    Command = TabItemTappedCommand,
+                    CommandParameter = tabItem
+                }
+            );
         }
         else
         {
@@ -774,15 +772,13 @@ public class TabHostView : Shadows
         _grid.Children.Insert(tabIndexInGrid, tabItem);
         if (Orientation == OrientationType.Horizontal)
         {
-            _grid
-                .ColumnDefinitions
-                .Insert(
-                    tabIndexInGrid,
-                    new ColumnDefinition
-                    {
-                        Width = TabType == TabType.Fixed ? GridLength.Star : GridLength.Auto
-                    }
-                );
+            _grid.ColumnDefinitions.Insert(
+                tabIndexInGrid,
+                new ColumnDefinition
+                {
+                    Width = TabType == TabType.Fixed ? GridLength.Star : GridLength.Auto
+                }
+            );
 
             if (TabType == TabType.Scrollable)
             {
@@ -803,15 +799,13 @@ public class TabHostView : Shadows
         }
         else
         {
-            _grid
-                .RowDefinitions
-                .Insert(
-                    tabIndexInGrid,
-                    new RowDefinition
-                    {
-                        Height = TabType == TabType.Fixed ? GridLength.Star : GridLength.Auto
-                    }
-                );
+            _grid.RowDefinitions.Insert(
+                tabIndexInGrid,
+                new RowDefinition
+                {
+                    Height = TabType == TabType.Fixed ? GridLength.Star : GridLength.Auto
+                }
+            );
 
             if (TabType == TabType.Scrollable)
             {
@@ -867,8 +861,7 @@ public class TabHostView : Shadows
             }
 
             var previousElementAt = _grid
-                .Children
-                .Where(v => v is TabItem)
+                .Children.Where(v => v is TabItem)
                 .ElementAtOrDefault(index - 1);
             var indexInGrid = _grid.Children.IndexOf(previousElementAt) + 1;
 
@@ -988,15 +981,17 @@ public class TabHostView : Shadows
                 var separator = CreateSeparator();
                 if (Orientation == OrientationType.Horizontal)
                 {
-                    _grid
-                        .ColumnDefinitions
-                        .Insert(index, new ColumnDefinition { Width = separator.WidthRequest });
+                    _grid.ColumnDefinitions.Insert(
+                        index,
+                        new ColumnDefinition { Width = separator.WidthRequest }
+                    );
                 }
                 else
                 {
-                    _grid
-                        .RowDefinitions
-                        .Insert(index, new RowDefinition { Height = separator.HeightRequest });
+                    _grid.RowDefinitions.Insert(
+                        index,
+                        new RowDefinition { Height = separator.HeightRequest }
+                    );
                 }
 
                 _grid.Children.Insert(index, separator);
@@ -1152,15 +1147,13 @@ public class TabHostView : Shadows
 
             if (Orientation == OrientationType.Horizontal)
             {
-                _grid
-                    .ColumnDefinitions
-                    .Insert(
-                        tabIndexInGrid,
-                        new ColumnDefinition
-                        {
-                            Width = TabType == TabType.Fixed ? GridLength.Star : GridLength.Auto
-                        }
-                    );
+                _grid.ColumnDefinitions.Insert(
+                    tabIndexInGrid,
+                    new ColumnDefinition
+                    {
+                        Width = TabType == TabType.Fixed ? GridLength.Star : GridLength.Auto
+                    }
+                );
 
                 if (TabType == TabType.Scrollable)
                 {
@@ -1181,15 +1174,13 @@ public class TabHostView : Shadows
             }
             else
             {
-                _grid
-                    .RowDefinitions
-                    .Insert(
-                        tabIndexInGrid,
-                        new RowDefinition
-                        {
-                            Height = TabType == TabType.Fixed ? GridLength.Star : GridLength.Auto
-                        }
-                    );
+                _grid.RowDefinitions.Insert(
+                    tabIndexInGrid,
+                    new RowDefinition
+                    {
+                        Height = TabType == TabType.Fixed ? GridLength.Star : GridLength.Auto
+                    }
+                );
 
                 if (TabType == TabType.Scrollable)
                 {
