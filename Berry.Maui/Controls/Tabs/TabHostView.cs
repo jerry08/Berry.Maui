@@ -133,7 +133,7 @@ public class TabHostView : Shadows
 
     private readonly Grid _grid;
     private readonly Frame _frame;
-    private List<TabItem> _selectableTabs = new();
+    private List<TabItem> _selectableTabs = [];
 
     private INotifyCollectionChanged _currentNotifyCollection;
 

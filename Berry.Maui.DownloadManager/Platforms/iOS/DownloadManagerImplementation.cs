@@ -49,7 +49,7 @@ public class DownloadManagerImplementation : IDownloadManager
     {
         _avoidDiscretionaryDownloadInBackground = avoidDiscretionaryDownloadInBackground;
         _httpMaximumConnectionsPerHost = httpMaximumConnectionsPerHost;
-        _queue = new List<IDownloadFile>();
+        _queue = [];
 
         if (avoidDiscretionaryDownloadInBackground)
         {

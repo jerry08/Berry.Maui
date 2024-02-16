@@ -8,7 +8,7 @@ namespace Berry.Maui.Behaviors;
 internal class UIPressesData
 {
     internal UIKeyModifierFlags Modifiers { get; set; } = 0;
-    internal List<UIKeyboardHidUsage> Keys { get; set; } = new List<UIKeyboardHidUsage>();
+    internal List<UIKeyboardHidUsage> Keys { get; set; } = [];
 
     internal static UIPressesData Create(NSSet<UIPress> presses, UIPressesEvent evt)
     {

@@ -42,7 +42,7 @@ public class DownloadManagerImplementation : IDownloadManager
 
     public DownloadManagerImplementation()
     {
-        _queue = new List<IDownloadFile>();
+        _queue = [];
 
         _downloadManager = (Android.App.DownloadManager)
             Application.Context.GetSystemService(Context.DownloadService)!;

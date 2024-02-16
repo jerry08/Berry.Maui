@@ -152,11 +152,9 @@ public partial class BottomSheet : ContentView
         }
         Shown += OnShown;
 
-        if (SelectedDetent is null)
-        {
-            SelectedDetent = GetDefaultDetent();
-        }
+        SelectedDetent ??= GetDefaultDetent();
 
+        window.AddLogicalChild(this);
         BottomSheetManager.Show(window, this, animated);
         return completionSource.Task;
     }
@@ -179,9 +177,9 @@ public partial class BottomSheet : ContentView
     {
         var enabledDetents = Detents.Where(d => d.IsEnabled);
 
-        if (enabledDetents.Count() == 0)
+        if (!enabledDetents.Any())
         {
-            return new List<Detent> { new ContentDetent() };
+            return [new ContentDetent()];
         }
         return enabledDetents;
     }
@@ -199,6 +197,7 @@ public partial class BottomSheet : ContentView
 
     internal void NotifyDismissed()
     {
+        Parent.RemoveLogicalChild(this);
         Dismissed?.Invoke(this, _dismissOrigin);
     }
 

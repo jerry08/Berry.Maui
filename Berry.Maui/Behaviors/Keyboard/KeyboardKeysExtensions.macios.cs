@@ -8,7 +8,7 @@ internal static class KeyboardKeysExtensions
 {
     internal static UIKeyboardHidUsage ToPlatformKeys(this KeyboardKeys virtualKeys)
     {
-        List<UIKeyboardHidUsage> platformKeyValues = new();
+        List<UIKeyboardHidUsage> platformKeyValues = [];
 
         foreach (KeyboardKeys virtualKey in Enum.GetValues(typeof(KeyboardKeys)))
         {
@@ -28,7 +28,7 @@ internal static class KeyboardKeysExtensions
 
     internal static List<UIKeyboardHidUsage> ToPlatformKeyValues(this KeyboardKeys virtualKeys)
     {
-        List<UIKeyboardHidUsage> platformKeyValues = new();
+        List<UIKeyboardHidUsage> platformKeyValues = [];
 
         foreach (KeyboardKeys virtualKey in Enum.GetValues(typeof(KeyboardKeys)))
         {
@@ -46,7 +46,7 @@ internal static class KeyboardKeysExtensions
 
     internal static KeyboardKeys ToVirtualKeys(this UIKeyboardHidUsage platformKeys)
     {
-        List<KeyboardKeys> virtualKeyValues = new();
+        List<KeyboardKeys> virtualKeyValues = [];
 
         foreach (UIKeyboardHidUsage platformKey in Enum.GetValues(typeof(UIKeyboardHidUsage)))
         {
@@ -66,7 +66,7 @@ internal static class KeyboardKeysExtensions
 
     internal static KeyboardKeys ToVirtualKeys(this List<UIKeyboardHidUsage> platformKeys)
     {
-        List<KeyboardKeys> virtualKeyValues = new();
+        List<KeyboardKeys> virtualKeyValues = [];
 
         foreach (var platformKey in platformKeys)
         {

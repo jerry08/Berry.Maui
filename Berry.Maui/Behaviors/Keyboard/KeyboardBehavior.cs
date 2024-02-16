@@ -7,7 +7,7 @@ public partial class KeyboardBehavior : PlatformBehavior<VisualElement>
 {
     KeyboardBehaviorTriggers? _triggers;
 
-    public KeyboardBehaviorTriggers Triggers => _triggers ??= new KeyboardBehaviorTriggers();
+    public KeyboardBehaviorTriggers Triggers => _triggers ??= [];
 
     public event EventHandler<KeyPressedEventArgs>? KeyDown;
     public event EventHandler<KeyPressedEventArgs>? KeyUp;

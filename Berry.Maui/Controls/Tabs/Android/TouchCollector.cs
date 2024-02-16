@@ -7,8 +7,7 @@ namespace Berry.Maui.Controls.Effects.Droid.GestureCollectors;
 
 internal static class TouchCollector
 {
-    static Dictionary<View, List<Action<View.TouchEventArgs>>> Collection { get; } =
-        new Dictionary<View, List<Action<View.TouchEventArgs>>>();
+    static Dictionary<View, List<Action<View.TouchEventArgs>>> Collection { get; } = [];
 
     static View? _activeView;
 
@@ -21,7 +20,7 @@ internal static class TouchCollector
         else
         {
             view.Touch += ActionActivator;
-            Collection.Add(view, new List<Action<View.TouchEventArgs>> { action });
+            Collection.Add(view, [action]);
         }
     }
 

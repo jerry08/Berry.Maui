@@ -31,7 +31,7 @@ public class DownloadManagerImplementation : IDownloadManager
 
     public DownloadManagerImplementation()
     {
-        _queue = new List<IDownloadFile>();
+        _queue = [];
 
         // Enumerate outstanding downloads.
         BackgroundDownloader

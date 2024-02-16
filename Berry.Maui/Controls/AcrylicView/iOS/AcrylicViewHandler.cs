@@ -22,7 +22,7 @@ public partial class AcrylicViewHandler : ViewHandler<IAcrylicView, BorderView>
             CrossPlatformArrange = new Func<Rect, Size>(VirtualView.CrossPlatformArrange)
         };
 
-        colorBlendUIView = new UIView();
+        colorBlendUIView = [];
 
         acrylicEffectView = new UIVisualEffectView()
         {

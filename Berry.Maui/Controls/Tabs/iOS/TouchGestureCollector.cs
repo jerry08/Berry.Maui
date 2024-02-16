@@ -7,8 +7,7 @@ namespace Berry.Maui.Controls.Effects.iOS.GestureCollectors;
 
 internal static class TouchGestureCollector
 {
-    static Dictionary<UIView, GestureActionsContainer> Collection { get; } =
-        new Dictionary<UIView, GestureActionsContainer>();
+    static Dictionary<UIView, GestureActionsContainer> Collection { get; } = [];
 
     public static void Add(UIView view, Action<TouchGestureRecognizer.TouchArgs> action)
     {
@@ -26,11 +25,7 @@ internal static class TouchGestureCollector
             gest.OnTouch += ActionActivator;
             Collection.Add(
                 view,
-                new GestureActionsContainer
-                {
-                    Recognizer = gest,
-                    Actions = new List<Action<TouchGestureRecognizer.TouchArgs>> { action }
-                }
+                new GestureActionsContainer { Recognizer = gest, Actions = [action] }
             );
             view.AddGestureRecognizer(gest);
         }

@@ -551,7 +551,7 @@ public class BottomSheetController
 
     public void ResizeVirtualView()
     {
-        var pv = (ContentViewGroup)_sheet.Handler?.PlatformView;
+        var pv = (ContentViewGroup?)_sheet.Handler?.PlatformView;
         var maxHeight = GetAvailableHeight();
         var height = CalculateTallestDetent(maxHeight);
 
@@ -581,12 +581,12 @@ public class BottomSheetController
 
         EnsureWindowContainer();
 
-        _stayOnFront.AddView(_windowContainer);
+        _stayOnFront?.AddView(_windowContainer);
 
         _frame.RemoveAllViews();
 
         // The Android view for the page could already have a ContainerView as a parent if it was shown as a bottom sheet before
-        ((ContentViewGroup)_sheet.Handler?.PlatformView)?.RemoveFromParent();
+        ((ContentViewGroup?)_sheet.Handler?.PlatformView)?.RemoveFromParent();
         var containerView = _sheet.ToPlatform(_mauiContext);
 
         var c = new FrameLayout(_mauiContext.Context);
@@ -643,7 +643,7 @@ public class BottomSheetController
         });
     }
 
-    void OnLayoutChange(object sender, AView.LayoutChangeEventArgs e)
+    void OnLayoutChange(object? sender, AView.LayoutChangeEventArgs e)
     {
         // Added Dispatcher here to fix issue when changing orientations
         _sheet.Dispatcher.Dispatch(() =>
@@ -672,10 +672,10 @@ public class BottomSheetController
         }
         if (Behavior.State == BottomSheetBehavior.StateHidden)
         {
-            _sheet.NotifyDismissed();
             Dispose();
+            _sheet.NotifyDismissed();
         }
-        ((BottomSheetHandler)_sheet.Handler).UpdateSelectedDetent(_sheet);
+        ((BottomSheetHandler?)_sheet.Handler)?.UpdateSelectedDetent(_sheet);
     }
 
     internal void UpdateSelectedDetent()

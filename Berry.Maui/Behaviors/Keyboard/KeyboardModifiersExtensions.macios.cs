@@ -8,7 +8,7 @@ internal static class KeyboardModifiersExtensions
 {
     internal static UIKeyModifierFlags ToPlatformModifiers(this KeyboardModifiers virtualModifiers)
     {
-        List<UIKeyModifierFlags> platformModifierValues = new();
+        List<UIKeyModifierFlags> platformModifierValues = [];
 
         foreach (KeyboardModifiers virtualModifier in Enum.GetValues(typeof(KeyboardModifiers)))
         {
@@ -28,7 +28,7 @@ internal static class KeyboardModifiersExtensions
 
     internal static KeyboardModifiers ToVirtualModifiers(this UIKeyModifierFlags platformModifiers)
     {
-        List<KeyboardModifiers> virtualModifierValues = new();
+        List<KeyboardModifiers> virtualModifierValues = [];
 
         foreach (UIKeyModifierFlags platformModifier in Enum.GetValues(typeof(UIKeyModifierFlags)))
         {
