@@ -11,11 +11,9 @@ public class UrlSessionDownloadDelegate : NSUrlSessionDownloadDelegate
     protected DownloadFileImplementation GetDownloadFileByTask(NSUrlSessionTask downloadTask)
     {
         return Controller
-            .Queue
-            .Cast<DownloadFileImplementation>()
-            .FirstOrDefault(
-                i =>
-                    i.Task != null && (int)i.Task.TaskIdentifier == (int)downloadTask.TaskIdentifier
+            .Queue.Cast<DownloadFileImplementation>()
+            .FirstOrDefault(i =>
+                i.Task != null && (int)i.Task.TaskIdentifier == (int)downloadTask.TaskIdentifier
             );
     }
 

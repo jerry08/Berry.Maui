@@ -1,8 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows.Input;
-using Berry.Maui.Controls.Effects;
-using Berry.Maui.Controls.Effects.iOS;
 using Berry.Maui.Controls.Effects.iOS.GestureCollectors;
 using Berry.Maui.Controls.Effects.iOS.GestureRecognizers;
 using Microsoft.Maui.Controls.Platform;
@@ -15,10 +13,10 @@ public class CommandsPlatform : PlatformEffect
     public UIView View => Control ?? Container;
 
     DateTime _tapTime;
-    ICommand _tapCommand;
-    ICommand _longCommand;
-    object _tapParameter;
-    object _longParameter;
+    ICommand? _tapCommand;
+    ICommand? _longCommand;
+    object? _tapParameter;
+    object? _longParameter;
 
     protected override void OnAttached()
     {

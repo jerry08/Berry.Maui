@@ -86,27 +86,24 @@ public class DownloadManagerImplementation : IDownloadManager
 
         AddFile(file);
 
-        NSOperationQueue
-            .MainQueue
-            .BeginInvokeOnMainThread(() =>
+        NSOperationQueue.MainQueue.BeginInvokeOnMainThread(() =>
+        {
+            NSUrlSession session;
+
+            var inBackground =
+                UIApplication.SharedApplication.ApplicationState == UIApplicationState.Background;
+
+            if (_avoidDiscretionaryDownloadInBackground && inBackground)
             {
-                NSUrlSession session;
+                session = _session;
+            }
+            else
+            {
+                session = _backgroundSession;
+            }
 
-                var inBackground =
-                    UIApplication.SharedApplication.ApplicationState
-                    == UIApplicationState.Background;
-
-                if (_avoidDiscretionaryDownloadInBackground && inBackground)
-                {
-                    session = _session;
-                }
-                else
-                {
-                    session = _backgroundSession;
-                }
-
-                file.StartDownload(session, mobileNetworkAllowed);
-            });
+            file.StartDownload(session, mobileNetworkAllowed);
+        });
     }
 
     public void Abort(IDownloadFile i)
