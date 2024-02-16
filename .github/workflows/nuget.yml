@@ -1,0 +1,104 @@
+name: CI Build
+
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.gitignore'
+      - '**/*.gitattributes'
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true                     # Disable the .NET logo
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true # Disable the .NET first time experience
+  DOTNET_CLI_TELEMETRY_OPTOUT: true       # Disable sending .NET CLI telemetry
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+      
+      - name: Install MAUI Workload
+        run: dotnet workload install maui --ignore-failed-sources
+
+      - name: Restore dependencies
+        run: dotnet restore
+      
+      - name: Build
+        run: dotnet build --no-restore -p:CSharpier_Bypass=true
+
+  pack:
+    if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
+
+    runs-on: windows-latest
+
+    permissions:
+      actions: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+      
+      - name: Install MAUI Workload
+        run: dotnet workload install maui --ignore-failed-sources
+
+      - name: Get version information from tag
+        id: get_version
+        uses: battila7/get-version-action@v2
+      
+      - name: Pack
+        run: >
+          dotnet pack
+          -p:ContinuousIntegrationBuild=true
+          -c Release
+          -p:Version=${{ steps.get_version.outputs.version-without-v }}
+          -p:CSharpier_Bypass=true
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: packages
+          path: "**/*.nupkg"
+
+  deploy:
+    runs-on: windows-latest
+    permissions:
+      actions: read
+
+    needs:
+      - pack
+
+    steps:
+      - name: Install .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: packages
+
+      - name: Push packages
+        run: >
+          dotnet nuget push **/*.nupkg
+          --source "https://api.nuget.org/v3/index.json"
+          --api-key ${{ secrets.NUGET_TOKEN }}
