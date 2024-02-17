@@ -211,6 +211,7 @@ public class BottomSheetController
     BottomSheetContainer _windowContainer;
     BottomSheetDragHandleView _handle;
     bool? _isBackgroundLight;
+    bool _isDisposed;
 
     public ViewGroup Frame => _frame;
 
@@ -293,12 +294,16 @@ public class BottomSheetController
 
     void Dispose()
     {
+        _isDisposed = true;
         _frame.LayoutChange -= OnLayoutChange;
         _windowContainer.RemoveFromParent();
     }
 
     public void Layout()
     {
+        if (_isDisposed)
+            return;
+
         LayoutDetents(_heights, GetAvailableHeight());
     }
 
