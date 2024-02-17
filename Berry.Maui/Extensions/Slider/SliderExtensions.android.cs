@@ -18,14 +18,20 @@ public static class SliderExtensions
 
     public static void UpdateValue(this MSlider mSlider, ISlider slider)
     {
-        var min = slider.Minimum;
-        var max = slider.Maximum;
+        var min = (float)slider.Minimum;
+        var max = (float)slider.Maximum;
         var value = slider.Value;
+
+        if (max <= min)
+            max = min + 1;
+
+        if (value < min)
+            value = min;
 
         //mSlider.Value = (int)((value - min) / (max - min) * PlatformMaxValue);
         mSlider.Value = (int)value;
-        mSlider.ValueFrom = (float)min;
-        mSlider.ValueTo = (float)max;
+        mSlider.ValueFrom = min;
+        mSlider.ValueTo = max;
     }
 
     public static void UpdateMinimumTrackColor(this MSlider mSlider, ISlider slider)
