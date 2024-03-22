@@ -35,7 +35,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSharpier.MsBuild" Version="0.27.2" PrivateAssets="all" />
+    <PackageReference Include="CSharpier.MsBuild" Version="0.27.3" PrivateAssets="all" />
     <PackageReference Include="M.BindableProperty.Generator" Version="0.11.1" PrivateAssets="all" />
     <!--<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.6" />
     <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.6" />-->
@@ -45,11 +45,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="Microsoft.Maui.Controls" Version="8.0.7" />
+    <PackageReference Update="Microsoft.Maui.Controls" Version="8.0.14" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.7" />
+    <PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.14" />
   </ItemGroup>
 
 </Project>
