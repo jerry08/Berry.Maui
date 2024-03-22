@@ -37,19 +37,11 @@
   <ItemGroup>
     <PackageReference Include="CSharpier.MsBuild" Version="0.27.3" PrivateAssets="all" />
     <PackageReference Include="M.BindableProperty.Generator" Version="0.11.1" PrivateAssets="all" />
-    <!--<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.6" />
-    <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.6" />-->
+    <PackageReference Update="Microsoft.Maui.Controls" Version="8.0.14" />
+    <PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.14" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="all" IsImplicitlyDefined="true" />
     <PackageReference Include="Sharpnado.TaskMonitor" Version="1.0.2" />
     <!--<PackageReference Include="System.Management" Version="7.0.0" Condition="$(TargetFramework.Contains('-windows')) == true" />-->
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Update="Microsoft.Maui.Controls" Version="8.0.14" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.14" />
   </ItemGroup>
 
 </Project>
