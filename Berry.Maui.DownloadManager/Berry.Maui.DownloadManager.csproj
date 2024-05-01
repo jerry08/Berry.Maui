@@ -17,15 +17,15 @@
 	</PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSharpier.MsBuild" Version="0.27.3" PrivateAssets="all" />
+    <PackageReference Include="CSharpier.MsBuild" Version="0.28.2" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="Microsoft.Maui.Controls" Version="8.0.14" />
+    <PackageReference Update="Microsoft.Maui.Controls" Version="8.0.21" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.14" />
+    <PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.21" />
   </ItemGroup>
 
 </Project>
