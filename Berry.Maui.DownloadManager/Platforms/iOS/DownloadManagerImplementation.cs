@@ -166,11 +166,11 @@ public class DownloadManagerImplementation : IDownloadManager
 
         using (configuration)
         {
-            return createSession(configuration, sessionDownloadDelegate);
+            return CreateSession(configuration, sessionDownloadDelegate);
         }
     }
 
-    private NSUrlSession createSession(
+    private NSUrlSession CreateSession(
         NSUrlSessionConfiguration configuration,
         UrlSessionDownloadDelegate sessionDownloadDelegate
     )
