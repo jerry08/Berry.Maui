@@ -23,6 +23,8 @@ public partial class TouchBehavior
     /// <param name="platformView">Native View</param>
     protected override void OnAttachedTo(VisualElement bindable, UIView platformView)
     {
+        base.OnAttachedTo(bindable, platformView);
+
         Element = bindable;
 
         touchGesture = new TouchUITapGestureRecognizer(this);
@@ -54,6 +56,8 @@ public partial class TouchBehavior
     /// <param name="platformView">Native View</param>
     protected override void OnDetachedFrom(VisualElement bindable, UIView platformView)
     {
+        base.OnDetachedFrom(bindable, platformView);
+
         if (
             ((platformView as IVisualNativeElementRenderer)?.Control ?? platformView)
             is UIButton button

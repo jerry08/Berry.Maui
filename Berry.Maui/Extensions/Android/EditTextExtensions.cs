@@ -1,0 +1,77 @@
+﻿using System;
+using Android.Text;
+using Android.Widget;
+using Microsoft.Maui;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls.Platform;
+using Microsoft.Maui.Controls.Platform.Android;
+using Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;
+using Entry = Microsoft.Maui.Controls.Entry;
+
+namespace Berry.Maui.Extensions;
+
+public static class EditTextExtensions
+{
+    internal static int GetCursorPosition(this EditText editText, int cursorOffset = 0)
+    {
+        var newCursorPosition = editText.SelectionStart + cursorOffset;
+        return Math.Max(0, newCursorPosition);
+    }
+
+    internal static int GetSelectedTextLength(this EditText editText)
+    {
+        var selectedLength = editText.SelectionEnd - editText.SelectionStart;
+        return Math.Max(0, selectedLength);
+    }
+
+    public static void UpdateImeOptions(this EditText editText, Entry entry)
+    {
+        var imeOptions = entry.OnThisPlatform().ImeOptions().ToPlatform();
+
+        editText.ImeOptions = imeOptions;
+    }
+
+    static (string oldText, string newText) GetTexts(EditText editText, InputView inputView)
+    {
+        var oldText = editText.Text ?? string.Empty;
+
+        var inputType = editText.InputType;
+
+        var isPasswordEnabled =
+            (inputType & InputTypes.TextVariationPassword) == InputTypes.TextVariationPassword
+            || (inputType & InputTypes.NumberVariationPassword)
+                == InputTypes.NumberVariationPassword;
+
+        var newText = TextTransformUtilites.GetTransformedText(
+            inputView?.Text,
+            isPasswordEnabled ? TextTransform.None : inputView.TextTransform
+        );
+
+        return (oldText, newText);
+    }
+
+    public static void UpdateText(this EditText editText, InputView inputView)
+    {
+        (var oldText, var newText) = GetTexts(editText, inputView);
+
+        if (oldText != newText)
+        {
+            editText.Text = newText;
+
+            // When updating from xplat->plat, we set the selection (cursor) to the end of the text
+            editText.SetSelection(newText.Length);
+        }
+    }
+
+    internal static void UpdateTextFromPlatform(this EditText editText, InputView inputView)
+    {
+        (var oldText, var newText) = GetTexts(editText, inputView);
+
+        if (oldText != newText)
+        {
+            // This update is happening while inputting text into the EditText, so we want to avoid
+            // resettting the cursor position and selection
+            editText.SetTextKeepState(newText);
+        }
+    }
+}

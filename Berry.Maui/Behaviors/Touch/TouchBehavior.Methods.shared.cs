@@ -39,7 +39,7 @@ public partial class TouchBehavior : IDisposable
             nameof(HoverStatusChanged)
         );
 
-    internal void RaiseCompleted()
+    internal void RaiseTouchGestureCompleted()
     {
         var element = Element;
         if (element is null)
@@ -48,11 +48,16 @@ public partial class TouchBehavior : IDisposable
         }
 
         var parameter = CommandParameter;
-        Command?.Execute(parameter);
+
+        if (Command?.CanExecute(parameter) is true)
+        {
+            Command.Execute(parameter);
+        }
+
         weakEventManager.HandleEvent(
             element,
-            new TouchCompletedEventArgs(parameter),
-            nameof(Completed)
+            new TouchGestureCompletedEventArgs(parameter),
+            nameof(TouchGestureCompleted)
         );
     }
 
@@ -162,7 +167,7 @@ public partial class TouchBehavior : IDisposable
             return;
         }
 
-        view.InputTransparent = IsAvailable;
+        view.InputTransparent = IsEnabled;
     }
 
     /// <inheritdoc/>

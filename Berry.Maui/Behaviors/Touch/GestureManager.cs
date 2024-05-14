@@ -298,7 +298,7 @@ sealed class GestureManager : IDisposable
             button.SendClicked();
         }
 
-        sender.RaiseCompleted();
+        sender.RaiseTouchGestureCompleted();
     }
 
     void HandleCollectionViewSelection(TouchBehavior sender)

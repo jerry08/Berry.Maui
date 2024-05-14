@@ -58,6 +58,8 @@ public partial class TouchBehavior
     /// <param name="platformView">Native View</param>
     protected override void OnAttachedTo(VisualElement bindable, AView platformView)
     {
+        base.OnAttachedTo(bindable, platformView);
+
         Element = bindable;
         view = platformView;
         viewGroup = Berry.Maui.Extensions.ViewExtensions.GetParentOfType<ViewGroup>(platformView);
@@ -100,6 +102,8 @@ public partial class TouchBehavior
     /// <param name="platformView">Native View</param>
     protected override void OnDetachedFrom(VisualElement bindable, AView platformView)
     {
+        base.OnDetachedFrom(bindable, platformView);
+
         element = bindable;
         view = platformView;
 
@@ -155,6 +159,13 @@ public partial class TouchBehavior
 
         rippleView.Right = view.Width;
         rippleView.Bottom = view.Height;
+
+        //rippleView.Left = view.Left;
+        //rippleView.Right = view.Right;
+        //rippleView.Bottom = view.Bottom;
+        //rippleView.Top = view.Top;
+        //rippleView.SetBackgroundColor(Color.Transparent);
+        //rippleView.BringToFront();
     }
 
     private void CreateRipple()
@@ -252,7 +263,7 @@ public partial class TouchBehavior
         }
 
         view.Click -= OnClick;
-        if (IsAccessibilityMode || (IsAvailable && (element?.IsEnabled ?? false)))
+        if (IsAccessibilityMode || (IsEnabled && (element?.IsEnabled ?? false)))
         {
             view.Click += OnClick;
             return;

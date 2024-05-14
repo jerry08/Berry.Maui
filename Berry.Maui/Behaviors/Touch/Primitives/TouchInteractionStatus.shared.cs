@@ -1,7 +1,7 @@
 ﻿namespace Berry.Maui.Behaviors;
 
 /// <summary>
-/// Provides data for the <see cref="TouchBehavior.Completed"/> event.
+/// Provides data for the <see cref="TouchBehavior.TouchGestureCompleted"/> event.
 /// </summary>
 public enum TouchInteractionStatus
 {

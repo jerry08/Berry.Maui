@@ -7,9 +7,9 @@ using Microsoft.Maui.Graphics;
 namespace Berry.Maui.Behaviors;
 
 /// <summary>
-///
+/// <see cref="PlatformBehavior{TView,TPlatformView}"/> that adds additional actions for user interactions
 /// </summary>
-public partial class TouchBehavior : PlatformBehavior<VisualElement>
+public partial class TouchBehavior : BasePlatformBehavior<VisualElement>
 {
     /// <summary>
     /// The visual state for when the touch is unpressed.
@@ -108,7 +108,7 @@ public partial class TouchBehavior : PlatformBehavior<VisualElement>
     /// <summary>
     /// Occurs when a touch gesture is completed.
     /// </summary>
-    public event EventHandler<TouchCompletedEventArgs> Completed
+    public event EventHandler<TouchGestureCompletedEventArgs> TouchGestureCompleted
     {
         add => weakEventManager.AddEventHandler(value);
         remove => weakEventManager.RemoveEventHandler(value);
@@ -124,22 +124,22 @@ public partial class TouchBehavior : PlatformBehavior<VisualElement>
     }
 
     /// <summary>
-    /// Bindable property for <see cref="IsAvailable"/>
+    /// Bindable property for <see cref="IsEnabled"/>
     /// </summary>
-    public static readonly BindableProperty IsAvailableProperty = BindableProperty.Create(
-        nameof(IsAvailable),
+    public static readonly BindableProperty IsEnabledProperty = BindableProperty.Create(
+        nameof(IsEnabled),
         typeof(bool),
         typeof(TouchBehavior),
         true
     );
 
     /// <summary>
-    /// Gets or sets a value indicating whether the touch is available.
+    /// Gets or sets a value indicating whether the touch is enabled.
     /// </summary>
-    public bool IsAvailable
+    public bool IsEnabled
     {
-        get => (bool)GetValue(IsAvailableProperty);
-        set => SetValue(IsAvailableProperty, value);
+        get => (bool)GetValue(IsEnabledProperty);
+        set => SetValue(IsEnabledProperty, value);
     }
 
     /// <summary>
@@ -169,15 +169,15 @@ public partial class TouchBehavior : PlatformBehavior<VisualElement>
         nameof(Command),
         typeof(ICommand),
         typeof(TouchBehavior),
-        default(ICommand)
+        null
     );
 
     /// <summary>
     /// Gets or sets the command to invoke when the user has completed a touch gesture.
     /// </summary>
-    public ICommand Command
+    public ICommand? Command
     {
-        get => (ICommand)GetValue(CommandProperty);
+        get => (ICommand?)GetValue(CommandProperty);
         set => SetValue(CommandProperty, value);
     }
 
@@ -188,15 +188,15 @@ public partial class TouchBehavior : PlatformBehavior<VisualElement>
         nameof(LongPressCommand),
         typeof(ICommand),
         typeof(TouchBehavior),
-        default(ICommand)
+        null
     );
 
     /// <summary>
     /// Gets or sets the command to invoke when the user has completed a long press.
     /// </summary>
-    public ICommand LongPressCommand
+    public ICommand? LongPressCommand
     {
-        get => (ICommand)GetValue(LongPressCommandProperty);
+        get => (ICommand?)GetValue(LongPressCommandProperty);
         set => SetValue(LongPressCommandProperty, value);
     }
 
@@ -475,9 +475,7 @@ public partial class TouchBehavior : PlatformBehavior<VisualElement>
     }
 
     internal bool CanExecute =>
-        IsAvailable
-        && (element?.IsEnabled ?? false)
-        && (Command?.CanExecute(CommandParameter) ?? true);
+        IsEnabled && Element?.IsEnabled is true && (Command?.CanExecute(CommandParameter) ?? true);
 
     /// <summary>
     /// Bindable property for <see cref="NormalScale"/>

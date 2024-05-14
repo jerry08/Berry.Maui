@@ -15,7 +15,9 @@ public static partial class KeyboardManager
 {
     static void ShowKeyboard(this AView inputView)
     {
-        (inputView.GetInputView() as TextView)?.ShowKeyboard();
+        var view = inputView.GetInputView();
+        if (view is TextView textView)
+            textView.ShowKeyboard();
     }
 
     public static void HideKeyboard()
@@ -29,8 +31,10 @@ public static partial class KeyboardManager
     static void HideKeyboard(this AView inputView, bool overrideValidation = false)
     {
         inputView = inputView.GetInputView();
+        if (inputView is null)
+            return;
 
-        if (inputView?.Context is null)
+        if (inputView.Context is null)
         {
             throw new ArgumentNullException(
                 nameof(inputView) + " must be set before the keyboard can be hidden."
@@ -80,7 +84,7 @@ public static partial class KeyboardManager
         }
     }
 
-    static AView GetInputView(this AView view)
+    static AView? GetInputView(this AView view)
     {
         return view switch
         {
@@ -90,13 +94,18 @@ public static partial class KeyboardManager
                 )!,
             TextView textView => textView,
             TextInputLayout inputLayout => inputLayout.EditText!,
-            _ => throw new Exception($"Unable to locate `TextView` for {view}"),
+            //_ => throw new Exception($"Unable to locate `TextView` for {view}"),
+            _ => null
         };
     }
 
     static bool IsSoftKeyboardVisible(this AView view)
     {
-        view = view.GetInputView();
+        var view2 = view.GetInputView();
+        if (view2 is null)
+            return false;
+
+        view = view2;
 
         var insets = ViewCompat.GetRootWindowInsets(view);
         if (insets is null)

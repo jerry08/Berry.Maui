@@ -24,6 +24,8 @@ public partial class TouchBehavior
     /// <inheritdoc/>
     protected override void OnAttachedTo(VisualElement bindable, FrameworkElement platformView)
     {
+        base.OnAttachedTo(bindable, platformView);
+
         Element = bindable;
         if (NativeAnimation)
         {
@@ -78,6 +80,8 @@ public partial class TouchBehavior
     /// <inheritdoc/>
     protected override void OnDetachedFrom(VisualElement bindable, FrameworkElement platformView)
     {
+        base.OnDetachedFrom(bindable, platformView);
+
         if (IsDisabled)
         {
             return;

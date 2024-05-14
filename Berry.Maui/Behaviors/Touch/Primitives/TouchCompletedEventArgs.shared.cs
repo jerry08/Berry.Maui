@@ -3,14 +3,14 @@
 namespace Berry.Maui.Behaviors;
 
 /// <summary>
-/// Provides data for the <see cref="TouchBehavior.Completed"/> event.
+/// Provides data for the <see cref="TouchBehavior.TouchGestureCompleted"/> event.
 /// </summary>
-public class TouchCompletedEventArgs : EventArgs
+public class TouchGestureCompletedEventArgs : EventArgs
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="TouchCompletedEventArgs"/> class.
+    /// Initializes a new instance of the <see cref="TouchGestureCompletedEventArgs"/> class.
     /// </summary>
-    internal TouchCompletedEventArgs(object? parameter) => Parameter = parameter;
+    internal TouchGestureCompletedEventArgs(object? parameter) => Parameter = parameter;
 
     /// <summary>
     /// Gets the parameter associated with the touch event.
