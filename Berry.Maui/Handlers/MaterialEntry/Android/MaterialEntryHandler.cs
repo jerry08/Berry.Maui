@@ -199,7 +199,7 @@ public class MaterialEntryHandler : ViewHandler<Entry, RelativeLayout>, IEntryHa
         // Inside of the android implementations that map events to listeners, the default return value for "Handled" is always true
         // This means, just by subscribing to EditorAction/KeyPressed/etc.. you change the behavior of the control
         // So, we are setting handled to false here in order to maintain default behavior
-        bool handled = false;
+        var handled = false;
         if (returnType != null)
         {
             var actionId = e.ActionId;

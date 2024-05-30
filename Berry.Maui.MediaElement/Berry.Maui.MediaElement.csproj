@@ -51,7 +51,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <MauiImage Include="Resources\Images\fullscreen.svg" Pack="True" PackagePath="buildTransitive\Images\" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\build\nuget.png" PackagePath="icon.png" Pack="true" />
+    <None Include="Resources\Images\fullscreen.svg" Pack="True" PackagePath="buildTransitive\Images\" />
     <None Include="ReadMe.txt" pack="true" PackagePath="." />
   </ItemGroup>
 
@@ -62,11 +67,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="Microsoft.Maui.Controls" Version="8.0.21" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.21" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.40" />
+    <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.40" />
   </ItemGroup>
 
 </Project>

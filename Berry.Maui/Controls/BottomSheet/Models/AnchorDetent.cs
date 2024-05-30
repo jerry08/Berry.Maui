@@ -6,10 +6,10 @@ namespace Berry.Maui.Controls;
 public partial class AnchorDetent : Detent
 {
     double _height = 0;
-#pragma warning disable CS0169
+
     [AutoBindable]
-    readonly VisualElement anchor;
-#pragma warning restore CS0169
+    private readonly VisualElement? _anchor;
+
     public override double GetHeight(BottomSheet page, double maxSheetHeight)
     {
         UpdateHeight(page, maxSheetHeight);

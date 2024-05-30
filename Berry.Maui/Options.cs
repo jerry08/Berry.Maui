@@ -4,6 +4,8 @@ namespace Berry.Maui;
 
 public class Options()
 {
+    internal static bool UsePlainer { get; private set; }
+
     internal static bool ShouldSuppressExceptionsInBehaviors { get; private set; }
 
     /// <summary>
@@ -12,6 +14,8 @@ public class Options()
     /// <remarks>
     /// Default value is false.
     /// </remarks>
-    public void SetShouldSuppressExceptionsInBehaviors(bool value) =>
+    public static void SetShouldSuppressExceptionsInBehaviors(bool value) =>
         ShouldSuppressExceptionsInBehaviors = value;
+
+    public static void SetUsePlainer(bool value) => UsePlainer = value;
 }

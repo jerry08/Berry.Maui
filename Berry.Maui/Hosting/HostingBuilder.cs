@@ -42,6 +42,28 @@ public class HostingBuilder
         });
         return this;
     }
+    
+    public HostingBuilder UseMaterialDatePicker()
+    {
+        _builder.ConfigureMauiHandlers(handlers =>
+        {
+#if ANDROID
+            handlers.AddHandler(typeof(DatePicker), typeof(MaterialDatePickerHandler));
+#endif
+        });
+        return this;
+    }
+
+    public HostingBuilder UseMaterialTimePicker()
+    {
+        _builder.ConfigureMauiHandlers(handlers =>
+        {
+#if ANDROID
+            handlers.AddHandler(typeof(TimePicker), typeof(MaterialTimePickerHandler));
+#endif
+        });
+        return this;
+    }
 
     public HostingBuilder UseBottomSheet()
     {
@@ -61,7 +83,7 @@ public class HostingBuilder
         return this;
     }
 
-    public HostingBuilder UseMauiPlainer()
+    public HostingBuilder UsePlainer()
     {
         _builder.ConfigureMauiHandlers(handlers => handlers.AddPlainer());
         return this;

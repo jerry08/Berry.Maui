@@ -1,3 +1,3 @@
 # Berry Maui
 
-A small collection of .NET MAUI controls, effects and behaviors.
+A collection of .NET MAUI controls, effects, behaviors, extensions and more useful stuff.

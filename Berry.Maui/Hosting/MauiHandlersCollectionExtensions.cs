@@ -8,6 +8,8 @@ public static class MauiHandlersCollectionExtensions
 {
     public static IMauiHandlersCollection AddPlainer(this IMauiHandlersCollection handlers)
     {
+        Options.SetUsePlainer(true);
+
         handlers
             .AddHandler(typeof(Entry), typeof(EntryViewHandler))
             .AddHandler(typeof(Editor), typeof(EditorViewHandler))

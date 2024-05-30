@@ -22,11 +22,13 @@ public static class MauiAppBuilderExtensions
     {
         new HostingBuilder(builder)
             .UseAcrylicView()
-            .UseMauiPlainer()
+            .UsePlainer()
             .UseBottomSheet()
             .UseInsets()
             .UseMaterialSwitch()
             .UseMaterialEntry()
+            .UseMaterialDatePicker()
+            .UseMaterialTimePicker()
             .UseTabs();
 
         return builder;

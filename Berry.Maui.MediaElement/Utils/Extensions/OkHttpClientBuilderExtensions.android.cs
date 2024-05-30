@@ -12,7 +12,7 @@ internal class NaiveTrustManager : Java.Lang.Object, IX509TrustManager
 
     public void CheckServerTrusted(X509Certificate[]? chain, string? authType) { }
 
-    public X509Certificate[]? GetAcceptedIssuers() => Array.Empty<X509Certificate>();
+    public X509Certificate[]? GetAcceptedIssuers() => [];
 }
 
 // https://stackoverflow.com/questions/54419649/still-getting-trust-anchor-for-certification-path-not-found-after-getting-immedi
