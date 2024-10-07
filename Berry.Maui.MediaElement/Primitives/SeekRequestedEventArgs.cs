@@ -11,10 +11,7 @@ sealed class MediaSeekRequestedEventArgs : EventArgs
     /// Initializes a new instance of the <see cref="MediaSeekRequestedEventArgs"/> class.
     /// </summary>
     /// <param name="requestedPosition">The requested position to seek to.</param>
-    public MediaSeekRequestedEventArgs(TimeSpan requestedPosition)
-    {
-        RequestedPosition = requestedPosition;
-    }
+    public MediaSeekRequestedEventArgs(TimeSpan requestedPosition) => RequestedPosition = requestedPosition;
 
     /// <summary>
     /// Gets the requested position to seek to.

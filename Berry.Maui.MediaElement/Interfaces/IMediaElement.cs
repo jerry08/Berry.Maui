@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 using Berry.Maui.Core.Primitives;
 using Berry.Maui.Interfaces;
 using Berry.Maui.Views;
@@ -13,6 +13,21 @@ namespace Berry.Maui.Core;
 /// </summary>
 public interface IMediaElement : IView, IAsynchronousMediaElementHandler
 {
+    /// <summary>
+    /// Gets or sets the title of the media.
+    /// </summary>
+    string MetadataTitle { get; set; }
+
+    /// <summary>
+    /// Gets or sets the artist of the media.
+    /// </summary>
+    string MetadataArtist { get; set; }
+
+    /// <summary>
+    /// Gets or sets the artwork Image Url.
+    /// </summary>
+    string MetadataArtworkUrl { get; set; }
+
     /// <summary>
     /// Gets the media aspect ratio.
     /// </summary>
@@ -28,13 +43,13 @@ public interface IMediaElement : IView, IAsynchronousMediaElementHandler
     /// Gets the height (in pixels) of the loaded media in pixels.
     /// </summary>
     /// <remarks>Not reported for non-visual media.</remarks>
-    int MediaHeight { get; }
+    int MediaHeight { get; internal set; }
 
     /// <summary>
     /// Gets the width (in pixels) of the loaded media in pixels.
     /// </summary>
     /// <remarks>Not reported for non-visual media.</remarks>
-    int MediaWidth { get; }
+    int MediaWidth { get; internal set; }
 
     /// <summary>
     /// The current position of the playing media.

@@ -51,6 +51,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Utils\test\**" />
+    <EmbeddedResource Remove="Utils\test\**" />
+    <MauiCss Remove="Utils\test\**" />
+    <MauiXaml Remove="Utils\test\**" />
+    <None Remove="Utils\test\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <MauiImage Include="Resources\Images\fullscreen.svg" Pack="True" PackagePath="buildTransitive\Images\" />
   </ItemGroup>
 
@@ -61,9 +69,29 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.Contains('-android'))">
-    <PackageReference Include="Xam.Plugins.Android.ExoPlayer" Version="2.19.1" />
-    <PackageReference Include="Xam.Plugins.Android.ExoPlayer.Transformer" Version="2.19.1" />
-    <PackageReference Include="Xam.Plugins.Android.ExoPlayer.OkHttp" Version="2.19.1" />
+    <PackageReference Include="Square.OkHttp3" Version="4.12.0.6" />
+    <PackageReference Include="Xamarin.Google.Guava" Version="33.3.1" />
+
+    <PackageReference Include="Jerro.Android.Media3.DataSource.OkHttp" Version="1.4.1" />
+    <PackageReference Include="Xamarin.AndroidX.Media3.ExoPlayer" Version="1.4.1" />
+    <PackageReference Include="Xamarin.AndroidX.Media3.Common" Version="1.4.1" />
+    <PackageReference Include="Xamarin.AndroidX.Media3.DataSource" Version="1.4.1" />
+    <PackageReference Include="Xamarin.AndroidX.Media3.UI" Version="1.4.1" />
+    <PackageReference Include="Xamarin.AndroidX.Media3.ExoPlayer.Rtsp" Version="1.4.1" />
+    <PackageReference Include="Xamarin.AndroidX.Media3.ExoPlayer.Hls" Version="1.4.1" />
+    <PackageReference Include="Xamarin.AndroidX.Media3.ExoPlayer.Dash" Version="1.4.1" />
+    <PackageReference Include="Xamarin.AndroidX.Media3.Session" Version="1.4.1" />
+
+    <!--Adding the above package reference requires Workaround for https://github.com/xamarin/AndroidX/issues/800#issuecomment-1774639627 -->
+    <!-- Tracking issue https://github.com/xamarin/AndroidX/issues/764 -->
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.8.5.1" />
+
+    <!-- Should match version of the referenced 'Xamarin.AndroidX.Collection' package -->
+    <PackageReference Include="Xamarin.AndroidX.Collection.Jvm" Version="1.4.4" />
+    <PackageReference Include="Xamarin.AndroidX.Collection.Ktx" Version="1.4.4" />
+
+    <!-- Should match version of the referenced 'Xamarin.AndroidX.Activity' package -->
+    <PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.9.2.1" />
   </ItemGroup>
 
   <ItemGroup>

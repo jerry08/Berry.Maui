@@ -11,10 +11,7 @@ public sealed class MediaPositionChangedEventArgs : EventArgs
     /// Initializes a new instance of the <see cref="MediaPositionChangedEventArgs"/> class.
     /// </summary>
     /// <param name="position">The position associated to this event.</param>
-    public MediaPositionChangedEventArgs(TimeSpan position)
-    {
-        Position = position;
-    }
+    public MediaPositionChangedEventArgs(TimeSpan position) => Position = position;
 
     /// <summary>
     /// Gets the position the media has progressed to.

@@ -1,6 +1,6 @@
 ﻿using Android.Content;
-using Com.Google.Android.Exoplayer2.Database;
-using Com.Google.Android.Exoplayer2.Upstream.Cache;
+using AndroidX.Media3.Database;
+using AndroidX.Media3.DataSource.Cache;
 using Java.IO;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Storage;

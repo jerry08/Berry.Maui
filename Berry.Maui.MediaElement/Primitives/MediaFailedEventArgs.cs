@@ -11,10 +11,7 @@ public sealed class MediaFailedEventArgs : EventArgs
     /// Initializes a new instance of the <see cref="MediaFailedEventArgs"/> class.
     /// </summary>
     /// <param name="errorMessage">An error message providing more information for this event.</param>
-    public MediaFailedEventArgs(string errorMessage)
-    {
-        ErrorMessage = errorMessage;
-    }
+    public MediaFailedEventArgs(string errorMessage) => ErrorMessage = errorMessage;
 
     /// <summary>
     /// Gets a description of why the media failed to load and/or play.
