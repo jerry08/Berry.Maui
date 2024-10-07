@@ -10,6 +10,7 @@ using Berry.Maui.Extensions;
 using Google.Android.Material.TextField;
 using Microsoft.Maui;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Graphics;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 using static Android.Widget.TextView;
@@ -34,6 +35,8 @@ public class MaterialEntryHandler : ViewHandler<Entry, RelativeLayout>, IEntryHa
         [nameof(IEntry.Width)] = MapWidth,
         [nameof(IEntry.ClearButtonVisibility)] = MapClearButtonVisibility,
         [nameof(MaterialEntry.BoxCornerRadii)] = MapBoxCornerRadii,
+        [nameof(MaterialEntry.EndIconMode)] = MapEndIconMode,
+        [nameof(MaterialEntry.BoxBackgroundMode)] = MapBoxBackgroundMode,
     };
 
     private static void MapBoxCornerRadii(MaterialEntryHandler handler, IEntry arg2)
@@ -50,9 +53,55 @@ public class MaterialEntryHandler : ViewHandler<Entry, RelativeLayout>, IEntryHa
         }
     }
 
+    private static void MapEndIconMode(MaterialEntryHandler handler, IEntry entry)
+    {
+        if (handler.TextInputLayout.EditText is null)
+            return;
+
+        if (handler.VirtualView is not MaterialEntry materialEntry)
+            return;
+
+        if (entry.ClearButtonVisibility is ClearButtonVisibility.WhileEditing)
+        {
+            handler.TextInputLayout.EndIconVisible = true;
+            handler.TextInputLayout.EndIconMode = materialEntry.EndIconMode switch
+            {
+                EndIconMode.ClearText => TextInputLayout.EndIconClearText,
+                EndIconMode.PasswordToggle => TextInputLayout.EndIconPasswordToggle,
+                EndIconMode.DropdownMenu => TextInputLayout.EndIconDropdownMenu,
+                EndIconMode.Custom => TextInputLayout.EndIconCustom,
+                _ => TextInputLayout.EndIconNone,
+            };
+        }
+        else
+        {
+            handler.TextInputLayout.EndIconVisible = false;
+            handler.TextInputLayout.EndIconMode = TextInputLayout.EndIconNone;
+        }
+    }
+
+    private static void MapBoxBackgroundMode(MaterialEntryHandler handler, IEntry entry)
+    {
+        if (handler.TextInputLayout.EditText is null)
+            return;
+
+        if (handler.VirtualView is not MaterialEntry materialEntry)
+            return;
+
+        handler.TextInputLayout.BoxBackgroundMode = materialEntry.BoxBackgroundMode switch
+        {
+            BoxBackgroundMode.Filled => TextInputLayout.BoxBackgroundFilled,
+            BoxBackgroundMode.Outline => TextInputLayout.BoxBackgroundOutline,
+            _ => TextInputLayout.BoxBackgroundNone,
+        };
+    }
+
     private static void MapClearButtonVisibility(MaterialEntryHandler handler, IEntry arg2)
     {
         if (handler.TextInputLayout.EditText is null)
+            return;
+
+        if (handler.VirtualView is not MaterialEntry materialEntry)
             return;
 
         if (arg2.ClearButtonVisibility is ClearButtonVisibility.WhileEditing)
@@ -299,6 +348,8 @@ public class MaterialEntryHandler : ViewHandler<Entry, RelativeLayout>, IEntryHa
         TextInputLayout.BoxBackgroundMode = TextInputLayout.BoxBackgroundFilled;
         //TextInputLayout.BoxStrokeWidth = 0;
         //_editText.TextAlignment = Android.Views.TextAlignment.Center;
+
+        //TextInputLayout.BoxBackgroundColor = Color.FromArgb("#EEEEEE").ToPlatform();
 
         return view;
     }
