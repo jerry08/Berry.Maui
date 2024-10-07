@@ -8,10 +8,7 @@ public class FocusChangeListenerWorkaround
 {
     private readonly IEntry _entry;
 
-    public FocusChangeListenerWorkaround(IEntry entry)
-    {
-        _entry = entry;
-    }
+    public FocusChangeListenerWorkaround(IEntry entry) => _entry = entry;
 
     public void OnFocusChange(Android.Views.View? v, bool hasFocus)
     {

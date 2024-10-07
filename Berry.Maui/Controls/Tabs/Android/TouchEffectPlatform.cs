@@ -34,7 +34,7 @@ public class TouchEffectPlatform : PlatformEffect
 
     protected override void OnAttached()
     {
-        if (Control is ListView || Control is ScrollView)
+        if (Control is ListView or ScrollView)
         {
             return;
         }

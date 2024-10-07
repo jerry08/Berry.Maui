@@ -565,10 +565,8 @@ public partial class TouchBehavior
     {
         private TouchBehavior? platformTouchEffect;
 
-        internal AccessibilityListener(TouchBehavior platformTouchEffect)
-        {
+        internal AccessibilityListener(TouchBehavior platformTouchEffect) =>
             this.platformTouchEffect = platformTouchEffect;
-        }
 
         public void OnAccessibilityStateChanged(bool enabled)
         {

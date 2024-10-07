@@ -109,12 +109,10 @@ public partial class Slider : View, ISliderController, IElementConfiguration<Sli
 
     readonly Lazy<PlatformConfigurationRegistry<Slider>> _platformConfigurationRegistry;
 
-    public Slider()
-    {
+    public Slider() =>
         _platformConfigurationRegistry = new Lazy<PlatformConfigurationRegistry<Slider>>(
             () => new PlatformConfigurationRegistry<Slider>(this)
         );
-    }
 
     public Slider(double min, double max, double val)
         : this()

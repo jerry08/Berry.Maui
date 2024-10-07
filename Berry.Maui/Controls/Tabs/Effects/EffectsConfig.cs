@@ -32,7 +32,7 @@ public static class EffectsConfig
 
     static void ConfigureChildrenInputTransparent(BindableObject bindable)
     {
-        if (!(bindable is Layout layout))
+        if (bindable is not Layout layout)
             return;
 
         if (GetChildrenInputTransparent(bindable))

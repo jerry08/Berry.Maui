@@ -81,7 +81,7 @@ public static class Commands
 
     static void PropertyChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        if (!(bindable is View view))
+        if (bindable is not View view)
             return;
 
         var eff = view.Effects.FirstOrDefault(e => e is CommandsRoutingEffect);

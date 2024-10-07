@@ -10,16 +10,10 @@ namespace Berry.Maui.Controls;
 public class CornerFrameLayout : FrameLayout
 {
     public CornerFrameLayout(Context context, IAttributeSet attrs)
-        : base(context, attrs)
-    {
-        SetClipChildren(true);
-    }
+        : base(context, attrs) => SetClipChildren(true);
 
     public CornerFrameLayout(Context context)
-        : base(context)
-    {
-        SetClipChildren(true);
-    }
+        : base(context) => SetClipChildren(true);
 
     private readonly Path _mPath = new Path();
     private readonly float[] _mRadii = new float[8];

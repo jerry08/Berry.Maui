@@ -87,7 +87,7 @@
                             Binding="{Binding Source={x:Reference customEntry}, Path=IsPassword}"
                             TargetType="Image"
                             Value="True">
-                            <Setter Property="Source" Value="eye_password_hide.svg" />
+                            <Setter Property="Source" Value="eye_password_hide2.svg" />
                         </DataTrigger>
                         <DataTrigger
                             Binding="{Binding Source={x:Reference customEntry}, Path=IsPassword}"

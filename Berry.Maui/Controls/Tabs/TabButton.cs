@@ -65,10 +65,7 @@ public class TabButton : TabItem
 
     private ImageButton _imageButton;
 
-    public TabButton()
-    {
-        Initialize();
-    }
+    public TabButton() => Initialize();
 
     public event EventHandler Clicked
     {

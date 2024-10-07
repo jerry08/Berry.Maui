@@ -42,7 +42,7 @@ public class HostingBuilder
         });
         return this;
     }
-    
+
     public HostingBuilder UseMaterialDatePicker()
     {
         _builder.ConfigureMauiHandlers(handlers =>

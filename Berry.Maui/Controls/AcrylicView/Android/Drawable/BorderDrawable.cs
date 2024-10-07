@@ -49,10 +49,8 @@ public class BorderDrawable : ColorDrawable
         Initialize(context, nativeColor2, nativeColor, border.BorderThickness, border.CornerRadius);
     }
 
-    public BorderDrawable(Context context, Thickness cornerRadius, Color color)
-    {
+    public BorderDrawable(Context context, Thickness cornerRadius, Color color) =>
         Initialize(context, Colors.Transparent.ToPlatform(), color, new Thickness(0), cornerRadius);
-    }
 
     /// <summary>
     /// Draw background color and rounded corners

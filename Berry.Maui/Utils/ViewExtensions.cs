@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Berry.Maui.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Maui;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Internals;
@@ -33,6 +35,11 @@ public static partial class ViewExtensions
 
         return fallbackToAppMauiContext ? Application.Current?.FindMauiContext() : default;
     }
+
+    public static ILogger<T>? CreateLogger<T>(
+        this Element element,
+        bool fallbackToAppMauiContext = true
+    ) => element.FindMauiContext(fallbackToAppMauiContext)?.CreateLogger<T>();
 
     public static IFontManager RequireFontManager(
         this Element element,

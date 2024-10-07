@@ -7,10 +7,7 @@ internal class JniWeakReference<T>
 {
     private readonly WeakReference<T> _reference;
 
-    public JniWeakReference(T target)
-    {
-        _reference = new WeakReference<T>(target);
-    }
+    public JniWeakReference(T target) => _reference = new WeakReference<T>(target);
 
     public bool TryGetTarget(out T? target)
     {

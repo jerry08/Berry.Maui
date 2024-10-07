@@ -33,7 +33,7 @@ public class TouchGestureRecognizer : UIGestureRecognizer
     public static bool IsActive { get; private set; }
 
     public bool Processing =>
-        State == UIGestureRecognizerState.Began || State == UIGestureRecognizerState.Changed;
+        State is UIGestureRecognizerState.Began or UIGestureRecognizerState.Changed;
     public event EventHandler<TouchArgs> OnTouch;
 
     public override async void TouchesBegan(NSSet touches, UIEvent evt)
@@ -122,10 +122,7 @@ public class TouchGestureRecognizerDelegate : UIGestureRecognizerDelegate
 {
     readonly UIView _view;
 
-    public TouchGestureRecognizerDelegate(UIView view)
-    {
-        _view = view;
-    }
+    public TouchGestureRecognizerDelegate(UIView view) => _view = view;
 
     public override bool ShouldRecognizeSimultaneously(
         UIGestureRecognizer gestureRecognizer,

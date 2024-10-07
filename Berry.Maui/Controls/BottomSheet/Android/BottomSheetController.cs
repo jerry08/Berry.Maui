@@ -122,10 +122,7 @@ public class BottomSheetController
         BottomSheetController _controller;
         EdgeToEdgeCallback? _edgeToEdgeCallback;
 
-        public EdgeToEdgeListener(BottomSheetController controller)
-        {
-            _controller = controller;
-        }
+        public EdgeToEdgeListener(BottomSheetController controller) => _controller = controller;
 
         public WindowInsetsCompat OnApplyWindowInsets(AView v, WindowInsetsCompat insets)
         {
@@ -157,10 +154,7 @@ public class BottomSheetController
         int _endHeight;
 
         public BottomSheetInsetsAnimationCallback(BottomSheetController controller)
-            : base(DispatchModeStop)
-        {
-            _controller = controller;
-        }
+            : base(DispatchModeStop) => _controller = controller;
 
         public override WindowInsetsAnimationCompat.BoundsCompat OnStart(
             WindowInsetsAnimationCompat animation,

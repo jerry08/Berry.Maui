@@ -10,10 +10,7 @@ public class BottomSheetCallback : BottomSheetBehavior.BottomSheetCallback
 
     public event EventHandler StateChanged;
 
-    public BottomSheetCallback(BottomSheet page)
-    {
-        _page = page;
-    }
+    public BottomSheetCallback(BottomSheet page) => _page = page;
 
     public override void OnSlide(AView bottomSheet, float newState) { }
 

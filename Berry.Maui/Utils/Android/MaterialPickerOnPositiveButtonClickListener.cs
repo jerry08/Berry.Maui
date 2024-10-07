@@ -11,10 +11,8 @@ public class MaterialPickerOnPositiveButtonClickListener
 
     public MaterialPickerOnPositiveButtonClickListener() { }
 
-    public MaterialPickerOnPositiveButtonClickListener(Action<long>? action)
-    {
+    public MaterialPickerOnPositiveButtonClickListener(Action<long>? action) =>
         ClickAction = action;
-    }
 
     public void OnPositiveButtonClick(Java.Lang.Object? selectionObj)
     {

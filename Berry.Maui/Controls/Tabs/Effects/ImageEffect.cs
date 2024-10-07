@@ -37,7 +37,7 @@ public static class ImageEffect
         object newValue
     )
     {
-        if (!(bindable is Image))
+        if (bindable is not Image)
         {
             throw new InvalidOperationException(
                 "Tint effect is only applicable on CachedImage and Image"
@@ -65,13 +65,7 @@ public class TintableImageEffect : RoutingEffect
 {
     public static readonly string Name = $"Sharpnado.{nameof(TintableImageEffect)}";
 
-    public TintableImageEffect(Color color)
-#if !NET6_0_OR_GREATER
-        : base(Name)
-#endif
-    {
-        TintColor = color;
-    }
+    public TintableImageEffect(Color color) => TintColor = color;
 
     public Color TintColor { get; }
 }

@@ -127,10 +127,7 @@ public partial class BottomSheet : ContentView
         set => SetValue(UseNavigationBarAreaProperty, value);
     }
 
-    public BottomSheet()
-    {
-        Resources.Add(new Style(typeof(Label)));
-    }
+    public BottomSheet() => Resources.Add(new Style(typeof(Label)));
 
     public Task ShowAsync(bool animated = true)
     {

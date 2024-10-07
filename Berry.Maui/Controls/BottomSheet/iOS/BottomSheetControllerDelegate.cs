@@ -8,10 +8,7 @@ internal class BottomSheetControllerDelegate : UISheetPresentationControllerDele
 {
     BottomSheet _sheet;
 
-    public BottomSheetControllerDelegate(BottomSheet sheet)
-    {
-        _sheet = sheet;
-    }
+    public BottomSheetControllerDelegate(BottomSheet sheet) => _sheet = sheet;
 
     public override void DidDismiss(UIPresentationController presentationController)
     {

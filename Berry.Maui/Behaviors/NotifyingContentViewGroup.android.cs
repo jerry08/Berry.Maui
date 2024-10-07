@@ -10,10 +10,7 @@ public class NotifyingContentViewGroup : ContentViewGroup
     public event EventHandler<MotionEvent?>? DispatchTouch;
 
     public NotifyingContentViewGroup(Context context)
-        : base(context)
-    {
-        SetClipChildren(false);
-    }
+        : base(context) => SetClipChildren(false);
 
     public override bool DispatchTouchEvent(MotionEvent? e)
     {

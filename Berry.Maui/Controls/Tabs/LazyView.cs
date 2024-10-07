@@ -76,7 +76,7 @@ public abstract class ALazyView : ContentView, ILazyView, IDisposable, IAnimatab
 
     protected override void OnBindingContextChanged()
     {
-        if (Content != null && !(Content is ActivityIndicator))
+        if (Content is not null and not ActivityIndicator)
         {
             Content.BindingContext = BindingContext;
         }

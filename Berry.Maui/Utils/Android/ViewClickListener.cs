@@ -9,10 +9,7 @@ public class ViewClickListener : Java.Lang.Object, View.IOnClickListener
 
     public ViewClickListener() { }
 
-    public ViewClickListener(Action? action)
-    {
-        ClickAction = action;
-    }
+    public ViewClickListener(Action? action) => ClickAction = action;
 
     public void OnClick(View? v)
     {
