@@ -21,8 +21,9 @@ public partial class MaterialDatePickerHandler : DatePickerHandler
             HidePicker = HidePickerDialog
         };
 
-        using (var gradientDrawable = new GradientDrawable())
+        if (Options.UsePlainer)
         {
+            using var gradientDrawable = new GradientDrawable();
             gradientDrawable.SetColor(Android.Graphics.Color.Transparent);
             mauiDatePicker.SetBackground(gradientDrawable);
             mauiDatePicker.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(
@@ -33,12 +34,24 @@ public partial class MaterialDatePickerHandler : DatePickerHandler
         return mauiDatePicker;
     }
 
+    protected override void DisconnectHandler(MauiDatePicker platformView)
+    {
+        if (_dialog != null)
+        {
+            _dialog.Dismiss();
+            _dialog.Dispose();
+            _dialog = null;
+        }
+
+        base.DisconnectHandler(platformView);
+    }
+
     void ShowPickerDialog()
     {
         if (VirtualView == null)
             return;
 
-        if (_dialog != null)
+        if (_dialog != null && _dialog.IsVisible)
             return;
 
         var date = VirtualView.Date;

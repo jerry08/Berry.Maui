@@ -36,6 +36,17 @@ public partial class MaterialTimePickerHandler : TimePickerHandler
         return mauiTimePicker;
     }
 
+    protected override void DisconnectHandler(MauiTimePicker platformView)
+    {
+        if (_dialog != null)
+        {
+            _dialog?.Dismiss();
+            _dialog = null;
+        }
+
+        base.DisconnectHandler(platformView);
+    }
+
     void ShowPickerDialog()
     {
         if (VirtualView is null)
@@ -74,6 +85,7 @@ public partial class MaterialTimePickerHandler : TimePickerHandler
     void HidePickerDialog()
     {
         _dialog?.Dismiss();
+        _dialog = null;
     }
 
     bool Use24HourView =>
