@@ -242,9 +242,9 @@ public partial class MediaManager : Java.Lang.Object, IPlayerListener
             mediaSessionWRandomId.Build()
             ?? throw new InvalidOperationException("Session cannot be null");
         ArgumentNullException.ThrowIfNull(session.Id);
-        //checkPermissionsTask = CheckAndRequestForegroundPermission(
-        //    checkPermissionSourceToken.Token
-        //);
+        checkPermissionsTask = CheckAndRequestForegroundPermission(
+            checkPermissionSourceToken.Token
+        );
 
         return (Player, PlayerView);
     }
