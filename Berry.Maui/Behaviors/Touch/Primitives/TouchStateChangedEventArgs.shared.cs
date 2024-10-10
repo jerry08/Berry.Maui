@@ -3,7 +3,7 @@
 namespace Berry.Maui.Behaviors;
 
 /// <summary>
-/// Provides data for the <see cref="TouchBehavior.StateChanged"/> event.
+/// Provides data for the <see cref="TouchBehavior.CurrentTouchStateChanged"/> event.
 /// </summary>
 public class TouchStateChangedEventArgs : EventArgs
 {

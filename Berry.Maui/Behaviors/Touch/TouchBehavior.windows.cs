@@ -27,54 +27,52 @@ public partial class TouchBehavior
         base.OnAttachedTo(bindable, platformView);
 
         Element = bindable;
-        if (NativeAnimation)
+
+        if (string.IsNullOrEmpty(platformView.Name))
         {
-            if (string.IsNullOrEmpty(platformView.Name))
-            {
-                platformView.Name = Guid.NewGuid().ToString();
-            }
-
-            if (platformView.Resources.ContainsKey(pointerDownAnimationKey))
-            {
-                pointerDownStoryboard = (Storyboard)platformView.Resources[pointerDownAnimationKey];
-            }
-            else
-            {
-                pointerDownStoryboard = new();
-                var downThemeAnimation = new PointerDownThemeAnimation();
-
-                Storyboard.SetTargetName(downThemeAnimation, platformView.Name);
-                pointerDownStoryboard.Children.Add(downThemeAnimation);
-                platformView.Resources.Add(
-                    new KeyValuePair<object, object>(pointerDownAnimationKey, pointerDownStoryboard)
-                );
-            }
-
-            if (platformView.Resources.ContainsKey(pointerUpAnimationKey))
-            {
-                pointerUpStoryboard = (Storyboard)platformView.Resources[pointerUpAnimationKey];
-            }
-            else
-            {
-                pointerUpStoryboard = new();
-                var upThemeAnimation = new PointerUpThemeAnimation();
-
-                Storyboard.SetTargetName(upThemeAnimation, platformView.Name);
-
-                pointerUpStoryboard.Children.Add(upThemeAnimation);
-
-                platformView.Resources.Add(
-                    new KeyValuePair<object, object>(pointerUpAnimationKey, pointerUpStoryboard)
-                );
-            }
-
-            platformView.PointerPressed += OnPointerPressed;
-            platformView.PointerReleased += OnPointerReleased;
-            platformView.PointerCanceled += OnPointerCanceled;
-            platformView.PointerExited += OnPointerExited;
-            platformView.PointerEntered += OnPointerEntered;
-            platformView.PointerCaptureLost += OnPointerCaptureLost;
+            platformView.Name = Guid.NewGuid().ToString();
         }
+
+        if (platformView.Resources.ContainsKey(pointerDownAnimationKey))
+        {
+            pointerDownStoryboard = (Storyboard)platformView.Resources[pointerDownAnimationKey];
+        }
+        else
+        {
+            pointerDownStoryboard = new();
+            var downThemeAnimation = new PointerDownThemeAnimation();
+
+            Storyboard.SetTargetName(downThemeAnimation, platformView.Name);
+            pointerDownStoryboard.Children.Add(downThemeAnimation);
+            platformView.Resources.Add(
+                new KeyValuePair<object, object>(pointerDownAnimationKey, pointerDownStoryboard)
+            );
+        }
+
+        if (platformView.Resources.ContainsKey(pointerUpAnimationKey))
+        {
+            pointerUpStoryboard = (Storyboard)platformView.Resources[pointerUpAnimationKey];
+        }
+        else
+        {
+            pointerUpStoryboard = new();
+            var upThemeAnimation = new PointerUpThemeAnimation();
+
+            Storyboard.SetTargetName(upThemeAnimation, platformView.Name);
+
+            pointerUpStoryboard.Children.Add(upThemeAnimation);
+
+            platformView.Resources.Add(
+                new KeyValuePair<object, object>(pointerUpAnimationKey, pointerUpStoryboard)
+            );
+        }
+
+        platformView.PointerPressed += OnPointerPressed;
+        platformView.PointerReleased += OnPointerReleased;
+        platformView.PointerCanceled += OnPointerCanceled;
+        platformView.PointerExited += OnPointerExited;
+        platformView.PointerEntered += OnPointerEntered;
+        platformView.PointerCaptureLost += OnPointerCaptureLost;
     }
 
     /// <inheritdoc/>
@@ -82,7 +80,7 @@ public partial class TouchBehavior
     {
         base.OnDetachedFrom(bindable, platformView);
 
-        if (IsDisabled)
+        if (!IsEnabled)
         {
             return;
         }
@@ -101,7 +99,7 @@ public partial class TouchBehavior
 
     void OnPointerEntered(object? sender, PointerRoutedEventArgs e)
     {
-        if (Element is null || IsDisabled)
+        if (Element is null || !IsEnabled)
         {
             return;
         }
@@ -111,13 +109,12 @@ public partial class TouchBehavior
         if (isPressed)
         {
             HandleTouch(TouchStatus.Started);
-            AnimateTilt(pointerDownStoryboard);
         }
     }
 
     void OnPointerExited(object? sender, PointerRoutedEventArgs e)
     {
-        if (Element is null || IsDisabled)
+        if (Element is null || !IsEnabled)
         {
             return;
         }
@@ -125,7 +122,6 @@ public partial class TouchBehavior
         if (isPressed)
         {
             HandleTouch(TouchStatus.Canceled);
-            AnimateTilt(pointerUpStoryboard);
         }
 
         HandleHover(HoverStatus.Exited);
@@ -133,7 +129,7 @@ public partial class TouchBehavior
 
     void OnPointerCanceled(object? sender, PointerRoutedEventArgs e)
     {
-        if (Element is null || IsDisabled)
+        if (Element is null || !IsEnabled)
         {
             return;
         }
@@ -143,13 +139,11 @@ public partial class TouchBehavior
         HandleTouch(TouchStatus.Canceled);
         HandleUserInteraction(TouchInteractionStatus.Completed);
         HandleHover(HoverStatus.Exited);
-
-        AnimateTilt(pointerUpStoryboard);
     }
 
     void OnPointerCaptureLost(object? sender, PointerRoutedEventArgs e)
     {
-        if (Element is null || IsDisabled)
+        if (Element is null || !IsEnabled)
         {
             return;
         }
@@ -161,40 +155,37 @@ public partial class TouchBehavior
 
         isPressed = false;
 
-        if (Status != TouchStatus.Canceled)
+        if (CurrentTouchStatus is not TouchStatus.Canceled)
         {
             HandleTouch(TouchStatus.Canceled);
         }
 
         HandleUserInteraction(TouchInteractionStatus.Completed);
 
-        if (HoverStatus != HoverStatus.Exited)
+        if (CurrentHoverStatus is not HoverStatus.Exited)
         {
             HandleHover(HoverStatus.Exited);
         }
-
-        AnimateTilt(pointerUpStoryboard);
     }
 
     void OnPointerReleased(object? sender, PointerRoutedEventArgs e)
     {
-        if (Element is null || IsDisabled)
+        if (Element is null || !IsEnabled)
         {
             return;
         }
 
-        if (isPressed && (HoverStatus == HoverStatus.Entered))
+        if (isPressed && (CurrentHoverStatus is HoverStatus.Entered))
         {
             HandleTouch(TouchStatus.Completed);
-            AnimateTilt(pointerUpStoryboard);
         }
-        else if (HoverStatus != HoverStatus.Exited)
+        else if (CurrentHoverStatus is not HoverStatus.Exited)
         {
             HandleTouch(TouchStatus.Canceled);
-            AnimateTilt(pointerUpStoryboard);
         }
 
         HandleUserInteraction(TouchInteractionStatus.Completed);
+        e.Handled = true;
 
         isPressed = false;
         isIntentionalCaptureLoss = true;
@@ -202,7 +193,7 @@ public partial class TouchBehavior
 
     void OnPointerPressed(object? sender, PointerRoutedEventArgs e)
     {
-        if (Element is null || IsDisabled || sender is not FrameworkElement container)
+        if (Element is null || !IsEnabled || sender is not FrameworkElement container)
         {
             return;
         }
@@ -213,24 +204,7 @@ public partial class TouchBehavior
         HandleUserInteraction(TouchInteractionStatus.Started);
         HandleTouch(TouchStatus.Started);
 
-        AnimateTilt(pointerDownStoryboard);
-
         isIntentionalCaptureLoss = false;
-    }
-
-    void AnimateTilt(Storyboard? storyboard)
-    {
-        if (storyboard is not null && Element is not null && NativeAnimation)
-        {
-            try
-            {
-                storyboard.Stop();
-                storyboard.Begin();
-            }
-            catch
-            {
-                // Suppress
-            }
-        }
+        e.Handled = true;
     }
 }

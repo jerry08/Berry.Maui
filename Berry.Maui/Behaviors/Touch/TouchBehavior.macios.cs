@@ -158,7 +158,7 @@ internal sealed class TouchUITapGestureRecognizer : UIGestureRecognizer
         }
 
         HandleTouch(
-                behavior?.Status == TouchStatus.Started
+                behavior?.CurrentTouchStatus == TouchStatus.Started
                     ? TouchStatus.Completed
                     : TouchStatus.Canceled,
                 TouchInteractionStatus.Completed
@@ -213,7 +213,7 @@ internal sealed class TouchUITapGestureRecognizer : UIGestureRecognizer
                 ? TouchStatus.Started
                 : TouchStatus.Canceled;
 
-        if (behavior?.Status != status)
+        if (behavior?.CurrentTouchStatus != status)
         {
             HandleTouch(status).SafeFireAndForget();
         }

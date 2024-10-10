@@ -48,7 +48,7 @@ public partial class TouchBehavior
         && ripple.IsAlive()
         && this.view.IsAlive()
         && (isAtLeastM ? this.view.Foreground : this.view.Background) == ripple
-        && element is MView view
+        && Element is MView view
         && view.GestureRecognizers.Any(gesture => gesture is TapGestureRecognizer);
 
     /// <summary>
@@ -104,13 +104,7 @@ public partial class TouchBehavior
     {
         base.OnDetachedFrom(bindable, platformView);
 
-        element = bindable;
         view = platformView;
-
-        if (element is null)
-        {
-            return;
-        }
 
         try
         {
@@ -141,6 +135,8 @@ public partial class TouchBehavior
                 rippleView.Dispose();
                 rippleView = null;
             }
+
+            Element = null;
         }
         catch (ObjectDisposedException)
         {
@@ -263,7 +259,7 @@ public partial class TouchBehavior
         }
 
         view.Click -= OnClick;
-        if (IsAccessibilityMode || (IsEnabled && (element?.IsEnabled ?? false)))
+        if (IsAccessibilityMode || (IsEnabled && (Element?.IsEnabled ?? false)))
         {
             view.Click += OnClick;
             return;
@@ -281,7 +277,7 @@ public partial class TouchBehavior
 
         if (viewGroup is null && view is not null)
         {
-            if (IsAndroidVersionAtLeast((int)BuildVersionCodes.M))
+            if (IsAndroidVersionAtLeast(23))
             {
                 view.Foreground = ripple;
             }
@@ -442,7 +438,9 @@ public partial class TouchBehavior
 
     private void OnTouchUp()
     {
-        HandleEnd(Status == TouchStatus.Started ? TouchStatus.Completed : TouchStatus.Canceled);
+        HandleEnd(
+            CurrentTouchStatus == TouchStatus.Started ? TouchStatus.Completed : TouchStatus.Canceled
+        );
     }
 
     private void OnTouchCancel()
@@ -493,15 +491,15 @@ public partial class TouchBehavior
         if (
             isHoverSupported
             && (
-                (status == TouchStatus.Canceled && HoverStatus == HoverStatus.Entered)
-                || (status == TouchStatus.Started && HoverStatus == HoverStatus.Exited)
+                (status == TouchStatus.Canceled && CurrentHoverStatus == HoverStatus.Entered)
+                || (status == TouchStatus.Started && CurrentHoverStatus == HoverStatus.Exited)
             )
         )
         {
             HandleHover(status == TouchStatus.Started ? HoverStatus.Entered : HoverStatus.Exited);
         }
 
-        if (Status != status)
+        if (CurrentTouchStatus != status)
         {
             HandleTouch(status);
 

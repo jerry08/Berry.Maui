@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Maui.Controls;
 
@@ -6,36 +8,34 @@ namespace Berry.Maui.Behaviors;
 
 public partial class TouchBehavior : IDisposable
 {
-    readonly NullReferenceException nre = new(nameof(Element));
-
     internal void RaiseInteractionStatusChanged() =>
         weakEventManager.HandleEvent(
-            Element ?? throw nre,
-            new TouchInteractionStatusChangedEventArgs(InteractionStatus),
+            this,
+            new TouchInteractionStatusChangedEventArgs(CurrentInteractionStatus),
             nameof(InteractionStatusChanged)
         );
 
-    internal void RaiseStatusChanged() =>
+    internal void RaiseCurrentTouchStatusChanged() =>
         weakEventManager.HandleEvent(
-            Element ?? throw nre,
-            new TouchStatusChangedEventArgs(Status),
-            nameof(StatusChanged)
+            this,
+            new TouchStatusChangedEventArgs(CurrentTouchStatus),
+            nameof(CurrentTouchStatusChanged)
         );
 
-    internal void RaiseHoverStateChanged()
+    async Task RaiseHoverStateChanged(CancellationToken token)
     {
-        ForceUpdateState();
+        await ForceUpdateState(token);
         weakEventManager.HandleEvent(
-            Element ?? throw nre,
-            new HoverStateChangedEventArgs(HoverState),
+            this,
+            new HoverStateChangedEventArgs(CurrentHoverState),
             nameof(HoverStateChanged)
         );
     }
 
     internal void RaiseHoverStatusChanged() =>
         weakEventManager.HandleEvent(
-            Element ?? throw nre,
-            new HoverStatusChangedEventArgs(HoverStatus),
+            this,
+            new HoverStatusChangedEventArgs(CurrentHoverStatus),
             nameof(HoverStatusChanged)
         );
 
@@ -78,29 +78,21 @@ public partial class TouchBehavior : IDisposable
         );
     }
 
-    internal void ForceUpdateState(bool animated = true)
+    internal async Task ForceUpdateState(CancellationToken token, bool animated = true)
     {
-        if (element is null)
+        if (Element is null)
         {
             return;
         }
 
-        gestureManager
-            .ChangeStateAsync(this, animated)
-            .ContinueWith(
-                t =>
-                {
-                    if (t.Exception is null)
-                    {
-                        return;
-                    }
-
-                    Console.WriteLine(
-                        $"Failed to force update state, with the {t.Exception} exception and the {t.Exception.Message} message."
-                    );
-                },
-                TaskContinuationOptions.OnlyOnFaulted
-            );
+        try
+        {
+            await gestureManager.ChangeStateAsync(this, animated, token);
+        }
+        catch (TaskCanceledException ex)
+        {
+            Trace.TraceInformation("{0}", ex);
+        }
     }
 
     internal void HandleTouch(TouchStatus status) => gestureManager.HandleTouch(this, status);
@@ -108,27 +100,31 @@ public partial class TouchBehavior : IDisposable
     internal void HandleUserInteraction(TouchInteractionStatus interactionStatus) =>
         gestureManager.HandleUserInteraction(this, interactionStatus);
 
-    internal void HandleHover(HoverStatus status) => gestureManager.HandleHover(this, status);
-
-    internal void RaiseStateChanged()
+    internal void HandleHover(HoverStatus status)
     {
-        ForceUpdateState();
-        HandleLongPress();
+        ObjectDisposedException.ThrowIf(isDisposed, this);
+
+        GestureManager.HandleHover(this, status);
+    }
+
+    async Task RaiseCurrentTouchStateChanged(CancellationToken token)
+    {
+        await Task.WhenAll(ForceUpdateState(token), HandleLongPress(token));
         weakEventManager.HandleEvent(
-            Element ?? throw nre,
-            new TouchStateChangedEventArgs(State),
-            nameof(StateChanged)
+            this,
+            new TouchStateChangedEventArgs(CurrentTouchState),
+            nameof(CurrentTouchStateChanged)
         );
     }
 
-    internal void HandleLongPress()
+    async Task HandleLongPress(CancellationToken token)
     {
         if (Element is null)
         {
             return;
         }
 
-        gestureManager.HandleLongPress(this);
+        await gestureManager.HandleLongPress(this, token);
     }
 
     void SetChildrenInputTransparent(bool value)

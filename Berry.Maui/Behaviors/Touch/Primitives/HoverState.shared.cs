@@ -9,7 +9,7 @@ public enum HoverState
     /// <summary>
     /// The pointer is not over the element.
     /// </summary>
-    Normal,
+    Default,
 
     /// <summary>
     /// The pointer is over the element.

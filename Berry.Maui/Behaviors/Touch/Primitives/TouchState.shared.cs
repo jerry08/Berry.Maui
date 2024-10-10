@@ -1,14 +1,14 @@
 ﻿namespace Berry.Maui.Behaviors;
 
 /// <summary>
-/// Provides data for the <see cref="TouchBehavior.StatusChanged"/> event.
+/// Provides data for the <see cref="TouchBehavior.CurrentTouchStatusChanged"/> event.
 /// </summary>
 public enum TouchState
 {
     /// <summary>
     /// The pointer is not over the element.
     /// </summary>
-    Normal,
+    Default,
 
     /// <summary>
     /// The pointer is over the element.
