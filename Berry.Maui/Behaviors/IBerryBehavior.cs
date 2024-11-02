@@ -26,7 +26,8 @@ public interface IBerryBehavior<TView>
             );
         }
 
-        if (behavior.IsSet(BindableObject.BindingContextProperty) || View is null)
+        //if (behavior.IsSet(BindableObject.BindingContextProperty) || View is null)
+        if (View is null)
         {
             return false;
         }
@@ -51,6 +52,7 @@ public interface IBerryBehavior<TView>
         if (behavior.IsSet(BindableObject.BindingContextProperty))
         {
             behavior.RemoveBinding(BindableObject.BindingContextProperty);
+            //behavior.ClearValue(BindableObject.BindingContextProperty);
             return true;
         }
 
