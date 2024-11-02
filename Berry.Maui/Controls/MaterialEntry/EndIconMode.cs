@@ -6,5 +6,5 @@ public enum EndIconMode
     ClearText,
     PasswordToggle,
     DropdownMenu,
-    Custom
+    Custom,
 }

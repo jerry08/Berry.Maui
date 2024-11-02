@@ -1,0 +1,22 @@
+<animated-selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <item
+      android:id="@+id/visible1"
+      android:drawable="@drawable/design_ic_visibility"
+      android:state_checked="true"/>
+
+  <item
+      android:id="@+id/masked1"
+      android:drawable="@drawable/design_ic_visibility_off"/>
+
+  <transition
+      android:drawable="@drawable/avd_show_password"
+      android:fromId="@id/masked1"
+      android:toId="@id/visible1"/>
+
+  <transition
+      android:drawable="@drawable/avd_hide_password"
+      android:fromId="@id/visible1"
+      android:toId="@id/masked1"/>
+
+</animated-selector>

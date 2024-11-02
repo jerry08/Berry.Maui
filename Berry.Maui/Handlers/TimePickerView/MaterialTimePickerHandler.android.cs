@@ -20,7 +20,7 @@ public partial class MaterialTimePickerHandler : TimePickerHandler
         var mauiTimePicker = new MauiTimePicker(Context)
         {
             ShowPicker = ShowPickerDialog,
-            HidePicker = HidePickerDialog
+            HidePicker = HidePickerDialog,
         };
 
         if (Options.UsePlainer)
@@ -68,8 +68,8 @@ public partial class MaterialTimePickerHandler : TimePickerHandler
         var builder = new MaterialTimePicker.Builder()
             .SetTimeFormat(Use24HourView ? TimeFormat.Clock24h : TimeFormat.Clock12h)
             .SetInputMode(MaterialTimePicker.InputModeClock)
-            .SetMinute(hour)
-            .SetHour(minute);
+            .SetMinute(minute)
+            .SetHour(hour);
 
         _dialog = builder.Build();
         _dialog.AddOnPositiveButtonClickListener(

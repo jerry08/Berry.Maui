@@ -1,12 +1,14 @@
 ﻿using System;
 using Android.Content;
 using Android.Runtime;
+using Android.Text.Method;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
 using AndroidX.AppCompat.Widget;
 using Berry.Maui.Controls;
 using Berry.Maui.Extensions;
+using Berry.Maui.Utils;
 using Google.Android.Material.TextField;
 using Microsoft.Maui;
 using Microsoft.Maui.Controls;
@@ -72,6 +74,11 @@ public class MaterialEntryHandler : ViewHandler<Entry, RelativeLayout>, IEntryHa
                 EndIconMode.Custom => TextInputLayout.EndIconCustom,
                 _ => TextInputLayout.EndIconNone,
             };
+
+            //if (materialEntry.EndIconMode is EndIconMode.PasswordToggle)
+            //{
+            //    //handler.TextInputLayout.SetEndIconDrawable(Resource.Drawable.end_icon_state);
+            //}
         }
         else
         {
@@ -96,7 +103,7 @@ public class MaterialEntryHandler : ViewHandler<Entry, RelativeLayout>, IEntryHa
         };
     }
 
-    private static void MapClearButtonVisibility(MaterialEntryHandler handler, IEntry arg2)
+    private static void MapClearButtonVisibility(MaterialEntryHandler handler, IEntry entry)
     {
         if (handler.TextInputLayout.EditText is null)
             return;
@@ -104,10 +111,29 @@ public class MaterialEntryHandler : ViewHandler<Entry, RelativeLayout>, IEntryHa
         if (handler.VirtualView is not MaterialEntry materialEntry)
             return;
 
-        if (arg2.ClearButtonVisibility is ClearButtonVisibility.WhileEditing)
+        if (entry.ClearButtonVisibility is ClearButtonVisibility.WhileEditing)
         {
             handler.TextInputLayout.EndIconVisible = true;
-            handler.TextInputLayout.EndIconMode = TextInputLayout.EndIconClearText;
+            handler.TextInputLayout.EndIconMode = materialEntry.EndIconMode switch
+            {
+                EndIconMode.ClearText => TextInputLayout.EndIconClearText,
+                EndIconMode.PasswordToggle => TextInputLayout.EndIconPasswordToggle,
+                EndIconMode.DropdownMenu => TextInputLayout.EndIconDropdownMenu,
+                EndIconMode.Custom => TextInputLayout.EndIconCustom,
+                _ => TextInputLayout.EndIconNone,
+            };
+
+            //if (materialEntry.EndIconMode is EndIconMode.PasswordToggle)
+            //{
+            //    //handler.TextInputLayout.SetEndIconOnClickListener(
+            //    //    new ViewClickListener(() =>
+            //    //    {
+            //    //        handler.TextInputLayout.EndIconDrawable.perfo.Animate();
+            //    //    })
+            //    //);
+            //
+            //    //handler.TextInputLayout.SetEndIconDrawable(Resource.Drawable.m3_password_eye);
+            //}
 
             //var dra = ContextCompat.GetDrawable(handler.TextInputLayout.Context, Resource.Drawable.material_ic_clear_black_24dp);
             ////dra.SetColorFilter(Color.ParseColor("#AE6118"), PorterDuff.Mode.Multiply);
@@ -127,9 +153,9 @@ public class MaterialEntryHandler : ViewHandler<Entry, RelativeLayout>, IEntryHa
         // so set OnFocusChangeListener.
         // https://github.com/material-components/material-components-android/issues/1015
         // https://stackoverflow.com/a/70663379
-        handler.TextInputLayout.OnFocusChangeListener = new FocusChangeListenerWorkaround(arg2);
+        handler.TextInputLayout.OnFocusChangeListener = new FocusChangeListenerWorkaround(entry);
         handler.TextInputLayout.EditText.OnFocusChangeListener = new FocusChangeListenerWorkaround(
-            arg2
+            entry
         );
     }
 
@@ -384,5 +410,5 @@ public class BerryTextInputEditText : TextInputEditText
 internal enum DataFlowDirection
 {
     ToPlatform,
-    FromPlatform
+    FromPlatform,
 }

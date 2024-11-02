@@ -4,5 +4,5 @@ public enum BoxBackgroundMode
 {
     None,
     Filled,
-    Outline
+    Outline,
 }
