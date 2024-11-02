@@ -266,8 +266,10 @@ public partial class TouchBehavior : BasePlatformBehavior<VisualElement>
         nameof(CurrentTouchState),
         typeof(TouchState),
         typeof(TouchBehavior),
-        TouchState.Default,
-        BindingMode.OneWayToSource
+        TouchBehaviorDefaults.CurrentTouchState,
+        BindingMode.OneWayToSource,
+        propertyChanged: static async (bindable, _, _) =>
+            await ((TouchBehavior)bindable).RaiseCurrentTouchStateChanged(CancellationToken.None)
     );
 
     /// <summary>
@@ -331,8 +333,10 @@ public partial class TouchBehavior : BasePlatformBehavior<VisualElement>
         nameof(CurrentHoverState),
         typeof(HoverState),
         typeof(TouchBehavior),
-        HoverState.Default,
-        BindingMode.OneWayToSource
+        TouchBehaviorDefaults.CurrentHoverState,
+        BindingMode.OneWayToSource,
+        propertyChanged: static async (bindable, _, _) =>
+            await ((TouchBehavior)bindable).RaiseHoverStateChanged(CancellationToken.None)
     );
 
     /// <summary>

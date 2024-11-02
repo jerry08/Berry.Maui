@@ -68,7 +68,7 @@ sealed class GestureManager : IDisposable, IAsyncDisposable
             return;
         }
 
-        TouchStatus updatedTouchStatus = status;
+        var updatedTouchStatus = status;
 
         var canExecuteAction = touchBehavior.CanExecute;
         if (status is not TouchStatus.Started || canExecuteAction)
@@ -116,7 +116,7 @@ sealed class GestureManager : IDisposable, IAsyncDisposable
             _
                 => throw new NotSupportedException(
                     $"{nameof(HoverStatus)} {hoverStatus} not yet supported"
-                )
+                ),
         };
 
         touchBehavior.CurrentHoverState = hoverState;
@@ -424,7 +424,7 @@ sealed class GestureManager : IDisposable, IAsyncDisposable
         {
             ArgumentNullException.ThrowIfNull(element);
 
-            VisualElement? searchingElement = element;
+            var searchingElement = element;
 
             child = null;
             parent = null;
@@ -566,7 +566,7 @@ sealed class GestureManager : IDisposable, IAsyncDisposable
             _
                 => throw new NotSupportedException(
                     $"The combination of {nameof(TouchState)} {touchState} and {nameof(HoverState)} {hoverState} is not yet supported"
-                )
+                ),
         };
 
         VisualStateManager.GoToState(visualElement, state);
@@ -993,7 +993,7 @@ sealed class GestureManager : IDisposable, IAsyncDisposable
             return false;
         }
 
-        double updatedRotationY = touchBehavior.DefaultRotationY;
+        var updatedRotationY = touchBehavior.DefaultRotationY;
 
         switch (touchState, hoverState)
         {
@@ -1208,8 +1208,8 @@ sealed class GestureManager : IDisposable, IAsyncDisposable
             in TouchBehavior touchBehavior
         )
         {
-            Easing? easing = touchBehavior.DefaultAnimationEasing;
-            int duration = touchBehavior.DefaultAnimationDuration;
+            var easing = touchBehavior.DefaultAnimationEasing;
+            var duration = touchBehavior.DefaultAnimationDuration;
 
             switch (touchState, hoverState)
             {
