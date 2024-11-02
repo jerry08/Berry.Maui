@@ -20,7 +20,7 @@ internal static class TouchGestureCollector
             var gest = new TouchGestureRecognizer
             {
                 CancelsTouchesInView = false,
-                Delegate = new TouchGestureRecognizerDelegate(view)
+                Delegate = new TouchGestureRecognizerDelegate(view),
             };
             gest.OnTouch += ActionActivator;
             Collection.Add(

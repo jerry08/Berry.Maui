@@ -34,7 +34,7 @@ public static partial class ApplicationEx
         {
             DisplayOrientation.Landscape => ScreenOrientation.Landscape,
             DisplayOrientation.Portrait => ScreenOrientation.Portrait,
-            _ => ScreenOrientation.Unspecified
+            _ => ScreenOrientation.Unspecified,
         };
     }
 

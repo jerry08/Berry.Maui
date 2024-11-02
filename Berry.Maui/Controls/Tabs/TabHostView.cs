@@ -744,7 +744,7 @@ public class TabHostView : Shadows
                 new TapGestureRecognizer
                 {
                     Command = TabItemTappedCommand,
-                    CommandParameter = tabItem
+                    CommandParameter = tabItem,
                 }
             );
         }
@@ -776,7 +776,7 @@ public class TabHostView : Shadows
                 tabIndexInGrid,
                 new ColumnDefinition
                 {
-                    Width = TabType == TabType.Fixed ? GridLength.Star : GridLength.Auto
+                    Width = TabType == TabType.Fixed ? GridLength.Star : GridLength.Auto,
                 }
             );
 
@@ -803,7 +803,7 @@ public class TabHostView : Shadows
                 tabIndexInGrid,
                 new RowDefinition
                 {
-                    Height = TabType == TabType.Fixed ? GridLength.Star : GridLength.Auto
+                    Height = TabType == TabType.Fixed ? GridLength.Star : GridLength.Auto,
                 }
             );
 
@@ -1151,7 +1151,7 @@ public class TabHostView : Shadows
                     tabIndexInGrid,
                     new ColumnDefinition
                     {
-                        Width = TabType == TabType.Fixed ? GridLength.Star : GridLength.Auto
+                        Width = TabType == TabType.Fixed ? GridLength.Star : GridLength.Auto,
                     }
                 );
 
@@ -1178,7 +1178,7 @@ public class TabHostView : Shadows
                     tabIndexInGrid,
                     new RowDefinition
                     {
-                        Height = TabType == TabType.Fixed ? GridLength.Star : GridLength.Auto
+                        Height = TabType == TabType.Fixed ? GridLength.Star : GridLength.Auto,
                     }
                 );
 

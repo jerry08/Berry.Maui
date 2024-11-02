@@ -52,7 +52,7 @@ public partial class ChainBehavior : PlatformBehavior<Image, Microsoft.UI.Xaml.C
         {
             null => null,
             1 => CreateEffectByName(effectNames[0]),
-            _ => CreateChainEffect(effectNames)
+            _ => CreateChainEffect(effectNames),
         };
     }
 
@@ -68,16 +68,16 @@ public partial class ChainBehavior : PlatformBehavior<Image, Microsoft.UI.Xaml.C
                 {
                     Name = "Blur",
                     Source = source ?? new CompositionEffectSourceParameter("Source"),
-                    BlurAmount = 5
+                    BlurAmount = 5,
                 },
             "saturation"
                 => new SaturationEffect()
                 {
                     Name = "Saturation",
                     Source = source ?? new CompositionEffectSourceParameter("Source"),
-                    Saturation = 0.05f
+                    Saturation = 0.05f,
                 },
-            _ => null
+            _ => null,
         };
     }
 

@@ -24,7 +24,7 @@ public class TouchGestureRecognizer : UIGestureRecognizer
     {
         Started,
         Ended,
-        Cancelled
+        Cancelled,
     }
 
     bool _disposed;

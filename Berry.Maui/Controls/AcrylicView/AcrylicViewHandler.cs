@@ -13,7 +13,7 @@ public partial class AcrylicViewHandler
             [nameof(IAcrylicView.EffectStyle)] = MapEffectStyle,
             [nameof(IAcrylicView.Content)] = MapContent,
             [nameof(IAcrylicView.BorderThickness)] = MapBorderThickness,
-            [nameof(IAcrylicView.BorderColor)] = MapBorderColor
+            [nameof(IAcrylicView.BorderColor)] = MapBorderColor,
         };
 
     public AcrylicViewHandler()

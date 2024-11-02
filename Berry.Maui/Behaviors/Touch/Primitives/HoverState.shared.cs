@@ -14,5 +14,5 @@ public enum HoverState
     /// <summary>
     /// The pointer is over the element.
     /// </summary>
-    Hovered
+    Hovered,
 }

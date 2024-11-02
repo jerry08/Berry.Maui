@@ -109,7 +109,7 @@ internal static class KeyboardKeysExtensions
         {
             KeyboardKeys.A => UIKeyboardHidUsage.KeyboardA,
             KeyboardKeys.B => UIKeyboardHidUsage.KeyboardB,
-            _ => 0
+            _ => 0,
         };
 
     static KeyboardKeys ToVirtualKey(UIKeyboardHidUsage platformKey) =>
@@ -117,6 +117,6 @@ internal static class KeyboardKeysExtensions
         {
             UIKeyboardHidUsage.KeyboardA => KeyboardKeys.A,
             UIKeyboardHidUsage.KeyboardB => KeyboardKeys.B,
-            _ => 0
+            _ => 0,
         };
 }

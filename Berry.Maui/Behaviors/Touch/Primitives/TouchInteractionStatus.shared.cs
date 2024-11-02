@@ -13,5 +13,5 @@ public enum TouchInteractionStatus
     /// <summary>
     /// The touch interaction has completed.
     /// </summary>
-    Completed
+    Completed,
 }

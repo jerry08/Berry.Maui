@@ -6,5 +6,5 @@ public enum EffectStyle
     Light = 1,
     Dark = 2,
     ExtraDark = 3,
-    Custom = 4
+    Custom = 4,
 }

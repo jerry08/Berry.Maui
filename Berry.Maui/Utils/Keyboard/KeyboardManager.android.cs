@@ -95,7 +95,7 @@ public static partial class KeyboardManager
             TextView textView => textView,
             TextInputLayout inputLayout => inputLayout.EditText!,
             //_ => throw new Exception($"Unable to locate `TextView` for {view}"),
-            _ => null
+            _ => null,
         };
     }
 

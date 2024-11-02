@@ -37,7 +37,7 @@ public partial class AcrylicViewHandler : ViewHandler<IAcrylicView, FrameLayout>
         borderViewGroup = new BorderViewGroup(Context)
         {
             CrossPlatformMeasure = new Func<double, double, Size>(VirtualView.CrossPlatformMeasure),
-            CrossPlatformArrange = new Func<Rect, Size>(VirtualView.CrossPlatformArrange)
+            CrossPlatformArrange = new Func<Rect, Size>(VirtualView.CrossPlatformArrange),
         };
 
         var frame = new FrameLayout(Context);

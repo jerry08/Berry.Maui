@@ -171,7 +171,7 @@ public class BorderDrawable : ColorDrawable
             borderBottomRightRadius,
             borderBottomRightRadius,
             borderBottomLeftRadius,
-            borderBottomLeftRadius
+            borderBottomLeftRadius,
         };
     }
 
@@ -202,7 +202,7 @@ public class BorderDrawable : ColorDrawable
             Math.Max(0f, borderBottomRightRadius - borderRightWidth),
             Math.Max(0f, borderBottomRightRadius - borderBottomWidth),
             Math.Max(0f, borderBottomLeftRadius - borderLeftWidth),
-            Math.Max(0f, borderBottomLeftRadius - borderBottomWidth)
+            Math.Max(0f, borderBottomLeftRadius - borderBottomWidth),
         };
     }
 }

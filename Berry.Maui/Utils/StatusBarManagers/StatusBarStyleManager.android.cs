@@ -117,7 +117,7 @@ public class StatusBarStyleManager : IStatusBarStyleManager
             currentWindow.DecorView
         )
         {
-            AppearanceLightStatusBars = isLight
+            AppearanceLightStatusBars = isLight,
         };
 
         return;

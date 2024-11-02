@@ -19,12 +19,12 @@ public class DelayedView<TView> : LazyView<TView>
             {
                 await Task.Run(() =>
                 {
-                    view = new TView { BindingContext = BindingContext, };
+                    view = new TView { BindingContext = BindingContext };
                 });
             }
             else
             {
-                view = new TView { BindingContext = BindingContext, };
+                view = new TView { BindingContext = BindingContext };
             }
 
             await Task.Delay(DelayInMilliseconds);

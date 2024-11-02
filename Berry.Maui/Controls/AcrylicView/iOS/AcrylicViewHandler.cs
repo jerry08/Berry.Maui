@@ -19,7 +19,7 @@ public partial class AcrylicViewHandler : ViewHandler<IAcrylicView, BorderView>
         var borderView = new BorderView
         {
             CrossPlatformMeasure = new Func<double, double, Size>(VirtualView.CrossPlatformMeasure),
-            CrossPlatformArrange = new Func<Rect, Size>(VirtualView.CrossPlatformArrange)
+            CrossPlatformArrange = new Func<Rect, Size>(VirtualView.CrossPlatformArrange),
         };
 
         colorBlendUIView = [];
@@ -28,7 +28,7 @@ public partial class AcrylicViewHandler : ViewHandler<IAcrylicView, BorderView>
         {
             Frame = VirtualView.Frame,
             ClipsToBounds = true,
-            Effect = UIBlurEffect.FromStyle(UIBlurEffectStyle.Light)
+            Effect = UIBlurEffect.FromStyle(UIBlurEffectStyle.Light),
         };
 
         return borderView;
@@ -113,7 +113,7 @@ public partial class AcrylicViewHandler : ViewHandler<IAcrylicView, BorderView>
             EffectStyle.Dark => UIBlurEffectStyle.Dark,
             EffectStyle.ExtraLight => UIBlurEffectStyle.ExtraLight,
             EffectStyle.ExtraDark => UIBlurEffectStyle.Dark, // ExtraDark only supports tvos
-            _ => UIBlurEffectStyle.Light
+            _ => UIBlurEffectStyle.Light,
         };
         handler.acrylicEffectView.Effect = UIBlurEffect.FromStyle(style);
     }

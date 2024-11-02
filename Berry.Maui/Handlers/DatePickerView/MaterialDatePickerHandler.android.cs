@@ -18,7 +18,7 @@ public partial class MaterialDatePickerHandler : DatePickerHandler
         var mauiDatePicker = new MauiDatePicker(Context)
         {
             ShowPicker = ShowPickerDialog,
-            HidePicker = HidePickerDialog
+            HidePicker = HidePickerDialog,
         };
 
         if (Options.UsePlainer)

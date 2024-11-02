@@ -44,7 +44,7 @@ public class BottomSheetViewController : UIViewController
                 cv.TopAnchor.ConstraintEqualTo(View.TopAnchor),
                 cv.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
                 cv.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
-                cv.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor)
+                cv.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor),
             }
         );
 

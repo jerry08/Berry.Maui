@@ -600,7 +600,7 @@ public class RealtimeBlurView : View
             bottomRight,
             bottomRight,
             bottomLeft,
-            bottomLeft
+            bottomLeft,
         };
 
         if (mRadii == radius)

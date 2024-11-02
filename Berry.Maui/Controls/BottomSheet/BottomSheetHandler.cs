@@ -41,7 +41,7 @@ public partial class BottomSheetHandler : ContentViewHandler
     }
 
     public static new CommandMapper<BottomSheet, BottomSheetHandler> CommandMapper =
-        new(ContentViewHandler.CommandMapper) { [nameof(BottomSheet.DismissAsync)] = MapDismiss, };
+        new(ContentViewHandler.CommandMapper) { [nameof(BottomSheet.DismissAsync)] = MapDismiss };
 
     static void MapDismiss(BottomSheetHandler handler, BottomSheet view, object? request)
     {

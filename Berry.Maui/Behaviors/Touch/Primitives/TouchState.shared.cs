@@ -13,5 +13,5 @@ public enum TouchState
     /// <summary>
     /// The pointer is over the element.
     /// </summary>
-    Pressed
+    Pressed,
 }

@@ -9,14 +9,14 @@ public enum StatusBarStyle
 {
     Default = 0,
     LightContent = 1,
-    DarkContent = 2
+    DarkContent = 2,
 }
 
 public enum NavigationBarStyle
 {
     Default = 0,
     LightContent = 1,
-    DarkContent = 2
+    DarkContent = 2,
 }
 
 public partial class Insets : BindableObject

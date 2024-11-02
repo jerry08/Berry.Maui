@@ -17,7 +17,7 @@ internal class UIPressesData
             Modifiers =
                 presses.AnyObject is UIPress anyPress && anyPress.Key is UIKey anyPressKey
                     ? anyPressKey.ModifierFlags
-                    : 0
+                    : 0,
         };
 
         var checkForModifier = pressData.Modifiers == 0;

@@ -64,7 +64,7 @@ public partial class ChainBehavior : PlatformBehavior<Image, UIImageView>
         {
             null => null,
             1 => CreateEffectByName(effectNames[0], inputImage),
-            _ => CreateChainEffect(effectNames, inputImage)
+            _ => CreateChainEffect(effectNames, inputImage),
         };
     }
 
@@ -74,7 +74,7 @@ public partial class ChainBehavior : PlatformBehavior<Image, UIImageView>
         {
             "blur" => new CIGaussianBlur { InputImage = inputImage, Radius = 5 },
             "saturation" => new CIColorControls() { InputImage = inputImage, Saturation = 0.05f },
-            _ => null
+            _ => null,
         };
 
         return filter?.OutputImage;

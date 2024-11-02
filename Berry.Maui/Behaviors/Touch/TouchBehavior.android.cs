@@ -298,7 +298,7 @@ public partial class TouchBehavior
                 LayoutParameters = new ViewGroup.LayoutParams(-1, -1),
                 Clickable = false,
                 Focusable = false,
-                Enabled = false
+                Enabled = false,
             };
 
             viewGroup?.AddView(rippleView);

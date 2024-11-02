@@ -21,7 +21,7 @@ public partial class BerrySliderHandler : ViewHandler<ISlider, MSlider>
             StepSize = 1,
             TickVisible = false,
             ValueFrom = 0,
-            ValueTo = 100
+            ValueTo = 100,
         };
     }
 

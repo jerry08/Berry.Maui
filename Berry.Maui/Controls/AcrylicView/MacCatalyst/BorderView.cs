@@ -290,7 +290,7 @@ public class BorderView : UIView
             {
                 FillRule = CAShapeLayer.FillRuleEvenOdd,
                 FillColor = borderColor,
-                Path = cGPath1
+                Path = cGPath1,
             };
             layer.AddSublayer(borderLayer);
         }

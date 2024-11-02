@@ -18,5 +18,5 @@ public enum TouchStatus
     /// <summary>
     /// The touch interaction has been canceled.
     /// </summary>
-    Canceled
+    Canceled,
 }

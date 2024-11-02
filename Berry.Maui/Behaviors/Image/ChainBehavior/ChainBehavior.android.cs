@@ -42,7 +42,7 @@ public partial class ChainBehavior : PlatformBehavior<Image, ImageView>
         {
             null => null,
             1 => CreateEffectByName(effectNames[0]),
-            _ => CreateChainEffect(effectNames)
+            _ => CreateChainEffect(effectNames),
         };
     }
 

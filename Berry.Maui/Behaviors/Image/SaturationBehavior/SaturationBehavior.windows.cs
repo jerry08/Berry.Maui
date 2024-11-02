@@ -34,7 +34,7 @@ public partial class SaturationBehavior : PlatformBehavior<Image, Microsoft.UI.X
         {
             Name = "Saturation",
             Source = new CompositionEffectSourceParameter("Source"),
-            Saturation = saturation
+            Saturation = saturation,
         };
 
         var compositor = ElementCompositionPreview.GetElementVisual(imageView).Compositor;

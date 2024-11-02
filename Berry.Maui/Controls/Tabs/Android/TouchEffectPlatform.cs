@@ -180,7 +180,7 @@ public class TouchEffectPlatform : PlatformEffect
 
     static ColorStateList GetPressedColorSelector(int pressedColor)
     {
-        return new ColorStateList(new[] { new int[] { } }, new[] { pressedColor, });
+        return new ColorStateList(new[] { new int[] { } }, new[] { pressedColor });
     }
 
     void ForceStartRipple(float x, float y)

@@ -34,7 +34,7 @@ public partial class BlurBehavior : PlatformBehavior<Image, Microsoft.UI.Xaml.Co
         {
             Name = "Blur",
             Source = new CompositionEffectSourceParameter("Source"),
-            BlurAmount = radius
+            BlurAmount = radius,
         };
 
         var compositor = ElementCompositionPreview.GetElementVisual(imageView).Compositor;

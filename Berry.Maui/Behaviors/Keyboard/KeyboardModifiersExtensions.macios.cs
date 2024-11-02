@@ -73,7 +73,7 @@ internal static class KeyboardModifiersExtensions
             KeyboardModifiers.Command => UIKeyModifierFlags.Command,
             KeyboardModifiers.Control => UIKeyModifierFlags.Control,
             KeyboardModifiers.Shift => UIKeyModifierFlags.Shift,
-            _ => 0
+            _ => 0,
         };
 
     static KeyboardModifiers ToVirtualModifier(UIKeyModifierFlags platformModifier) =>
@@ -84,6 +84,6 @@ internal static class KeyboardModifiersExtensions
             UIKeyModifierFlags.Command => KeyboardModifiers.Command,
             UIKeyModifierFlags.Control => KeyboardModifiers.Control,
             UIKeyModifierFlags.Shift => KeyboardModifiers.Shift,
-            _ => 0
+            _ => 0,
         };
 }

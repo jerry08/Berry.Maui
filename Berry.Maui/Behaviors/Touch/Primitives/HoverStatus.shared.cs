@@ -13,5 +13,5 @@ public enum HoverStatus
     /// <summary>
     /// The pointer has exited the element.
     /// </summary>
-    Exited
+    Exited,
 }

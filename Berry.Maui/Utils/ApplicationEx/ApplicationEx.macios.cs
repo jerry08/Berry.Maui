@@ -13,7 +13,7 @@ public static partial class ApplicationEx
         {
             DisplayOrientation.Landscape => UIInterfaceOrientation.LandscapeLeft,
             DisplayOrientation.Portrait => UIInterfaceOrientation.Portrait,
-            _ => UIInterfaceOrientation.Unknown
+            _ => UIInterfaceOrientation.Unknown,
         };
 
         UIDevice.CurrentDevice.SetValueForKey(

@@ -25,7 +25,7 @@ public enum NavigationBarStyle
     /// <summary>
     /// The dark content navigation bar style.
     /// </summary>
-    DarkContent = 2
+    DarkContent = 2,
 }
 
 /// <summary>

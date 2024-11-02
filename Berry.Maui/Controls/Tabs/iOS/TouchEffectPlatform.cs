@@ -25,7 +25,7 @@ public class TouchEffectPlatform : PlatformEffect
             UserInteractionEnabled = false,
             Opaque = false,
             Alpha = 0,
-            TranslatesAutoresizingMaskIntoConstraints = false
+            TranslatesAutoresizingMaskIntoConstraints = false,
         };
 
         UpdateEffectColor();

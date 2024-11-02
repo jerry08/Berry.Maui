@@ -110,7 +110,7 @@ public class KeyboardPageViewController : PageViewController
         var eventArgs = new KeyPressedEventArgs
         {
             Modifiers = presses.Modifiers.ToVirtualModifiers(),
-            Keys = presses.Keys.ToVirtualKeys()
+            Keys = presses.Keys.ToVirtualKeys(),
         };
 
         foreach (var registration in matchingRegistrations)
