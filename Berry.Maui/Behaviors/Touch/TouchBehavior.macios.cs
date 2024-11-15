@@ -29,18 +29,9 @@ public partial class TouchBehavior
 
         touchGesture = new TouchUITapGestureRecognizer(this);
 
-        if (
-            ((platformView as IVisualNativeElementRenderer)?.Control ?? platformView)
-            is UIButton button
-        )
-        {
-            button.AllTouchEvents += PreventButtonHighlight;
-            ((TouchUITapGestureRecognizer)touchGesture).IsButton = true;
-        }
-
         platformView.AddGestureRecognizer(touchGesture);
 
-        if (UIDevice.CurrentDevice.CheckSystemVersion(13, 0))
+        if (OperatingSystem.IsIOSVersionAtLeast(13))
         {
             hoverGesture = new UIHoverGestureRecognizer(OnHover);
             platformView.AddGestureRecognizer(hoverGesture);
@@ -58,24 +49,16 @@ public partial class TouchBehavior
     {
         base.OnDetachedFrom(bindable, platformView);
 
-        if (
-            ((platformView as IVisualNativeElementRenderer)?.Control ?? platformView)
-            is UIButton button
-        )
-        {
-            button.AllTouchEvents -= PreventButtonHighlight;
-        }
-
         if (touchGesture is not null)
         {
-            platformView?.RemoveGestureRecognizer(touchGesture);
+            platformView.RemoveGestureRecognizer(touchGesture);
             touchGesture?.Dispose();
             touchGesture = null;
         }
 
         if (hoverGesture is not null)
         {
-            platformView?.RemoveGestureRecognizer(hoverGesture);
+            platformView.RemoveGestureRecognizer(hoverGesture);
             hoverGesture?.Dispose();
             hoverGesture = null;
         }
@@ -100,19 +83,6 @@ public partial class TouchBehavior
                 HandleHover(HoverStatus.Exited);
                 break;
         }
-    }
-
-    private void PreventButtonHighlight(object? sender, EventArgs args)
-    {
-        if (sender is not UIButton button)
-        {
-            throw new ArgumentException(
-                $"{nameof(sender)} must be Type {nameof(UIButton)}",
-                nameof(sender)
-            );
-        }
-
-        button.Highlighted = false;
     }
 }
 

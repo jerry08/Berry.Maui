@@ -6,6 +6,7 @@ using Berry.Maui.Controls.Effects;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Compatibility.Platform.Android;
 using Microsoft.Maui.Controls.Platform;
+using Microsoft.Maui.Platform;
 
 namespace Berry.Maui.Controls.Droid;
 
@@ -34,7 +35,7 @@ public class AndroidTintableImageEffect : PlatformEffect
     {
         var effect = (TintableImageEffect?)
             Element.Effects.FirstOrDefault(x => x is TintableImageEffect);
-        var color = effect?.TintColor?.ToAndroid();
+        var color = effect?.TintColor.ToPlatform();
 
         if (Control is ImageView imageView && imageView.Handle != IntPtr.Zero && color.HasValue)
         {

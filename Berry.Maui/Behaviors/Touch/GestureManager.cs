@@ -113,10 +113,9 @@ sealed class GestureManager : IDisposable, IAsyncDisposable
         {
             HoverStatus.Entered => HoverState.Hovered,
             HoverStatus.Exited => HoverState.Default,
-            _
-                => throw new NotSupportedException(
-                    $"{nameof(HoverStatus)} {hoverStatus} not yet supported"
-                ),
+            _ => throw new NotSupportedException(
+                $"{nameof(HoverStatus)} {hoverStatus} not yet supported"
+            ),
         };
 
         touchBehavior.CurrentHoverState = hoverState;
@@ -563,10 +562,9 @@ sealed class GestureManager : IDisposable, IAsyncDisposable
             (TouchState.Pressed, _) => TouchBehavior.PressedVisualState,
             (TouchState.Default, HoverState.Hovered) => TouchBehavior.HoveredVisualState,
             (TouchState.Default, HoverState.Default) => TouchBehavior.UnpressedVisualState,
-            _
-                => throw new NotSupportedException(
-                    $"The combination of {nameof(TouchState)} {touchState} and {nameof(HoverState)} {hoverState} is not yet supported"
-                ),
+            _ => throw new NotSupportedException(
+                $"The combination of {nameof(TouchState)} {touchState} and {nameof(HoverState)} {hoverState} is not yet supported"
+            ),
         };
 
         VisualStateManager.GoToState(visualElement, state);

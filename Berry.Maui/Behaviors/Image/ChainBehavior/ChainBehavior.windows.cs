@@ -63,20 +63,18 @@ public partial class ChainBehavior : PlatformBehavior<Image, Microsoft.UI.Xaml.C
     {
         return effectName switch
         {
-            "blur"
-                => new GaussianBlurEffect()
-                {
-                    Name = "Blur",
-                    Source = source ?? new CompositionEffectSourceParameter("Source"),
-                    BlurAmount = 5,
-                },
-            "saturation"
-                => new SaturationEffect()
-                {
-                    Name = "Saturation",
-                    Source = source ?? new CompositionEffectSourceParameter("Source"),
-                    Saturation = 0.05f,
-                },
+            "blur" => new GaussianBlurEffect()
+            {
+                Name = "Blur",
+                Source = source ?? new CompositionEffectSourceParameter("Source"),
+                BlurAmount = 5,
+            },
+            "saturation" => new SaturationEffect()
+            {
+                Name = "Saturation",
+                Source = source ?? new CompositionEffectSourceParameter("Source"),
+                Saturation = 0.05f,
+            },
             _ => null,
         };
     }

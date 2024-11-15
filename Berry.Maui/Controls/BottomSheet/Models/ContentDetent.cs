@@ -24,6 +24,6 @@ public partial class ContentDetent : Detent
             maxSheetHeight
         );
 
-        return Math.Min(maxSheetHeight, r.Request.Height + page.Padding.VerticalThickness);
+        return Math.Min(maxSheetHeight, r.Height + page.Padding.VerticalThickness);
     }
 }
