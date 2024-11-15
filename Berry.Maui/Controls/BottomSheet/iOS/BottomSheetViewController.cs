@@ -132,12 +132,12 @@ public class BottomSheetViewController : UIViewController
         var detents = _sheet.GetEnabledDetents();
         return SheetPresentationController.SelectedDetentIdentifier switch
         {
-            UISheetPresentationControllerDetentIdentifier.Medium
-                => detents.FirstOrDefault(d =>
-                    d is RatioDetent ratioDetent && ratioDetent.Ratio == .5f
-                ),
-            UISheetPresentationControllerDetentIdentifier.Large
-                => detents.FirstOrDefault(d => d is FullscreenDetent),
+            UISheetPresentationControllerDetentIdentifier.Medium => detents.FirstOrDefault(d =>
+                d is RatioDetent ratioDetent && ratioDetent.Ratio == .5f
+            ),
+            UISheetPresentationControllerDetentIdentifier.Large => detents.FirstOrDefault(d =>
+                d is FullscreenDetent
+            ),
             UISheetPresentationControllerDetentIdentifier.Unknown or _ => null,
         };
     }

@@ -18,7 +18,7 @@ public partial class PickerViewHandler : PickerHandler
             gradientDrawable.SetColor(Android.Graphics.Color.Transparent);
             nativeView.SetBackground(gradientDrawable);
             nativeView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(
-                Colors.Transparent.ToAndroid()
+                Colors.Transparent.ToPlatform()
             );
         }
 

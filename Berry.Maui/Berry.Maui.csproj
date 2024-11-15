@@ -10,6 +10,7 @@
 		<!--<ImplicitUsings>enable</ImplicitUsings>-->
     <AllowUnsafeBlocks Condition="$(TargetFramework.Contains('-windows'))">true</AllowUnsafeBlocks>
     <SkipValidateMauiImplicitPackageReferences>true</SkipValidateMauiImplicitPackageReferences>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 
     <IsPackable>true</IsPackable>
     <Description>A small collection of .NET MAUI controls, effects and behaviors.</Description>

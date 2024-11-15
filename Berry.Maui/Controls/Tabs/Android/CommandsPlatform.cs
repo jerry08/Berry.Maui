@@ -11,7 +11,9 @@ namespace Berry.Maui.Controls.Effects.Droid;
 public class CommandsPlatform : PlatformEffect
 {
     public View View => Control ?? Container;
-    public bool IsDisposed => (Container as IVisualElementRenderer)?.Element == null;
+
+    //public bool IsDisposed => (Container as IVisualElementRenderer)?.Element == null;
+    public bool IsDisposed => Container is null || Element is null;
 
     DateTime _tapTime;
     readonly Rect _rect = new Rect();
@@ -29,7 +31,7 @@ public class CommandsPlatform : PlatformEffect
 
     void OnTouch(View.TouchEventArgs args)
     {
-        switch (args.Event.Action)
+        switch (args.Event?.Action)
         {
             case MotionEventActions.Down:
                 _tapTime = DateTime.Now;

@@ -1,7 +1,7 @@
 ﻿using Foundation;
 using Microsoft.Maui.ApplicationModel;
-using Microsoft.Maui.Controls.Compatibility.Platform.iOS;
 using Microsoft.Maui.Graphics;
+using Microsoft.Maui.Platform;
 using UIKit;
 
 namespace Berry.Maui;
@@ -21,7 +21,7 @@ public class StatusBarStyleManager : IStatusBarStyleManager
                 UIApplication.SharedApplication.ValueForKey(new NSString("statusBar")) as UIView;
             if (statusBar.RespondsToSelector(new ObjCRuntime.Selector("setBackgroundColor:")))
             {
-                statusBar.BackgroundColor = Color.FromHex(hexColor).ToUIColor();
+                statusBar.BackgroundColor = Color.FromArgb(hexColor).ToPlatform();
             }
             UIApplication.SharedApplication.SetStatusBarStyle(
                 isLight ? UIStatusBarStyle.DarkContent : UIStatusBarStyle.LightContent,

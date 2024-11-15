@@ -4,6 +4,7 @@ using Berry.Maui.Controls.Effects.iOS.GestureRecognizers;
 using Microsoft.Maui.Controls.Compatibility.Platform.iOS;
 using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Graphics;
+using Microsoft.Maui.Platform;
 using ObjCRuntime;
 using UIKit;
 
@@ -88,7 +89,7 @@ public class TouchEffectPlatform : PlatformEffect
         }
 
         _alpha = color.Alpha < 1.0 ? 1 : (float)0.3;
-        _layer.BackgroundColor = color.ToUIColor();
+        _layer.BackgroundColor = color.ToPlatform();
     }
 
     void BringLayer()

@@ -31,7 +31,7 @@ public partial class AcrylicViewHandler : ViewHandler<IAcrylicView, FrameLayout>
 
         realtimeBlurView = new RealtimeBlurView(Context, SetContentVisible);
         realtimeBlurView.SetBlurRadius(120);
-        realtimeBlurView.SetOverlayColor(Colors.Transparent.ToAndroid());
+        realtimeBlurView.SetOverlayColor(Colors.Transparent.ToPlatform());
         realtimeBlurView.SetDownsampleFactor(4);
 
         borderViewGroup = new BorderViewGroup(Context)

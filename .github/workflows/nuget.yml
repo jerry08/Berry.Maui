@@ -17,7 +17,7 @@ jobs:
       - name: Install .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 9.0.x
       
       - name: Install MAUI Workload
         run: dotnet workload install maui --ignore-failed-sources
@@ -43,7 +43,7 @@ jobs:
       - name: Install .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 9.0.x
       
       - name: Install MAUI Workload
         run: dotnet workload install maui --ignore-failed-sources
@@ -78,7 +78,7 @@ jobs:
       - name: Install .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 9.0.x
 
       - name: Download artifacts
         uses: actions/download-artifact@v4

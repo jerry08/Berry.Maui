@@ -11,6 +11,7 @@ using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Compatibility.Platform.Android;
 using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Graphics;
+using Microsoft.Maui.Platform;
 using Color = Android.Graphics.Color;
 using ListView = Android.Widget.ListView;
 using ScrollView = Android.Widget.ScrollView;
@@ -106,7 +107,7 @@ public class TouchEffectPlatform : PlatformEffect
             return;
         }
 
-        _color = color.ToAndroid();
+        _color = color.ToPlatform();
         _alpha = _color.A == 255 ? (byte)80 : _color.A;
 
         if (EnableRipple)

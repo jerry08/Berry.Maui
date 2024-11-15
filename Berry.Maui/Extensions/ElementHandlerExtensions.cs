@@ -55,25 +55,25 @@ public static class ElementHandlerExtensions
         return service;
     }
 
-    public static T GetRequiredService<T>(this IElementHandler handler, Type type)
-        where T : notnull
-    {
-        var services = handler.GetServiceProvider();
-
-        var service = services.GetRequiredService(type);
-
-        return (T)service;
-    }
-
-    public static T GetRequiredService<T>(this IElementHandler handler)
-        where T : notnull
-    {
-        var services = handler.GetServiceProvider();
-
-        var service = services.GetRequiredService<T>();
-
-        return service;
-    }
+    //public static T GetRequiredService<T>(this IElementHandler handler, Type type)
+    //    where T : notnull
+    //{
+    //    var services = handler.GetServiceProvider();
+    //
+    //    var service = services.GetRequiredService(type);
+    //
+    //    return (T)service;
+    //}
+    //
+    //public static T GetRequiredService<T>(this IElementHandler handler)
+    //    where T : notnull
+    //{
+    //    var services = handler.GetServiceProvider();
+    //
+    //    var service = services.GetRequiredService<T>();
+    //
+    //    return service;
+    //}
 
     public static Task<T> InvokeAsync<T>(
         this IElementHandler handler,
