@@ -10,9 +10,9 @@ namespace Berry.Maui.Controls;
 
 internal partial class BottomSheetManager
 {
-    static NSObject _keyboardWillShowObserver;
+    static NSObject? _keyboardWillShowObserver;
     private static nfloat _keyboardHeight;
-    private static object _keyboardDidHideObserver;
+    private static object? _keyboardDidHideObserver;
 
     static partial void PlatformShow(Window window, BottomSheet sheet, bool animated)
     {
@@ -20,19 +20,15 @@ internal partial class BottomSheetManager
         var controller = new BottomSheetViewController(window.Handler.MauiContext, sheet);
         sheet.Controller = controller;
 
-        if (_keyboardWillShowObserver is null)
-        {
-            _keyboardWillShowObserver = UIKeyboard.Notifications.ObserveWillShow(KeyboardWillShow);
-        }
-        if (_keyboardDidHideObserver is null)
-        {
-            _keyboardDidHideObserver = UIKeyboard.Notifications.ObserveDidHide(KeyboardDidHide);
-        }
+        _keyboardWillShowObserver ??= UIKeyboard.Notifications.ObserveWillShow(KeyboardWillShow);
+
+        _keyboardDidHideObserver ??= UIKeyboard.Notifications.ObserveDidHide(KeyboardDidHide);
 
         if (OperatingSystem.IsIOSVersionAtLeast(15))
         {
             controller.SheetPresentationController.PrefersGrabberVisible = sheet.HasHandle;
         }
+
         if (OperatingSystem.IsIOSVersionAtLeast(15))
         {
             var largestDetentIdentifier = UISheetPresentationControllerDetentIdentifier.Unknown;
@@ -113,15 +109,15 @@ internal partial class BottomSheetManager
 
         var parent = Platform.GetCurrentUIViewController();
 
-        parent.PresentViewController(controller, animated, sheet.NotifyShown);
+        parent?.PresentViewController(controller, animated, sheet.NotifyShown);
     }
 
-    static void KeyboardDidHide(object sender, UIKeyboardEventArgs e)
+    static void KeyboardDidHide(object? sender, UIKeyboardEventArgs e)
     {
         _keyboardHeight = 0;
     }
 
-    static void KeyboardWillShow(object sender, UIKeyboardEventArgs e)
+    static void KeyboardWillShow(object? sender, UIKeyboardEventArgs e)
     {
         _keyboardHeight = e.FrameEnd.Height;
     }

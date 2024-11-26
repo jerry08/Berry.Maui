@@ -39,25 +39,21 @@ public class BottomSheetViewController : UIViewController
         cv.TranslatesAutoresizingMaskIntoConstraints = false;
 
         NSLayoutConstraint.ActivateConstraints(
-            new[]
-            {
+            [
                 cv.TopAnchor.ConstraintEqualTo(View.TopAnchor),
                 cv.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
                 cv.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
                 cv.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor),
-            }
+            ]
         );
 
         UpdateBackground();
         _sheet.NotifyShowing();
 
-        if (_keyboardDidHideObserver is null)
-        {
-            _keyboardDidHideObserver = UIKeyboard.Notifications.ObserveDidHide(KeyboardDidHide);
-        }
+        _keyboardDidHideObserver ??= UIKeyboard.Notifications.ObserveDidHide(KeyboardDidHide);
     }
 
-    void KeyboardDidHide(object sender, UIKeyboardEventArgs e)
+    void KeyboardDidHide(object? sender, UIKeyboardEventArgs e)
     {
         Layout();
     }
@@ -67,7 +63,7 @@ public class BottomSheetViewController : UIViewController
         _sheet.CachedDetents.Clear();
         if (OperatingSystem.IsIOSVersionAtLeast(16))
         {
-            SheetPresentationController.InvalidateDetents();
+            SheetPresentationController?.InvalidateDetents();
         }
     }
 
@@ -76,7 +72,7 @@ public class BottomSheetViewController : UIViewController
         if (_sheet?.BackgroundBrush != null)
         {
             Paint paint = _sheet.BackgroundBrush;
-            View.BackgroundColor = paint.ToColor().ToPlatform();
+            View.BackgroundColor = paint.ToColor()?.ToPlatform();
         }
         else
         {
@@ -114,7 +110,7 @@ public class BottomSheetViewController : UIViewController
         {
             return;
         }
-        SheetPresentationController.AnimateChanges(() =>
+        SheetPresentationController?.AnimateChanges(() =>
         {
             SheetPresentationController.SelectedDetentIdentifier = GetIdentifierForDetent(
                 _sheet.SelectedDetent
@@ -123,14 +119,14 @@ public class BottomSheetViewController : UIViewController
     }
 
     [SupportedOSPlatform("ios15.0")]
-    internal Detent GetSelectedDetent()
+    internal Detent? GetSelectedDetent()
     {
         if (!OperatingSystem.IsIOSVersionAtLeast(15))
         {
             return null;
         }
         var detents = _sheet.GetEnabledDetents();
-        return SheetPresentationController.SelectedDetentIdentifier switch
+        return SheetPresentationController?.SelectedDetentIdentifier switch
         {
             UISheetPresentationControllerDetentIdentifier.Medium => detents.FirstOrDefault(d =>
                 d is RatioDetent ratioDetent && ratioDetent.Ratio == .5f

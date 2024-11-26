@@ -1,4 +1,5 @@
-﻿using Foundation;
+﻿using System.Linq;
+using Foundation;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Devices;
 using UIKit;
@@ -7,6 +8,13 @@ namespace Berry.Maui;
 
 public static partial class ApplicationEx
 {
+    public static UIWindow? GetKeyWindow() =>
+        //UIApplication.SharedApplication.KeyWindow
+        UIApplication
+            .SharedApplication.ConnectedScenes.OfType<UIWindowScene>()
+            .SelectMany(s => s.Windows)
+            .FirstOrDefault(w => w.IsKeyWindow);
+
     public static partial void SetOrientation(DisplayOrientation orientation)
     {
         var platformOrientation = orientation switch

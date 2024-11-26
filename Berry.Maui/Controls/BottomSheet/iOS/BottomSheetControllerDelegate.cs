@@ -20,6 +20,6 @@ internal class BottomSheetControllerDelegate : UISheetPresentationControllerDele
         UISheetPresentationController sheetPresentationController
     )
     {
-        ((BottomSheetHandler)_sheet.Handler).UpdateSelectedDetent(_sheet);
+        ((BottomSheetHandler?)_sheet.Handler)?.UpdateSelectedDetent(_sheet);
     }
 }

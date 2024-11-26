@@ -41,7 +41,7 @@ public enum DownloadFileStatus
     /// <summary>
     /// The download has failed. You'll find detailed information in the property StatusDetails.
     /// </summary>
-    FAILED
+    FAILED,
 }
 
 /// <summary>

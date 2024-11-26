@@ -16,9 +16,8 @@ public static class Helper
             BackgroundTransferStatus.Error => DownloadFileStatus.FAILED,
             BackgroundTransferStatus.Completed => DownloadFileStatus.COMPLETED,
             BackgroundTransferStatus.Canceled => DownloadFileStatus.CANCELED,
-            BackgroundTransferStatus.Idle
-            or BackgroundTransferStatus.PausedSystemPolicy
-                => DownloadFileStatus.PAUSED,
+            BackgroundTransferStatus.Idle or BackgroundTransferStatus.PausedSystemPolicy =>
+                DownloadFileStatus.PAUSED,
             _ => DownloadFileStatus.INITIALIZED,
         };
     }

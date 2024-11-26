@@ -11,9 +11,9 @@ internal partial class BottomSheetManager
         sheet.SizeChanged += OnSizeChanged;
     }
 
-    static void OnSizeChanged(object sender, EventArgs e)
+    static void OnSizeChanged(object? sender, EventArgs e)
     {
-        PlatformLayout((BottomSheet)sender);
+        PlatformLayout((BottomSheet)sender!);
     }
 
     static partial void PlatformShow(Window window, BottomSheet sheet, bool animated);
