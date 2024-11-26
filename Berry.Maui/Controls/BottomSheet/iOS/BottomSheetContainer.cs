@@ -43,15 +43,20 @@ internal class BottomSheetContainer : UIView
     {
         base.LayoutSubviews();
 
-        if (_previousFrame != null && _previousFrame == _view.Frame)
+        if (_sheet?.Window != null)
         {
-            return;
-        }
+            if (_previousFrame != null && _previousFrame == _view.Frame)
+            {
+                return;
+            }
 
-        var h = CalculateTallestDetent(_sheet.Window.Height - BottomSheetManager.KeyboardHeight);
-        _view.Frame = new CGRect(0, 0, Bounds.Width, h);
-        _sheet.Arrange(_view.Frame.ToRectangle());
-        _sheet.Controller.Layout();
-        _previousFrame = _view.Frame;
+            var h = CalculateTallestDetent(
+                _sheet.Window.Height - BottomSheetManager.KeyboardHeight
+            );
+            _view.Frame = new CGRect(0, 0, Bounds.Width, h);
+            _sheet.Arrange(_view.Frame.ToRectangle());
+            _sheet.Controller.Layout();
+            _previousFrame = _view.Frame;
+        }
     }
 }
