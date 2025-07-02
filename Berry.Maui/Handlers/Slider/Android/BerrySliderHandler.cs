@@ -30,8 +30,8 @@ public partial class BerrySliderHandler : IBerrySliderHandler
         [nameof(ISlider.Value)] = MapValue,
     };
 
-    public static CommandMapper<ISlider, IBerrySliderHandler> CommandMapper =
-        new(ViewCommandMapper) { };
+    public static CommandMapper<ISlider, IBerrySliderHandler> CommandMapper = new(ViewCommandMapper)
+    { };
 
     public BerrySliderHandler()
         : base(Mapper, CommandMapper) { }

@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Frozen;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Numerics;
 using Berry.Maui.Core.Primitives;
 using Berry.Maui.Views;
 using Microsoft.Extensions.Logging;
-using Microsoft.Maui;
-using Microsoft.Maui.Dispatching;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Imaging;
+using Windows.Media;
 using Windows.Media.Playback;
 using Windows.Media.Streaming.Adaptive;
 using Windows.Storage;
 using Windows.System.Display;
+using ParentWindow = Berry.Maui.Extensions.PageExtensions.ParentWindow;
 using WindowsMediaElement = Windows.Media.Playback.MediaPlayer;
 using WinMediaSource = Windows.Media.Core.MediaSource;
 
@@ -22,263 +18,276 @@ namespace Berry.Maui.Core.Views;
 
 partial class MediaManager : IDisposable
 {
-    // States that allow changing position
-    readonly FrozenSet<MediaElementState> allowUpdatePositionStates = new[]
-    {
-        MediaElementState.Playing,
-        MediaElementState.Paused,
-        MediaElementState.Stopped,
-    }.ToFrozenSet();
+	Metadata? metadata;
+	SystemMediaTransportControls? systemMediaControls;
 
-    // The requests to keep display active are cumulative, this bool makes sure it only gets requested once
-    bool displayActiveRequested;
+	// States that allow changing position
+	readonly IReadOnlyList<MediaElementState> allowUpdatePositionStates =
+	[
+		MediaElementState.Playing,
+		MediaElementState.Paused,
+		MediaElementState.Stopped,
+	];
 
-    /// <summary>
-    /// The <see cref="DisplayRequest"/> is used to enable the <see cref="MediaElement.ShouldKeepScreenOn"/> functionality.
-    /// </summary>
-    /// <remarks>
-    /// Calls to <see cref="DisplayRequest.RequestActive"/> and <see cref="DisplayRequest.RequestRelease"/> should be in balance.
-    /// Not doing so will result in the screen staying on and negatively impacting the environment :(
-    /// </remarks>
-    protected DisplayRequest DisplayRequest { get; } = new();
+	// The requests to keep display active are cumulative, this bool makes sure it only gets requested once
+	bool displayActiveRequested;
 
-    /// <summary>
-    /// Creates the corresponding platform view of <see cref="MediaElement"/> on Windows.
-    /// </summary>
-    /// <returns>The platform native counterpart of <see cref="MediaElement"/>.</returns>
-    public PlatformMediaElement CreatePlatformView()
-    {
-        Player = new();
-        WindowsMediaElement MediaElement = new();
-        MediaElement.MediaOpened += OnMediaElementMediaOpened;
+	/// <summary>
+	/// The <see cref="DisplayRequest"/> is used to enable the <see cref="MediaElement.ShouldKeepScreenOn"/> functionality.
+	/// </summary>
+	/// <remarks>
+	/// Calls to <see cref="DisplayRequest.RequestActive"/> and <see cref="DisplayRequest.RequestRelease"/> should be in balance.
+	/// Not doing so will result in the screen staying on and negatively impacting the environment :(
+	/// </remarks>
+	protected DisplayRequest DisplayRequest { get; } = new();
 
-        Player.SetMediaPlayer(MediaElement);
+	/// <summary>
+	/// Creates the corresponding platform view of <see cref="MediaElement"/> on Windows.
+	/// </summary>
+	/// <returns>The platform native counterpart of <see cref="MediaElement"/>.</returns>
+	public PlatformMediaElement CreatePlatformView()
+	{
+		Player = new();
+		WindowsMediaElement MediaElement = new();
+		MediaElement.MediaOpened += OnMediaElementMediaOpened;
 
-        Player.MediaPlayer.PlaybackSession.PlaybackRateChanged += OnPlaybackSessionPlaybackRateChanged;
-        Player.MediaPlayer.PlaybackSession.PlaybackStateChanged += OnPlaybackSessionPlaybackStateChanged;
-        Player.MediaPlayer.PlaybackSession.SeekCompleted += OnPlaybackSessionSeekCompleted;
-        Player.MediaPlayer.MediaFailed += OnMediaElementMediaFailed;
-        Player.MediaPlayer.MediaEnded += OnMediaElementMediaEnded;
-        Player.MediaPlayer.VolumeChanged += OnMediaElementVolumeChanged;
-        Player.MediaPlayer.IsMutedChanged += OnMediaElementIsMutedChanged;
+		Player.SetMediaPlayer(MediaElement);
+		Player.MediaPlayer.PlaybackSession.NaturalVideoSizeChanged += OnNaturalVideoSizeChanged;
+		Player.MediaPlayer.PlaybackSession.PlaybackRateChanged += OnPlaybackSessionPlaybackRateChanged;
+		Player.MediaPlayer.PlaybackSession.PlaybackStateChanged += OnPlaybackSessionPlaybackStateChanged;
+		Player.MediaPlayer.PlaybackSession.SeekCompleted += OnPlaybackSessionSeekCompleted;
+		Player.MediaPlayer.MediaFailed += OnMediaElementMediaFailed;
+		Player.MediaPlayer.MediaEnded += OnMediaElementMediaEnded;
+		Player.MediaPlayer.VolumeChanged += OnMediaElementVolumeChanged;
+		Player.MediaPlayer.IsMutedChanged += OnMediaElementIsMutedChanged;
 
-        return Player;
-    }
+		Player.MediaPlayer.SystemMediaTransportControls.IsEnabled = false;
+		systemMediaControls = Player.MediaPlayer.SystemMediaTransportControls;
 
-    /// <summary>
-    /// Releases the managed and unmanaged resources used by the <see cref="MediaManager"/>.
-    /// </summary>
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
+		return Player;
+	}
 
-    protected virtual partial void PlatformPlay()
-    {
-        Player?.MediaPlayer.Play();
+	/// <summary>
+	/// Releases the managed and unmanaged resources used by the <see cref="MediaManager"/>.
+	/// </summary>
+	public void Dispose()
+	{
+		Dispose(true);
+		GC.SuppressFinalize(this);
+	}
 
-        if (MediaElement.ShouldKeepScreenOn
-            && !displayActiveRequested)
-        {
-            DisplayRequest.RequestActive();
-            displayActiveRequested = true;
-        }
-    }
+	protected virtual partial void PlatformPlay()
+	{
+		Player?.MediaPlayer.Play();
 
-    protected virtual partial void PlatformPause()
-    {
-        Player?.MediaPlayer.Pause();
+		if (MediaElement.ShouldKeepScreenOn
+			&& !displayActiveRequested)
+		{
+			DisplayRequest.RequestActive();
+			displayActiveRequested = true;
+		}
+	}
 
-        if (displayActiveRequested)
-        {
-            DisplayRequest.RequestRelease();
-            displayActiveRequested = false;
-        }
-    }
+	protected virtual partial void PlatformPause()
+	{
+		Player?.MediaPlayer.Pause();
 
-    protected virtual async partial Task PlatformSeek(TimeSpan position, CancellationToken token)
-    {
-        if (Player?.MediaPlayer.CanSeek is true)
-        {
-            if (Dispatcher.IsDispatchRequired)
-            {
-                await Dispatcher.DispatchAsync(() => UpdatePosition(Player, position)).WaitAsync(token);
-            }
-            else
-            {
-                token.ThrowIfCancellationRequested();
-                UpdatePosition(Player, position);
-            }
-        }
+		if (displayActiveRequested)
+		{
+			DisplayRequest.RequestRelease();
+			displayActiveRequested = false;
+		}
+	}
 
-        static void UpdatePosition(in MediaPlayerElement mediaPlayerElement, in TimeSpan position) => mediaPlayerElement.MediaPlayer.Position = position;
-    }
+	protected virtual async partial Task PlatformSeek(TimeSpan position, CancellationToken token)
+	{
+		if (Player?.MediaPlayer.CanSeek is true)
+		{
+			if (Dispatcher.IsDispatchRequired)
+			{
+				await Dispatcher.DispatchAsync(() => UpdatePosition(Player, position)).WaitAsync(token);
+			}
+			else
+			{
+				token.ThrowIfCancellationRequested();
+				UpdatePosition(Player, position);
+			}
+		}
 
-    protected virtual partial void PlatformStop()
-    {
-        if (Player is null)
-        {
-            return;
-        }
+		static void UpdatePosition(in MediaPlayerElement mediaPlayerElement, in TimeSpan position) => mediaPlayerElement.MediaPlayer.Position = position;
+	}
 
-        // There's no Stop method so pause the video and reset its position
-        Player.MediaPlayer.Pause();
-        Player.MediaPlayer.Position = TimeSpan.Zero;
+	protected virtual partial void PlatformStop()
+	{
+		if (Player is null)
+		{
+			return;
+		}
 
-        MediaElement.CurrentStateChanged(MediaElementState.Stopped);
+		// There's no Stop method so pause the video and reset its position
+		Player.MediaPlayer.Pause();
+		Player.MediaPlayer.Position = TimeSpan.Zero;
 
-        if (displayActiveRequested)
-        {
-            DisplayRequest.RequestRelease();
-            displayActiveRequested = false;
-        }
-    }
+		MediaElement.CurrentStateChanged(MediaElementState.Stopped);
 
-    protected virtual partial void PlatformUpdateAspect()
-    {
-        if (Player is null)
-        {
-            return;
-        }
+		if (displayActiveRequested)
+		{
+			DisplayRequest.RequestRelease();
+			displayActiveRequested = false;
+		}
+	}
 
-        Player.Stretch = MediaElement.Aspect switch
-        {
-            Aspect.Fill => Microsoft.UI.Xaml.Media.Stretch.Fill,
-            Aspect.AspectFill => Microsoft.UI.Xaml.Media.Stretch.UniformToFill,
-            _ => Microsoft.UI.Xaml.Media.Stretch.Uniform,
-        };
-    }
+	protected virtual partial void PlatformUpdateAspect()
+	{
+		if (Player is null)
+		{
+			return;
+		}
 
-    protected virtual partial void PlatformUpdateSpeed()
-    {
-        if (Player is null)
-        {
-            return;
-        }
+		Player.Stretch = MediaElement.Aspect switch
+		{
+			Aspect.Fill => Microsoft.UI.Xaml.Media.Stretch.Fill,
+			Aspect.AspectFill => Microsoft.UI.Xaml.Media.Stretch.UniformToFill,
+			_ => Microsoft.UI.Xaml.Media.Stretch.Uniform,
+		};
+	}
 
-        var previousSpeed = Player.MediaPlayer.PlaybackRate;
-        Player.MediaPlayer.PlaybackRate = MediaElement.Speed;
+	protected virtual partial void PlatformUpdateSpeed()
+	{
+		if (Player is null)
+		{
+			return;
+		}
 
-        // Only trigger once when going to the paused state
-        if (MediaElement.Speed == 0 && previousSpeed > 0)
-        {
-            MediaElement.Pause();
-        }
-        // Only trigger once when we move from the paused state
-        else if (MediaElement.Speed > 0 && previousSpeed == 0)
-        {
-            MediaElement.Play();
-        }
-    }
+		var previousSpeed = Player.MediaPlayer.PlaybackRate;
+		Player.MediaPlayer.PlaybackRate = MediaElement.Speed;
 
-    protected virtual partial void PlatformUpdateShouldShowPlaybackControls()
-    {
-        if (Player is null)
-        {
-            return;
-        }
+		// Only trigger once when going to the paused state
+		if (IsZero<double>(MediaElement.Speed) && previousSpeed > 0)
+		{
+			Player.MediaPlayer.Pause();
+		}
+		// Only trigger once when we move from the paused state
+		else if (MediaElement.Speed > 0 && IsZero<double>(previousSpeed))
+		{
+			MediaElement.Play();
+		}
+	}
 
-        Player.AreTransportControlsEnabled =
-            MediaElement.ShouldShowPlaybackControls;
-    }
+	protected virtual partial void PlatformUpdateShouldShowPlaybackControls()
+	{
+		if (Player is null)
+		{
+			return;
+		}
 
-    protected virtual partial void PlatformUpdatePosition()
-    {
-        if (Player is not null
-            && allowUpdatePositionStates.Contains(MediaElement.CurrentState))
-        {
-            MediaElement.Position = Player.MediaPlayer.Position;
-        }
-    }
+		Player.AreTransportControlsEnabled =
+			MediaElement.ShouldShowPlaybackControls;
+	}
 
-    protected virtual partial void PlatformUpdateVolume()
-    {
-        if (Player is null)
-        {
-            return;
-        }
+	protected virtual partial void PlatformUpdatePosition()
+	{
+		if (Application.Current?.Windows is null || Application.Current.Windows.Count == 0)
+		{
+			return;
+		}
+		if (!ParentWindow.Exists)
+		{
+			// Parent window is null, so we can't update the position
+			// This is a workaround for a bug where the timer keeps running after the window is closed
+			return;
+		}
 
-        // If currently muted, ignore
-        if (MediaElement.ShouldMute)
-        {
-            return;
-        }
+		if (Player is not null
+			&& allowUpdatePositionStates.Contains(MediaElement.CurrentState))
+		{
+			MediaElement.Position = Player.MediaPlayer.Position;
+		}
+	}
 
-        if (Dispatcher.IsDispatchRequired)
-        {
-            Dispatcher.Dispatch(() => UpdateVolume(Player, MediaElement.Volume));
-        }
-        else
-        {
-            UpdateVolume(Player, MediaElement.Volume);
-        }
+	protected virtual partial void PlatformUpdateVolume()
+	{
+		if (Player is null)
+		{
+			return;
+		}
 
-        static void UpdateVolume(in MediaPlayerElement mediaPlayerElement, in double volume) => mediaPlayerElement.MediaPlayer.Volume = volume;
-    }
+		// If currently muted, ignore
+		if (MediaElement.ShouldMute)
+		{
+			return;
+		}
 
-    protected virtual partial void PlatformUpdateShouldKeepScreenOn()
-    {
-        if (MediaElement.ShouldKeepScreenOn)
-        {
-            if (MediaElement != null
-                && allowUpdatePositionStates.Contains(MediaElement.CurrentState)
-                && !displayActiveRequested)
-            {
-                DisplayRequest.RequestActive();
-                displayActiveRequested = true;
-            }
-        }
-        else
-        {
-            if (displayActiveRequested)
-            {
-                DisplayRequest.RequestRelease();
-                displayActiveRequested = false;
-            }
-        }
-    }
+		if (Dispatcher.IsDispatchRequired)
+		{
+			Dispatcher.Dispatch(() => UpdateVolume(Player, MediaElement.Volume));
+		}
+		else
+		{
+			UpdateVolume(Player, MediaElement.Volume);
+		}
 
-    protected virtual partial void PlatformUpdateShouldMute()
-    {
-        if (Player?.MediaPlayer is null)
-        {
-            return;
-        }
+		static void UpdateVolume(in MediaPlayerElement mediaPlayerElement, in double volume) => mediaPlayerElement.MediaPlayer.Volume = volume;
+	}
 
-        Player.MediaPlayer.IsMuted = MediaElement.ShouldMute;
-    }
+	protected virtual partial void PlatformUpdateShouldKeepScreenOn()
+	{
+		if (MediaElement.ShouldKeepScreenOn)
+		{
+			if (allowUpdatePositionStates.Contains(MediaElement.CurrentState)
+				&& !displayActiveRequested)
+			{
+				DisplayRequest.RequestActive();
+				displayActiveRequested = true;
+			}
+		}
+		else
+		{
+			if (displayActiveRequested)
+			{
+				DisplayRequest.RequestRelease();
+				displayActiveRequested = false;
+			}
+		}
+	}
 
-    protected virtual async partial void PlatformUpdateSource()
-    {
-        if (Player is null)
-        {
-            return;
-        }
+	protected virtual partial void PlatformUpdateShouldMute()
+	{
+		if (Player is null)
+		{
+			return;
+		}
+		Dispatcher.Dispatch(() => Player.MediaPlayer.IsMuted = MediaElement.ShouldMute);
+	}
 
-        if (MediaElement.Source is null)
-        {
-            Player.Source = null;
-            MediaElement.CurrentStateChanged(MediaElementState.None);
+	protected virtual async partial ValueTask PlatformUpdateSource()
+	{
+		if (Player is null)
+		{
+			return;
+		}
 
-            return;
-        }
+		await Dispatcher.DispatchAsync(() => Player.PosterSource = new BitmapImage());
 
-        Player.AutoPlay = MediaElement.ShouldAutoPlay;
+		if (MediaElement.Source is null)
+		{
+			Player.Source = null;
+			MediaElement.MediaWidth = MediaElement.MediaHeight = 0;
 
-        if (MediaElement.Source is UriMediaSource uriMediaSource)
-        {
-            //var uri = uriMediaSource.Uri?.AbsoluteUri;
-            //if (!string.IsNullOrWhiteSpace(uri))
-            //{
-            //	Player.Source = WinMediaSource.CreateFromUri(new Uri(uri));
-            //
-            //	return;
-            //}
+			MediaElement.CurrentStateChanged(MediaElementState.None);
 
-            var uri = uriMediaSource.Uri?.AbsoluteUri;
-            if (!string.IsNullOrWhiteSpace(uri))
-            {
+			return;
+		}
+
+		MediaElement.Position = TimeSpan.Zero;
+		MediaElement.Duration = TimeSpan.Zero;
+		Player.AutoPlay = MediaElement.ShouldAutoPlay;
+
+		if (MediaElement.Source is UriMediaSource uriMediaSource)
+		{
+			var uri = uriMediaSource.Uri?.AbsoluteUri;
+			if (!string.IsNullOrWhiteSpace(uri))
+			{
                 if (uriMediaSource.Headers?.Count > 0)
                 {
                     var httpClient = new Windows.Web.Http.HttpClient();
@@ -329,175 +338,228 @@ partial class MediaManager : IDisposable
                     //    Player.Source = playbackItem;
                     //}
                 }
+                
+				Player.Source = WinMediaSource.CreateFromUri(new Uri(uri));
+			}
+		}
+		else if (MediaElement.Source is FileMediaSource fileMediaSource)
+		{
+			var filename = fileMediaSource.Path;
+			if (!string.IsNullOrWhiteSpace(filename))
+			{
+				StorageFile storageFile = await StorageFile.GetFileFromPathAsync(filename);
+				Player.Source = WinMediaSource.CreateFromStorageFile(storageFile);
+			}
+		}
+		else if (MediaElement.Source is ResourceMediaSource resourceMediaSource)
+		{
+			string path = "ms-appx:///" + resourceMediaSource.Path;
+			if (!string.IsNullOrWhiteSpace(path))
+			{
+				Player.Source = WinMediaSource.CreateFromUri(new Uri(path));
+			}
+		}
+	}
 
-                Player.Source = WinMediaSource.CreateFromUri(new Uri(uri));
-                return;
-            }
-        }
-        else if (MediaElement.Source is FileMediaSource fileMediaSource)
-        {
-            var filename = fileMediaSource.Path;
-            if (!string.IsNullOrWhiteSpace(filename))
-            {
-                var storageFile = await StorageFile.GetFileFromPathAsync(filename);
-                Player.Source = WinMediaSource.CreateFromStorageFile(storageFile);
-            }
-        }
-        else if (MediaElement.Source is ResourceMediaSource resourceMediaSource)
-        {
-            var path = "ms-appx:///" + resourceMediaSource.Path;
-            if (!string.IsNullOrWhiteSpace(path))
-            {
-                Player.Source = WinMediaSource.CreateFromUri(new Uri(path));
-            }
-        }
-    }
+	protected virtual partial void PlatformUpdateShouldLoopPlayback()
+	{
+		if (Player is null)
+		{
+			return;
+		}
 
-    protected virtual partial void PlatformUpdateShouldLoopPlayback()
-    {
-        if (Player is null)
-        {
-            return;
-        }
+		Player.MediaPlayer.IsLoopingEnabled = MediaElement.ShouldLoopPlayback;
+	}
 
-        Player.MediaPlayer.IsLoopingEnabled = MediaElement.ShouldLoopPlayback;
-    }
+	/// <summary>
+	/// Releases the unmanaged resources used by the <see cref="MediaManager"/> and optionally releases the managed resources.
+	/// </summary>
+	/// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources; <see langword="false"/> to release only unmanaged resources.</param>
+	protected virtual void Dispose(bool disposing)
+	{
+		if (disposing)
+		{
+			if (Player?.MediaPlayer is not null)
+			{
+				if (displayActiveRequested)
+				{
+					DisplayRequest.RequestRelease();
+					displayActiveRequested = false;
+				}
 
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="MediaManager"/> and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources; <see langword="false"/> to release only unmanaged resources.</param>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            if (Player?.MediaPlayer is not null)
-            {
-                if (displayActiveRequested)
-                {
-                    DisplayRequest.RequestRelease();
-                    displayActiveRequested = false;
-                }
+				Player.MediaPlayer.MediaOpened -= OnMediaElementMediaOpened;
+				Player.MediaPlayer.MediaFailed -= OnMediaElementMediaFailed;
+				Player.MediaPlayer.MediaEnded -= OnMediaElementMediaEnded;
+				Player.MediaPlayer.VolumeChanged -= OnMediaElementVolumeChanged;
+				Player.MediaPlayer.IsMutedChanged -= OnMediaElementIsMutedChanged;
 
-                Player.MediaPlayer.MediaOpened -= OnMediaElementMediaOpened;
-                Player.MediaPlayer.MediaFailed -= OnMediaElementMediaFailed;
-                Player.MediaPlayer.MediaEnded -= OnMediaElementMediaEnded;
-                Player.MediaPlayer.VolumeChanged -= OnMediaElementVolumeChanged;
-                Player.MediaPlayer.IsMutedChanged -= OnMediaElementIsMutedChanged;
+				if (Player.MediaPlayer.PlaybackSession is not null)
+				{
+					Player.MediaPlayer.PlaybackSession.NaturalVideoSizeChanged -= OnNaturalVideoSizeChanged;
+					Player.MediaPlayer.PlaybackSession.PlaybackRateChanged -= OnPlaybackSessionPlaybackRateChanged;
+					Player.MediaPlayer.PlaybackSession.PlaybackStateChanged -= OnPlaybackSessionPlaybackStateChanged;
+					Player.MediaPlayer.PlaybackSession.SeekCompleted -= OnPlaybackSessionSeekCompleted;
+				}
+			}
+		}
+	}
 
-                if (Player.MediaPlayer.PlaybackSession is not null)
-                {
-                    Player.MediaPlayer.PlaybackSession.PlaybackRateChanged -= OnPlaybackSessionPlaybackRateChanged;
-                    Player.MediaPlayer.PlaybackSession.PlaybackStateChanged -= OnPlaybackSessionPlaybackStateChanged;
-                    Player.MediaPlayer.PlaybackSession.SeekCompleted -= OnPlaybackSessionSeekCompleted;
-                }
-            }
-        }
-    }
+	static bool IsZero<TValue>(TValue numericValue) where TValue : INumber<TValue>
+	{
+		return TValue.IsZero(numericValue);
+	}
 
-    void OnMediaElementMediaOpened(WindowsMediaElement sender, object args)
-    {
-        if (Player is null)
-        {
-            return;
-        }
+	async ValueTask UpdateMetadata()
+	{
+		if (systemMediaControls is null || Player is null)
+		{
+			return;
+		}
 
-        if (Dispatcher.IsDispatchRequired)
-        {
-            Dispatcher.Dispatch(() => SetDuration(MediaElement, Player));
-        }
-        else
-        {
-            SetDuration(MediaElement, Player);
-        }
-        MediaElement.MediaOpened();
+		metadata ??= new(systemMediaControls, MediaElement, Dispatcher);
+		metadata.SetMetadata(MediaElement);
+		if (string.IsNullOrEmpty(MediaElement.MetadataArtworkUrl))
+		{
+			return;
+		}
+		if (!Uri.TryCreate(MediaElement.MetadataArtworkUrl, UriKind.RelativeOrAbsolute, out var metadataArtworkUri))
+		{
+			Trace.TraceError($"{nameof(MediaElement)} unable to update artwork because {nameof(MediaElement.MetadataArtworkUrl)} is not a valid URI");
+			return;
+		}
 
-        static void SetDuration(in IMediaElement mediaElement, in MediaPlayerElement mediaPlayerElement) => mediaElement.Duration = mediaPlayerElement.MediaPlayer.NaturalDuration == TimeSpan.MaxValue
-                                                                                                                                        ? TimeSpan.Zero
-                                                                                                                                        : mediaPlayerElement.MediaPlayer.NaturalDuration;
-    }
+		if (Dispatcher.IsDispatchRequired)
+		{
+			await Dispatcher.DispatchAsync(() => UpdatePosterSource(Player, metadataArtworkUri));
+		}
+		else
+		{
+			UpdatePosterSource(Player, metadataArtworkUri);
+		}
 
-    void OnMediaElementMediaEnded(WindowsMediaElement sender, object args)
-    {
-        MediaElement?.MediaEnded();
-    }
+		static void UpdatePosterSource(in MediaPlayerElement player, in Uri metadataArtworkUri)
+		{
+			player.PosterSource = new BitmapImage(metadataArtworkUri);
+		}
+	}
 
-    void OnMediaElementMediaFailed(WindowsMediaElement sender, MediaPlayerFailedEventArgs args)
-    {
-        var errorMessage = string.Empty;
-        var errorCode = string.Empty;
-        var error = args.Error.ToString();
+	async void OnMediaElementMediaOpened(WindowsMediaElement sender, object args)
+	{
+		if (Player is null)
+		{
+			return;
+		}
 
-        if (!string.IsNullOrWhiteSpace(args.ErrorMessage))
-        {
-            errorMessage = $"Error message: {args.ErrorMessage}";
-        }
+		if (Dispatcher.IsDispatchRequired)
+		{
+			Dispatcher.Dispatch(() => SetDuration(MediaElement, Player));
+		}
+		else
+		{
+			SetDuration(MediaElement, Player);
+		}
 
-        if (args.ExtendedErrorCode != null)
-        {
-            errorCode = $"Error code: {args.ExtendedErrorCode.Message}";
-        }
+		MediaElement.MediaOpened();
 
-        var message = string.Join(", ",
-            new[] { error, errorCode, errorMessage }
-            .Where(s => !string.IsNullOrEmpty(s)));
+		await UpdateMetadata();
 
-        MediaElement?.MediaFailed(new MediaFailedEventArgs(message));
+		static void SetDuration(in IMediaElement mediaElement, in MediaPlayerElement mediaPlayerElement)
+		{
+			mediaElement.Duration = mediaPlayerElement.MediaPlayer.NaturalDuration == TimeSpan.MaxValue
+				? TimeSpan.Zero
+				: mediaPlayerElement.MediaPlayer.NaturalDuration;
+		}
+	}
 
-        Logger?.LogError("{logMessage}", message);
-    }
+	void OnMediaElementMediaEnded(WindowsMediaElement sender, object args)
+	{
+		MediaElement?.MediaEnded();
+	}
 
-    void OnMediaElementIsMutedChanged(WindowsMediaElement sender, object args)
-    {
-        MediaElement.ShouldMute = sender.IsMuted;
-    }
+	void OnMediaElementMediaFailed(WindowsMediaElement sender, MediaPlayerFailedEventArgs args)
+	{
+		string errorMessage = string.Empty;
+		string errorCode = string.Empty;
+		string error = args.Error.ToString();
 
-    void OnMediaElementVolumeChanged(WindowsMediaElement sender, object args)
-    {
-        MediaElement.Volume = sender.Volume;
-    }
+		if (!string.IsNullOrWhiteSpace(args.ErrorMessage))
+		{
+			errorMessage = $"Error message: {args.ErrorMessage}";
+		}
 
-    void OnPlaybackSessionPlaybackRateChanged(MediaPlaybackSession sender, object args)
-    {
-        if (MediaElement.Speed != sender.PlaybackRate)
-        {
-            if (Dispatcher.IsDispatchRequired)
-            {
-                Dispatcher.Dispatch(() => UpdateSpeed(MediaElement, sender.PlaybackRate));
-            }
-            else
-            {
-                UpdateSpeed(MediaElement, sender.PlaybackRate);
-            }
-        }
+		if (args.ExtendedErrorCode != null)
+		{
+			errorCode = $"Error code: {args.ExtendedErrorCode.Message}";
+		}
 
-        static void UpdateSpeed(in IMediaElement mediaElement, in double playbackRate) => mediaElement.Speed = playbackRate;
-    }
+		var message = string.Join(", ",
+			new[] { error, errorCode, errorMessage }
+			.Where(s => !string.IsNullOrEmpty(s)));
 
-    void OnPlaybackSessionPlaybackStateChanged(MediaPlaybackSession sender, object args)
-    {
-        var newState = sender.PlaybackState switch
-        {
-            MediaPlaybackState.Buffering => MediaElementState.Buffering,
-            MediaPlaybackState.Playing => MediaElementState.Playing,
-            MediaPlaybackState.Paused => MediaElementState.Paused,
-            MediaPlaybackState.Opening => MediaElementState.Opening,
-            _ => MediaElementState.None,
-        };
+		MediaElement?.MediaFailed(new MediaFailedEventArgs(message));
 
-        MediaElement?.CurrentStateChanged(newState);
+		Logger?.LogError("{LogMessage}", message);
+	}
 
-        if (sender.PlaybackState == MediaPlaybackState.Playing && sender.PlaybackRate == 0)
-        {
-            Dispatcher.Dispatch(() =>
-            {
-                sender.PlaybackRate = 1;
-            });
-        }
-    }
+	void OnMediaElementIsMutedChanged(WindowsMediaElement sender, object args)
+	{
+		MediaElement.ShouldMute = sender.IsMuted;
+	}
 
-    void OnPlaybackSessionSeekCompleted(MediaPlaybackSession sender, object args)
-    {
-        MediaElement?.SeekCompleted();
-    }
+	void OnMediaElementVolumeChanged(WindowsMediaElement sender, object args)
+	{
+		MediaElement.Volume = sender.Volume;
+	}
+
+	void OnNaturalVideoSizeChanged(MediaPlaybackSession sender, object args)
+	{
+		if (MediaElement is not null)
+		{
+			MediaElement.MediaWidth = (int)sender.NaturalVideoWidth;
+			MediaElement.MediaHeight = (int)sender.NaturalVideoHeight;
+		}
+	}
+
+	void OnPlaybackSessionPlaybackRateChanged(MediaPlaybackSession sender, object args)
+	{
+		if (AreFloatingPointNumbersEqual(MediaElement.Speed, sender.PlaybackRate))
+		{
+			if (Dispatcher.IsDispatchRequired)
+			{
+				Dispatcher.Dispatch(() => UpdateSpeed(MediaElement, sender.PlaybackRate));
+			}
+			else
+			{
+				UpdateSpeed(MediaElement, sender.PlaybackRate);
+			}
+		}
+
+		static void UpdateSpeed(in IMediaElement mediaElement, in double playbackRate) => mediaElement.Speed = playbackRate;
+	}
+
+	void OnPlaybackSessionPlaybackStateChanged(MediaPlaybackSession sender, object args)
+	{
+		var newState = sender.PlaybackState switch
+		{
+			MediaPlaybackState.Buffering => MediaElementState.Buffering,
+			MediaPlaybackState.Playing => MediaElementState.Playing,
+			MediaPlaybackState.Paused => MediaElementState.Paused,
+			MediaPlaybackState.Opening => MediaElementState.Opening,
+			_ => MediaElementState.None,
+		};
+
+		MediaElement?.CurrentStateChanged(newState);
+		if (sender.PlaybackState == MediaPlaybackState.Playing && IsZero<double>(sender.PlaybackRate))
+		{
+			Dispatcher.Dispatch(() =>
+			{
+				sender.PlaybackRate = 1;
+			});
+		}
+	}
+
+	void OnPlaybackSessionSeekCompleted(MediaPlaybackSession sender, object args)
+	{
+		MediaElement?.SeekCompleted();
+	}
 }

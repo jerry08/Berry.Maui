@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using Microsoft.Maui.Controls;
 
-namespace PhoenixPortal.Behaviors;
+namespace Berry.Maui.Extensions;
 
 public static class PropertyChangedEventArgsExtensions
 {

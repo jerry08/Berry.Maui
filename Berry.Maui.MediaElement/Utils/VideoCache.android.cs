@@ -1,9 +1,7 @@
 ﻿using Android.Content;
 using AndroidX.Media3.Database;
 using AndroidX.Media3.DataSource.Cache;
-using Java.IO;
-using Microsoft.Maui.ApplicationModel;
-using Microsoft.Maui.Storage;
+using File = Java.IO.File;
 
 namespace Berry.Maui.Utils;
 

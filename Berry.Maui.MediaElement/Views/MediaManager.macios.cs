@@ -1,297 +1,317 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using AVFoundation;
+﻿using AVFoundation;
 using AVKit;
-using Berry.Maui.Core.Primitives;
 using Berry.Maui.Views;
 using CoreFoundation;
+using CoreGraphics;
 using CoreMedia;
 using Foundation;
+using MediaPlayer;
 using Microsoft.Extensions.Logging;
-using Microsoft.Maui;
+using UIKit;
 
 namespace Berry.Maui.Core.Views;
 
 public partial class MediaManager : IDisposable
 {
-    // Media would still start playing when Speed was set although ShouldAutoPlay=False
-    // This field was added to overcome that.
-    bool initialSpeedSet;
+	Metadata? metaData;
 
-    /// <summary>
-    /// The default <see cref="NSKeyValueObservingOptions"/> flags used in the iOS and macOS observers.
-    /// </summary>
-    protected const NSKeyValueObservingOptions valueObserverOptions =
-        NSKeyValueObservingOptions.Initial | NSKeyValueObservingOptions.New;
+	// Media would still start playing when Speed was set although ShouldAutoPlay=False
+	// This field was added to overcome that.
+	bool isInitialSpeedSet;
 
-    /// <summary>
-    /// Observer that tracks when an error has occurred in the playback of the current item.
-    /// </summary>
-    protected IDisposable? CurrentItemErrorObserver { get; set; }
+	/// <summary>
+	/// Creates the corresponding platform view of <see cref="MediaElement"/> on iOS and macOS.
+	/// </summary>
+	/// <returns>The platform native counterpart of <see cref="MediaElement"/>.</returns>
+	public (PlatformMediaElement Player, AVPlayerViewController PlayerViewController) CreatePlatformView()
+	{
+		Player = new();
+		PlayerViewController = new()
+		{
+			Player = Player
+		};
 
-    /// <summary>
-    /// Observer that tracks when an error has occurred with media playback.
-    /// </summary>
-    protected NSObject? ErrorObserver { get; set; }
+		// Pre-initialize Volume and Muted properties to the player object
+		Player.Muted = MediaElement.ShouldMute;
+		var volumeDiff = Math.Abs(Player.Volume - MediaElement.Volume);
+		if (volumeDiff > 0.01)
+		{
+			Player.Volume = (float)MediaElement.Volume;
+		}
 
-    /// <summary>
-    /// Observer that tracks when the media has failed to play to the end.
-    /// </summary>
-    protected NSObject? ItemFailedToPlayToEndTimeObserver { get; set; }
+		UIApplication.SharedApplication.BeginReceivingRemoteControlEvents();
 
-    /// <summary>
-    /// Observer that tracks when the playback of media has stalled.
-    /// </summary>
-    protected NSObject? PlaybackStalledObserver { get; set; }
+#if IOS
+		PlayerViewController.UpdatesNowPlayingInfoCenter = false;
+#else
+		PlayerViewController.UpdatesNowPlayingInfoCenter = true;
+#endif
+		var avSession = AVAudioSession.SharedInstance();
+		avSession.SetCategory(AVAudioSessionCategory.Playback);
+		avSession.SetActive(true);
 
-    /// <summary>
-    /// Observer that tracks when the media has played to the end.
-    /// </summary>
-    protected NSObject? PlayedToEndObserver { get; set; }
+		AddStatusObservers();
+		AddPlayedToEndObserver();
+		AddErrorObservers();
 
-    /// <summary>
-    /// The current media playback item.
-    /// </summary>
-    protected AVPlayerItem? PlayerItem { get; set; }
+		return (Player, PlayerViewController);
+	}
 
-    /// <summary>
-    /// The <see cref="AVPlayerViewController"/> that hosts the media Player.
-    /// </summary>
-    protected AVPlayerViewController? PlayerViewController { get; set; }
+	/// <summary>
+	/// Releases the managed and unmanaged resources used by the <see cref="MediaManager"/>.
+	/// </summary>
+	public void Dispose()
+	{
+		Dispose(true);
+		GC.SuppressFinalize(this);
+	}
 
-    /// <summary>
-    /// Observer that tracks the playback rate of the media.
-    /// </summary>
-    protected IDisposable? RateObserver { get; set; }
+	/// <summary>
+	/// The default <see cref="NSKeyValueObservingOptions"/> flags used in the iOS and macOS observers.
+	/// </summary>
+	protected NSKeyValueObservingOptions ValueObserverOptions => NSKeyValueObservingOptions.Initial | NSKeyValueObservingOptions.New;
 
-    /// <summary>
-    /// Observer that tracks the status of the media.
-    /// </summary>
-    protected IDisposable? StatusObserver { get; set; }
+	/// <summary>
+	/// Observer that tracks when an error has occurred in the playback of the current item.
+	/// </summary>
+	protected IDisposable? CurrentItemErrorObserver { get; set; }
 
-    /// <summary>
-    /// Observer that tracks the time control status of the media.
-    /// </summary>
-    protected IDisposable? TimeControlStatusObserver { get; set; }
+	/// <summary>
+	/// Observer that tracks when an error has occurred with media playback.
+	/// </summary>
+	protected NSObject? ErrorObserver { get; set; }
 
-    /// <summary>
-    /// Observer that tracks the volume of the media playback.
-    /// </summary>
-    protected IDisposable? VolumeObserver { get; set; }
+	/// <summary>
+	/// Observer that tracks when the media has failed to play to the end.
+	/// </summary>
+	protected NSObject? ItemFailedToPlayToEndTimeObserver { get; set; }
 
-    /// <summary>
-    /// Observer that tracks if the audio is muted.
-    /// </summary>
-    protected IDisposable? MutedObserver { get; set; }
+	/// <summary>
+	/// Observer that tracks when the playback of media has stalled.
+	/// </summary>
+	protected NSObject? PlaybackStalledObserver { get; set; }
 
-    /// <summary>
-    /// Creates the corresponding platform view of <see cref="MediaElement"/> on iOS and macOS.
-    /// </summary>
-    /// <returns>The platform native counterpart of <see cref="MediaElement"/>.</returns>
-    public (PlatformMediaElement Player, AVPlayerViewController PlayerViewController) CreatePlatformView()
-    {
-        Player = new();
-        PlayerViewController = new()
-        {
-            Player = Player
-        };
+	/// <summary>
+	/// Observer that tracks when the media has played to the end.
+	/// </summary>
+	protected NSObject? PlayedToEndObserver { get; set; }
 
-        // Pre-initialize Volume and Muted properties to the player object
-        Player.Muted = MediaElement.ShouldMute;
-        var volumeDiff = Math.Abs(Player.Volume - MediaElement.Volume);
-        if (volumeDiff > 0.01)
-        {
-            Player.Volume = (float)MediaElement.Volume;
-        }
+	/// <summary>
+	/// The current media playback item.
+	/// </summary>
+	protected AVPlayerItem? PlayerItem { get; set; }
 
-        AddStatusObservers();
-        AddPlayedToEndObserver();
-        AddErrorObservers();
+	/// <summary>
+	/// The <see cref="AVPlayerViewController"/> that hosts the media Player.
+	/// </summary>
+	protected AVPlayerViewController? PlayerViewController { get; set; }
 
-        return (Player, PlayerViewController);
-    }
+	/// <summary>
+	/// Observer that tracks the playback rate of the media.
+	/// </summary>
+	protected IDisposable? RateObserver { get; set; }
 
-    /// <summary>
-    /// Releases the managed and unmanaged resources used by the <see cref="MediaManager"/>.
-    /// </summary>
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
+	/// <summary>
+	/// Observer that tracks the status of the media.
+	/// </summary>
+	protected IDisposable? StatusObserver { get; set; }
 
-    protected virtual partial void PlatformPlay()
-    {
-        if (Player?.CurrentTime == PlayerItem?.Duration)
-        {
-            return;
-        }
+	/// <summary>
+	/// Observer that tracks the time control status of the media.
+	/// </summary>
+	protected IDisposable? TimeControlStatusObserver { get; set; }
 
-        Player?.Play();
-    }
+	/// <summary>
+	/// Observer that tracks the volume of the media playback.
+	/// </summary>
+	protected IDisposable? VolumeObserver { get; set; }
 
-    protected virtual partial void PlatformPause()
-    {
-        Player?.Pause();
-    }
+	/// <summary>
+	/// Observer that tracks if the audio is muted.
+	/// </summary>
+	protected IDisposable? MutedObserver { get; set; }
 
-    protected virtual async partial Task PlatformSeek(TimeSpan position, CancellationToken token)
-    {
-        token.ThrowIfCancellationRequested();
+	protected virtual partial void PlatformPlay()
+	{
+		if (Player?.CurrentTime == PlayerItem?.Duration)
+		{
+			return;
+		}
 
-        var seekTaskCompletionSource = new TaskCompletionSource();
+		Player?.Play();
+	}
 
-        if (Player?.CurrentItem is null)
-        {
-            throw new InvalidOperationException($"{nameof(AVPlayer)}.{nameof(AVPlayer.CurrentItem)} is not yet initialized");
-        }
+	protected virtual partial void PlatformPause()
+	{
+		Player?.Pause();
+	}
 
-        if (Player?.Status is not AVPlayerStatus.ReadyToPlay)
-        {
-            throw new InvalidOperationException($"{nameof(AVPlayer)}.{nameof(AVPlayer.Status)} must first be set to {AVPlayerStatus.ReadyToPlay}");
-        }
+	protected virtual async partial Task PlatformSeek(TimeSpan position, CancellationToken token)
+	{
+		token.ThrowIfCancellationRequested();
 
-        var ranges = Player.CurrentItem.SeekableTimeRanges;
-        var seekToTime = new CMTime(Convert.ToInt64(position.TotalMilliseconds), 1000);
+		var seekTaskCompletionSource = new TaskCompletionSource();
 
-        foreach (var v in ranges)
-        {
-            if (seekToTime >= (seekToTime - v.CMTimeRangeValue.Start)
-                && seekToTime < (v.CMTimeRangeValue.Start + v.CMTimeRangeValue.Duration))
-            {
-                Player.Seek(seekToTime + v.CMTimeRangeValue.Start, complete =>
-                {
-                    if (!complete)
-                    {
-                        throw new InvalidOperationException("Seek Failed");
-                    }
+		if (Player?.CurrentItem is null)
+		{
+			throw new InvalidOperationException($"{nameof(AVPlayer)}.{nameof(AVPlayer.CurrentItem)} is not yet initialized");
+		}
 
-                    seekTaskCompletionSource.SetResult();
-                });
-                break;
-            }
-        }
+		if (Player.Status is not AVPlayerStatus.ReadyToPlay)
+		{
+			throw new InvalidOperationException($"{nameof(AVPlayer)}.{nameof(AVPlayer.Status)} must first be set to {AVPlayerStatus.ReadyToPlay}");
+		}
 
-        await seekTaskCompletionSource.Task.WaitAsync(token);
+		var ranges = Player.CurrentItem.SeekableTimeRanges;
+		var seekToTime = new CMTime(Convert.ToInt64(position.TotalMilliseconds), 1000);
+		foreach (var range in ranges.Select(r => r.CMTimeRangeValue))
+		{
+			if (seekToTime >= range.Start && seekToTime < (range.Start + range.Duration))
+			{
+				Player.Seek(seekToTime, complete =>
+				{
+					if (!complete)
+					{
+						throw new InvalidOperationException("Seek Failed");
+					}
 
-        MediaElement.SeekCompleted();
-    }
+					seekTaskCompletionSource.SetResult();
+				});
+				break;
+			}
+		}
 
-    protected virtual partial void PlatformStop()
-    {
-        // There's no Stop method so pause the video and reset its position
-        Player?.Seek(CMTime.Zero);
-        Player?.Pause();
+		await seekTaskCompletionSource.Task.WaitAsync(token);
 
-        MediaElement.CurrentStateChanged(MediaElementState.Stopped);
-    }
+		MediaElement.SeekCompleted();
+	}
 
-    protected virtual partial void PlatformUpdateAspect()
-    {
-        if (PlayerViewController is null)
-        {
-            return;
-        }
+	protected virtual partial void PlatformStop()
+	{
+		// There's no Stop method so pause the video and reset its position
+		Player?.Seek(CMTime.Zero);
+		Player?.Pause();
 
-        PlayerViewController.VideoGravity = MediaElement.Aspect switch
-        {
-            Aspect.Fill => AVLayerVideoGravity.Resize,
-            Aspect.AspectFill => AVLayerVideoGravity.ResizeAspectFill,
-            _ => AVLayerVideoGravity.ResizeAspect,
-        };
-    }
+		MediaElement.CurrentStateChanged(MediaElementState.Stopped);
+	}
 
-    protected virtual partial void PlatformUpdateSource()
-    {
-        MediaElement.CurrentStateChanged(MediaElementState.Opening);
+	protected virtual partial void PlatformUpdateAspect()
+	{
+		if (PlayerViewController is null)
+		{
+			return;
+		}
 
-        AVAsset? asset = null;
+		PlayerViewController.VideoGravity = MediaElement.Aspect switch
+		{
+			Aspect.Fill => AVLayerVideoGravity.Resize,
+			Aspect.AspectFill => AVLayerVideoGravity.ResizeAspectFill,
+			_ => AVLayerVideoGravity.ResizeAspect,
+		};
+	}
 
-        if (MediaElement.Source is UriMediaSource uriMediaSource)
-        {
-            var uri = uriMediaSource.Uri;
+	protected virtual partial ValueTask PlatformUpdateSource()
+	{
+		MediaElement.CurrentStateChanged(MediaElementState.Opening);
 
-            if (!string.IsNullOrWhiteSpace(uri?.AbsoluteUri))
-            {
-                //asset = AVAsset.FromUrl(new NSUrl(uri.AbsoluteUri));
-                asset = AVUrlAsset.Create(new NSUrl(uri.AbsoluteUri), GetOptionsWithHeaders(uriMediaSource.Headers));
-            }
-        }
-        else if (MediaElement.Source is FileMediaSource fileMediaSource)
-        {
-            var uri = fileMediaSource.Path;
+		AVAsset? asset = null;
+		if (Player is null)
+		{
+			return ValueTask.CompletedTask;
+		}
 
-            if (!string.IsNullOrWhiteSpace(uri))
-            {
-                asset = AVAsset.FromUrl(NSUrl.CreateFileUrl(uri));
-            }
-        }
-        else if (MediaElement.Source is ResourceMediaSource resourceMediaSource)
-        {
-            var path = resourceMediaSource.Path;
+		metaData ??= new(Player);
+		Metadata.ClearNowPlaying();
+		PlayerViewController?.ContentOverlayView?.Subviews.FirstOrDefault()?.RemoveFromSuperview();
 
-            if (!string.IsNullOrWhiteSpace(path))
-            {
-                var directory = Path.GetDirectoryName(path) ?? "";
-                var filename = Path.GetFileNameWithoutExtension(path);
-                var extension = Path.GetExtension(path)[1..];
-                var url = NSBundle.MainBundle.GetUrlForResource(filename,
-                    extension, directory);
+		if (MediaElement.Source is UriMediaSource uriMediaSource)
+		{
+			var uri = uriMediaSource.Uri;
+			if (!string.IsNullOrWhiteSpace(uri?.AbsoluteUri))
+			{
+				//asset = AVAsset.FromUrl(new NSUrl(uri.AbsoluteUri));
+				asset = AVUrlAsset.Create(new NSUrl(uri.AbsoluteUri), GetOptionsWithHeaders(uriMediaSource.Headers));
+			}
+		}
+		else if (MediaElement.Source is FileMediaSource fileMediaSource)
+		{
+			var uri = fileMediaSource.Path;
 
-                asset = AVAsset.FromUrl(url);
-            }
-        }
+			if (!string.IsNullOrWhiteSpace(uri))
+			{
+				asset = AVAsset.FromUrl(NSUrl.CreateFileUrl(uri));
+			}
+		}
+		else if (MediaElement.Source is ResourceMediaSource resourceMediaSource)
+		{
+			var path = resourceMediaSource.Path;
 
-        if (asset is not null)
-        {
-            PlayerItem = new AVPlayerItem(asset);
-        }
-        else
-        {
-            PlayerItem = null;
-        }
+			if (!string.IsNullOrWhiteSpace(path) && Path.HasExtension(path))
+			{
+				string directory = Path.GetDirectoryName(path) ?? "";
+				string filename = Path.GetFileNameWithoutExtension(path);
+				string extension = Path.GetExtension(path)[1..];
+				var url = NSBundle.MainBundle.GetUrlForResource(filename,
+					extension, directory);
 
-        CurrentItemErrorObserver?.Dispose();
+				asset = AVAsset.FromUrl(url);
+			}
+			else
+			{
+				Logger.LogWarning("Invalid file path for ResourceMediaSource.");
+			}
+		}
 
-        Player?.ReplaceCurrentItemWithPlayerItem(PlayerItem);
+		PlayerItem = asset is not null
+			? new AVPlayerItem(asset)
+			: null;
 
-        CurrentItemErrorObserver = PlayerItem?.AddObserver("error",
-            valueObserverOptions, (NSObservedChange change) =>
-            {
-                if (Player?.CurrentItem?.Error is null)
-                {
-                    return;
-                }
+		metaData.SetMetadata(PlayerItem, MediaElement);
+		CurrentItemErrorObserver?.Dispose();
 
-                var message = $"{Player?.CurrentItem?.Error?.LocalizedDescription} - " +
-                    $"{Player?.CurrentItem?.Error?.LocalizedFailureReason}";
+		Player.ReplaceCurrentItemWithPlayerItem(PlayerItem);
 
-                MediaElement.MediaFailed(
-                    new MediaFailedEventArgs(message));
+		CurrentItemErrorObserver = PlayerItem?.AddObserver("error",
+			ValueObserverOptions, (NSObservedChange change) =>
+			{
+				if (Player.CurrentItem?.Error is null)
+				{
+					return;
+				}
 
-                Logger.LogError("{logMessage}", message);
-            });
+				var message = $"{Player.CurrentItem?.Error?.LocalizedDescription} - " +
+							  $"{Player.CurrentItem?.Error?.LocalizedFailureReason}";
 
-        if (PlayerItem is not null && PlayerItem.Error is null)
-        {
-            MediaElement.MediaOpened();
+				MediaElement.MediaFailed(
+					new MediaFailedEventArgs(message));
 
-            if (MediaElement.ShouldAutoPlay)
-            {
-                Player?.Play();
-            }
-        }
-        else if (PlayerItem is null)
-        {
-            MediaElement.CurrentStateChanged(MediaElementState.None);
-        }
-    }
+				Logger.LogError("{LogMessage}", message);
+			});
 
-    private AVUrlAssetOptions? GetOptionsWithHeaders(IDictionary<string, string>? headers)
+		if (PlayerItem is not null && PlayerItem.Error is null)
+		{
+			MediaElement.MediaOpened();
+
+			(MediaElement.MediaWidth, MediaElement.MediaHeight) = GetVideoDimensions(PlayerItem);
+
+			if (MediaElement.ShouldAutoPlay)
+			{
+				Player.Play();
+			}
+
+			SetPoster();
+		}
+		else if (PlayerItem is null)
+		{
+			MediaElement.MediaWidth = MediaElement.MediaHeight = 0;
+
+			MediaElement.CurrentStateChanged(MediaElementState.None);
+		}
+
+		return ValueTask.CompletedTask;
+	}
+
+	private AVUrlAssetOptions? GetOptionsWithHeaders(IDictionary<string, string>? headers)
     {
         if (headers is null)
             return null;
@@ -309,310 +329,412 @@ public partial class MediaManager : IDisposable
             NSDictionary.FromObjectAndKey(nativeHeaders, nativeHeadersKey)
         );
     }
+	
+	void SetPoster()
+	{
+		if (PlayerItem is null || metaData is null)
+		{
+			return;
+		}
 
-    protected virtual partial void PlatformUpdateSpeed()
-    {
-        if (PlayerViewController?.Player is null)
-        {
-            return;
-        }
+		var videoTrack = PlayerItem.Asset.TracksWithMediaType(AVMediaTypes.Video.GetConstant()).FirstOrDefault();
+		if (videoTrack is not null)
+		{
+			return;
+		}
 
-        // First time we're getting a playback speed and should NOT auto play, do nothing.
-        if (!initialSpeedSet && !MediaElement.ShouldAutoPlay)
-        {
-            initialSpeedSet = true;
-            return;
-        }
+		if (PlayerItem.Asset.Tracks.Length == 0)
+		{
+			// No video track found and no tracks found. This is likely an audio file. So we can't set a poster.
+			return;
+		}
 
-        PlayerViewController.Player.Rate = (float)MediaElement.Speed;
-    }
+		if (PlayerViewController?.View is not null && PlayerViewController.ContentOverlayView is not null && !string.IsNullOrEmpty(MediaElement.MetadataArtworkUrl))
+		{
+			var image = UIImage.LoadFromData(NSData.FromUrl(new NSUrl(MediaElement.MetadataArtworkUrl))) ?? new UIImage();
+			var imageView = new UIImageView(image)
+			{
+				ContentMode = UIViewContentMode.ScaleAspectFit,
+				TranslatesAutoresizingMaskIntoConstraints = false,
+				ClipsToBounds = true,
+				AutoresizingMask = UIViewAutoresizing.FlexibleDimensions
+			};
 
-    protected virtual partial void PlatformUpdateShouldShowPlaybackControls()
-    {
-        if (PlayerViewController is null)
-        {
-            return;
-        }
+			PlayerViewController.ContentOverlayView.AddSubview(imageView);
+			NSLayoutConstraint.ActivateConstraints(
+			[
+				imageView.CenterXAnchor.ConstraintEqualTo(PlayerViewController.ContentOverlayView.CenterXAnchor),
+				imageView.CenterYAnchor.ConstraintEqualTo(PlayerViewController.ContentOverlayView.CenterYAnchor),
+				imageView.WidthAnchor.ConstraintLessThanOrEqualTo(PlayerViewController.ContentOverlayView.WidthAnchor),
+				imageView.HeightAnchor.ConstraintLessThanOrEqualTo(PlayerViewController.ContentOverlayView.HeightAnchor),
 
-        PlayerViewController.ShowsPlaybackControls =
-            MediaElement.ShouldShowPlaybackControls;
-    }
+				// Maintain the aspect ratio
+				imageView.WidthAnchor.ConstraintEqualTo(imageView.HeightAnchor, image.Size.Width / image.Size.Height)
+			]);
+		}
+	}
 
-    protected virtual partial void PlatformUpdatePosition()
-    {
-        if (Player is null)
-        {
-            return;
-        }
+	protected virtual partial void PlatformUpdateSpeed()
+	{
+		if (PlayerViewController?.Player is null)
+		{
+			return;
+		}
 
-        if (PlayerItem is not null)
-        {
-            if (PlayerItem.Duration == CMTime.Indefinite)
-            {
-                var range = PlayerItem.SeekableTimeRanges?.LastOrDefault();
+		// First time we're getting a playback speed and should NOT auto play, do nothing.
+		if (!isInitialSpeedSet && !MediaElement.ShouldAutoPlay)
+		{
+			isInitialSpeedSet = true;
+			return;
+		}
 
-                if (range?.CMTimeRangeValue is not null)
-                {
-                    MediaElement.Duration = ConvertTime(range.CMTimeRangeValue.Duration);
-                    MediaElement.Position = ConvertTime(PlayerItem.CurrentTime);
-                }
-            }
-            else
-            {
-                MediaElement.Duration = ConvertTime(PlayerItem.Duration);
-                MediaElement.Position = ConvertTime(PlayerItem.CurrentTime);
-            }
-        }
-        else
-        {
-            Player.Pause();
-            MediaElement.Duration = MediaElement.Position = TimeSpan.Zero;
-        }
-    }
+		PlayerViewController.Player.Rate = (float)MediaElement.Speed;
+	}
 
-    protected virtual partial void PlatformUpdateVolume()
-    {
-        if (Player is null)
-        {
-            return;
-        }
+	protected virtual partial void PlatformUpdateShouldShowPlaybackControls()
+	{
+		if (PlayerViewController is null)
+		{
+			return;
+		}
 
-        var volumeDiff = Math.Abs(Player.Volume - MediaElement.Volume);
-        if (volumeDiff > 0.01)
-        {
-            Player.Volume = (float)MediaElement.Volume;
-        }
-    }
+		PlayerViewController.ShowsPlaybackControls =
+			MediaElement.ShouldShowPlaybackControls;
+	}
 
-    protected virtual partial void PlatformUpdateShouldKeepScreenOn()
-    {
-        if (Player is null)
-        {
-            return;
-        }
+	protected virtual partial void PlatformUpdatePosition()
+	{
+		if (Player is null)
+		{
+			return;
+		}
 
-        Player.PreventsDisplaySleepDuringVideoPlayback = MediaElement.ShouldKeepScreenOn;
-    }
+		if (PlayerItem is not null)
+		{
+			if (PlayerItem.Duration == CMTime.Indefinite)
+			{
+				var range = PlayerItem.SeekableTimeRanges?.LastOrDefault();
 
-    protected virtual partial void PlatformUpdateShouldMute()
-    {
-        if (Player is null)
-        {
-            return;
-        }
+				if (range?.CMTimeRangeValue is not null)
+				{
+					MediaElement.Duration = ConvertTime(range.CMTimeRangeValue.Duration);
+					MediaElement.Position = ConvertTime(PlayerItem.CurrentTime);
+				}
+			}
+			else
+			{
+				MediaElement.Duration = ConvertTime(PlayerItem.Duration);
+				MediaElement.Position = ConvertTime(PlayerItem.CurrentTime);
+			}
+		}
+		else
+		{
+			Player.Pause();
+			MediaElement.Duration = MediaElement.Position = TimeSpan.Zero;
+		}
+	}
 
-        Player.Muted = MediaElement.ShouldMute;
-    }
+	protected virtual partial void PlatformUpdateVolume()
+	{
+		if (Player is null)
+		{
+			return;
+		}
 
-    protected virtual partial void PlatformUpdateShouldLoopPlayback()
-    {
-        // no-op we loop through using the PlayedToEndObserver
-    }
+		var volumeDiff = Math.Abs(Player.Volume - MediaElement.Volume);
+		if (volumeDiff > 0.01)
+		{
+			Player.Volume = (float)MediaElement.Volume;
+		}
+	}
 
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="MediaManager"/> and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources; <see langword="false"/> to release only unmanaged resources.</param>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            if (Player is not null)
-            {
-                Player.Pause();
-                DestroyErrorObservers();
-                DestroyPlayedToEndObserver();
 
-                RateObserver?.Dispose();
-                CurrentItemErrorObserver?.Dispose();
-                Player.ReplaceCurrentItemWithPlayerItem(null);
-                MutedObserver?.Dispose();
-                VolumeObserver?.Dispose();
-                StatusObserver?.Dispose();
-                TimeControlStatusObserver?.Dispose();
-                Player.Dispose();
-            }
+	protected virtual partial void PlatformUpdateShouldKeepScreenOn()
+	{
+		if (Player is null)
+		{
+			return;
+		}
 
-            PlayerViewController?.Dispose();
-        }
-    }
+		UIApplication.SharedApplication.IdleTimerDisabled = MediaElement.ShouldKeepScreenOn;
+	}
 
-    static TimeSpan ConvertTime(CMTime cmTime) => TimeSpan.FromSeconds(double.IsNaN(cmTime.Seconds) ? 0 : cmTime.Seconds);
 
-    void AddStatusObservers()
-    {
-        if (Player is null)
-        {
-            return;
-        }
+	protected virtual partial void PlatformUpdateShouldMute()
+	{
+		if (Player is null)
+		{
+			return;
+		}
 
-        MutedObserver = Player.AddObserver("muted", valueObserverOptions, MutedChanged);
-        VolumeObserver = Player.AddObserver("volume", valueObserverOptions, VolumeChanged);
-        StatusObserver = Player.AddObserver("status", valueObserverOptions, StatusChanged);
-        TimeControlStatusObserver = Player.AddObserver("timeControlStatus", valueObserverOptions, TimeControlStatusChanged);
-        RateObserver = AVPlayer.Notifications.ObserveRateDidChange(RateChanged);
-    }
+		Player.Muted = MediaElement.ShouldMute;
+	}
 
-    void VolumeChanged(NSObservedChange e)
-    {
-        if (Player is null)
-        {
-            return;
-        }
+	protected virtual partial void PlatformUpdateShouldLoopPlayback()
+	{
+		// no-op we loop through using the PlayedToEndObserver
+	}
 
-        var volumeDiff = Math.Abs(Player.Volume - MediaElement.Volume);
-        if (volumeDiff > 0.01)
-        {
-            MediaElement.Volume = Player.Volume;
-        }
-    }
+	/// <summary>
+	/// Releases the unmanaged resources used by the <see cref="MediaManager"/> and optionally releases the managed resources.
+	/// </summary>
+	/// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources; <see langword="false"/> to release only unmanaged resources.</param>
+	protected virtual void Dispose(bool disposing)
+	{
+		if (disposing)
+		{
+			if (Player is not null)
+			{
+				Player.Pause();
+				Player.InvokeOnMainThread(() => { UIApplication.SharedApplication.EndReceivingRemoteControlEvents(); });
+				// disable the idle timer so screen turns off when media is not playing
+				UIApplication.SharedApplication.IdleTimerDisabled = false;
+				var audioSession = AVAudioSession.SharedInstance();
+				audioSession.SetActive(false);
 
-    void MutedChanged(NSObservedChange e)
-    {
-        if (Player is null)
-        {
-            return;
-        }
+				DestroyErrorObservers();
+				DestroyPlayedToEndObserver();
 
-        MediaElement.ShouldMute = Player.Muted;
-    }
+				RateObserver?.Dispose();
+				RateObserver = null;
 
-    void AddErrorObservers()
-    {
-        DestroyErrorObservers();
+				CurrentItemErrorObserver?.Dispose();
+				CurrentItemErrorObserver = null;
 
-        ItemFailedToPlayToEndTimeObserver = AVPlayerItem.Notifications.ObserveItemFailedToPlayToEndTime(ErrorOccurred);
-        PlaybackStalledObserver = AVPlayerItem.Notifications.ObservePlaybackStalled(ErrorOccurred);
-        ErrorObserver = AVPlayerItem.Notifications.ObserveNewErrorLogEntry(ErrorOccurred);
-    }
+				Player.ReplaceCurrentItemWithPlayerItem(null);
 
-    void AddPlayedToEndObserver()
-    {
-        DestroyPlayedToEndObserver();
+				MutedObserver?.Dispose();
+				MutedObserver = null;
 
-        PlayedToEndObserver = AVPlayerItem.Notifications.ObserveDidPlayToEndTime(PlayedToEnd);
-    }
+				VolumeObserver?.Dispose();
+				VolumeObserver = null;
 
-    void DestroyErrorObservers()
-    {
-        ItemFailedToPlayToEndTimeObserver?.Dispose();
-        PlaybackStalledObserver?.Dispose();
-        ErrorObserver?.Dispose();
-    }
+				StatusObserver?.Dispose();
+				StatusObserver = null;
 
-    void DestroyPlayedToEndObserver()
-    {
-        PlayedToEndObserver?.Dispose();
-    }
+				TimeControlStatusObserver?.Dispose();
+				TimeControlStatusObserver = null;
 
-    void StatusChanged(NSObservedChange obj)
-    {
-        if (Player is null)
-        {
-            return;
-        }
+				Player.Dispose();
+				Player = null;
+			}
 
-        var newState = MediaElement.CurrentState;
+			PlayerViewController?.Dispose();
+			PlayerViewController = null;
+		}
+	}
 
-        switch (Player.Status)
-        {
-            case AVPlayerStatus.Unknown:
-                newState = MediaElementState.Stopped;
-                break;
-            case AVPlayerStatus.ReadyToPlay:
-                newState = MediaElementState.Paused;
-                break;
-            case AVPlayerStatus.Failed:
-                newState = MediaElementState.Failed;
-                break;
-        }
+	static TimeSpan ConvertTime(CMTime cmTime) => TimeSpan.FromSeconds(double.IsNaN(cmTime.Seconds) ? 0 : cmTime.Seconds);
 
-        MediaElement.CurrentStateChanged(newState);
-    }
+	static (int Width, int Height) GetVideoDimensions(AVPlayerItem avPlayerItem)
+	{
+		// Create an AVAsset instance with the video file URL
+		var asset = avPlayerItem.Asset;
 
-    void TimeControlStatusChanged(NSObservedChange obj)
-    {
-        if (Player is null || Player.Status == AVPlayerStatus.Unknown
-            || Player.CurrentItem?.Error is not null)
-        {
-            return;
-        }
+		// Retrieve the video track
+		var videoTrack = asset.TracksWithMediaType(AVMediaTypes.Video.GetConstant()).FirstOrDefault();
 
-        var newState = MediaElement.CurrentState;
+		if (videoTrack is not null)
+		{
+			// Get the natural size of the video
+			var size = videoTrack.NaturalSize;
+			var preferredTransform = videoTrack.PreferredTransform;
 
-        switch (Player.TimeControlStatus)
-        {
-            case AVPlayerTimeControlStatus.Paused:
-                newState = MediaElementState.Paused;
-                break;
-            case AVPlayerTimeControlStatus.Playing:
-                newState = MediaElementState.Playing;
-                break;
-            case AVPlayerTimeControlStatus.WaitingToPlayAtSpecifiedRate:
-                newState = MediaElementState.Buffering;
-                break;
-        }
+			// Apply the preferred transform to get the correct dimensions
+			var transformedSize = CGAffineTransform.CGRectApplyAffineTransform(new CGRect(CGPoint.Empty, size), preferredTransform);
+			var width = Math.Abs(transformedSize.Width);
+			var height = Math.Abs(transformedSize.Height);
 
-        MediaElement.CurrentStateChanged(newState);
-    }
+			return ((int)width, (int)height);
+		}
+		else
+		{
+			// HLS doesn't have tracks, try to get the dimensions this way
+			if (!avPlayerItem.PresentationSize.IsEmpty)
+			{
+				return ((int)avPlayerItem.PresentationSize.Width, (int)avPlayerItem.PresentationSize.Height);
+			}
 
-    void ErrorOccurred(object? sender, NSNotificationEventArgs args)
-    {
-        string message;
+			// If all else fails, just return 0, 0
+			return (0, 0);
+		}
+	}
 
-        var error = Player?.CurrentItem?.Error;
-        if (error is not null)
-        {
-            message = error.LocalizedDescription;
 
-            MediaElement.MediaFailed(new MediaFailedEventArgs(message));
-            Logger?.LogError("{logMessage}", message);
-        }
-        else
-        {
-            // Non-fatal error, just log
-            message = args.Notification?.ToString() ??
-                "Media playback failed for an unknown reason.";
+	void AddStatusObservers()
+	{
+		if (Player is null)
+		{
+			return;
+		}
 
-            Logger?.LogWarning("{logMessage}", message);
-        }
-    }
+		MutedObserver = Player.AddObserver("muted", ValueObserverOptions, MutedChanged);
+		VolumeObserver = Player.AddObserver("volume", ValueObserverOptions, VolumeChanged);
+		StatusObserver = Player.AddObserver("status", ValueObserverOptions, StatusChanged);
+		TimeControlStatusObserver = Player.AddObserver("timeControlStatus", ValueObserverOptions, TimeControlStatusChanged);
+		RateObserver = AVPlayer.Notifications.ObserveRateDidChange(RateChanged);
+	}
 
-    void PlayedToEnd(object? sender, NSNotificationEventArgs args)
-    {
-        if (args.Notification.Object != PlayerViewController?.Player?.CurrentItem || Player is null)
-        {
-            return;
-        }
 
-        if (MediaElement.ShouldLoopPlayback)
-        {
-            PlayerViewController?.Player?.Seek(CMTime.Zero);
-            Player.Play();
-        }
-        else
-        {
-            try
-            {
-                DispatchQueue.MainQueue.DispatchAsync(MediaElement.MediaEnded);
-            }
-            catch (Exception e)
-            {
-                Logger.LogWarning(e, "{logMessage}", $"Failed to play media to end.");
-            }
-        }
-    }
+	void VolumeChanged(NSObservedChange e)
+	{
+		if (Player is null)
+		{
+			return;
+		}
 
-    void RateChanged(object? sender, NSNotificationEventArgs args)
-    {
-        if (Player is null)
-        {
-            return;
-        }
+		var volumeDiff = Math.Abs(Player.Volume - MediaElement.Volume);
+		if (volumeDiff > 0.01)
+		{
+			MediaElement.Volume = Player.Volume;
+		}
+	}
 
-        if (!AreFloatingPointNumbersEqual(MediaElement.Speed, Player.Rate))
-        {
-            MediaElement.Speed = Player.Rate;
-        }
-    }
+
+	void MutedChanged(NSObservedChange e)
+	{
+		if (Player is null)
+		{
+			return;
+		}
+
+		MediaElement.ShouldMute = Player.Muted;
+	}
+
+	void AddErrorObservers()
+	{
+		DestroyErrorObservers();
+
+		ItemFailedToPlayToEndTimeObserver = AVPlayerItem.Notifications.ObserveItemFailedToPlayToEndTime(ErrorOccurred);
+		PlaybackStalledObserver = AVPlayerItem.Notifications.ObservePlaybackStalled(ErrorOccurred);
+		ErrorObserver = AVPlayerItem.Notifications.ObserveNewErrorLogEntry(ErrorOccurred);
+	}
+
+	void AddPlayedToEndObserver()
+	{
+		DestroyPlayedToEndObserver();
+
+		PlayedToEndObserver = AVPlayerItem.Notifications.ObserveDidPlayToEndTime(PlayedToEnd);
+	}
+
+	void DestroyErrorObservers()
+	{
+		ItemFailedToPlayToEndTimeObserver?.Dispose();
+		PlaybackStalledObserver?.Dispose();
+		ErrorObserver?.Dispose();
+	}
+
+	void DestroyPlayedToEndObserver()
+	{
+		PlayedToEndObserver?.Dispose();
+	}
+
+
+	void StatusChanged(NSObservedChange obj)
+	{
+		if (Player is null)
+		{
+			return;
+		}
+
+		var newState = Player.Status switch
+		{
+			AVPlayerStatus.Unknown => MediaElementState.Stopped,
+			AVPlayerStatus.ReadyToPlay => MediaElementState.Paused,
+			AVPlayerStatus.Failed => MediaElementState.Failed,
+			_ => MediaElement.CurrentState
+		};
+
+		MediaElement.CurrentStateChanged(newState);
+	}
+
+
+	void TimeControlStatusChanged(NSObservedChange obj)
+	{
+		if (Player is null || Player.Status is AVPlayerStatus.Unknown
+						   || Player.CurrentItem?.Error is not null)
+		{
+			return;
+		}
+
+		var newState = Player.TimeControlStatus switch
+		{
+			AVPlayerTimeControlStatus.Paused => MediaElementState.Paused,
+			AVPlayerTimeControlStatus.Playing => MediaElementState.Playing,
+			AVPlayerTimeControlStatus.WaitingToPlayAtSpecifiedRate => MediaElementState.Buffering,
+			_ => MediaElement.CurrentState
+		};
+
+		metaData?.SetMetadata(PlayerItem, MediaElement);
+
+		MediaElement.CurrentStateChanged(newState);
+	}
+
+
+	void ErrorOccurred(object? sender, NSNotificationEventArgs args)
+	{
+		string message;
+
+		var error = Player?.CurrentItem?.Error;
+		if (error is not null)
+		{
+			message = error.LocalizedDescription;
+
+			MediaElement.MediaFailed(new MediaFailedEventArgs(message));
+			Logger.LogError("{LogMessage}", message);
+		}
+		else
+		{
+			// Non-fatal error, just log
+			message = args.Notification?.ToString() ??
+					  "Media playback failed for an unknown reason.";
+
+			Logger?.LogWarning("{LogMessage}", message);
+		}
+	}
+
+
+	void PlayedToEnd(object? sender, NSNotificationEventArgs args)
+	{
+		if (args.Notification.Object != PlayerViewController?.Player?.CurrentItem || Player is null)
+		{
+			return;
+		}
+
+		if (MediaElement.ShouldLoopPlayback)
+		{
+			PlayerViewController?.Player?.Seek(CMTime.Zero);
+			Player.Play();
+		}
+		else
+		{
+			try
+			{
+				DispatchQueue.MainQueue.DispatchAsync(MediaElement.MediaEnded);
+			}
+			catch (Exception e)
+			{
+				Logger.LogWarning(e, "{LogMessage}", $"Failed to play media to end.");
+			}
+		}
+	}
+
+
+	void RateChanged(object? sender, NSNotificationEventArgs args)
+	{
+		if (Player is null)
+		{
+			return;
+		}
+
+		if (!AreFloatingPointNumbersEqual(MediaElement.Speed, Player.Rate))
+		{
+			MediaElement.Speed = Player.Rate;
+			if (metaData is not null)
+			{
+				metaData.NowPlayingInfo.PlaybackRate = (float)MediaElement.Speed;
+				MPNowPlayingInfoCenter.DefaultCenter.NowPlaying = metaData.NowPlayingInfo;
+			}
+		}
+	}
 }

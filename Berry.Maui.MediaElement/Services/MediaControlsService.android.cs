@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Versioning;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
@@ -11,168 +7,174 @@ using Android.OS;
 using AndroidX.Core.App;
 using AndroidX.Media3.Session;
 using AndroidX.Media3.UI;
-using Microsoft.Maui.ApplicationModel;
+using Berry.Maui.Services;
 using Resource = Microsoft.Maui.Controls.Resource;
 
-namespace Berry.Maui.Services;
+namespace Berry.Maui.Media.Services;
 
-[Service(Exported = false, Enabled = true, Name = "berry.maui.media.services", ForegroundServiceType = ForegroundService.TypeMediaPlayback)]
-class MediaControlsService : Service
+[SupportedOSPlatform("Android26.0")]
+[IntentFilter(["androidx.media3.session.MediaSessionService"])]
+[Service(Exported = false, Enabled = true, Name = "Berry.Maui.media.services", ForegroundServiceType = ForegroundService.TypeMediaPlayback)]
+sealed partial class MediaControlsService : Service
 {
-    bool isDisposed;
+	readonly WeakEventManager taskRemovedEventManager = new();
 
-    public MediaSession? Session;
-    public AndroidX.Media3.ExoPlayer.IExoPlayer? Player;
+	bool isDisposed;
 
-    public NotificationManager? NotificationManager;
-    PlayerNotificationManager? playerNotificationManager;
-    NotificationCompat.Builder? notification;
+	PlayerNotificationManager? playerNotificationManager;
+	NotificationCompat.Builder? notificationBuilder;
 
-    public PlayerView? PlayerView { get; set; }
+	public event EventHandler TaskRemoved
+	{
+		add => taskRemovedEventManager.AddEventHandler(value);
+		remove => taskRemovedEventManager.RemoveEventHandler(value);
+	}
 
-    public BoundServiceBinder? Binder = null;
+	public BoundServiceBinder? Binder { get; private set; }
+	public NotificationManager? NotificationManager { get; private set; }
 
-    public override IBinder? OnBind(Intent? intent)
-    {
-        Binder = new BoundServiceBinder(this);
-        return Binder;
-    }
-    public override void OnCreate()
-    {
-        base.OnCreate();
-        StartForegroundServices();
-    }
-    public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)
-    {
-        return StartCommandResult.NotSticky;
-    }
+	public override IBinder? OnBind(Intent? intent)
+	{
+		Binder = new BoundServiceBinder(this);
+		return Binder;
+	}
 
-    public override void OnTaskRemoved(Intent? rootIntent)
-    {
-        base.OnTaskRemoved(rootIntent);
-        Player?.Stop();
-        playerNotificationManager?.SetPlayer(null);
-        NotificationManager?.CancelAll();
-    }
+	public override void OnCreate()
+	{
+		base.OnCreate();
+		StartForegroundServices();
+	}
 
-    public override void OnDestroy()
-    {
-        base.OnDestroy();
-        playerNotificationManager?.SetPlayer(null);
-        NotificationManager?.CancelAll();
-        if (OperatingSystem.IsAndroidVersionAtLeast(26) && !OperatingSystem.IsAndroidVersionAtLeast(33))
-        {
-            StopForeground(true);
-        }
-        StopSelf();
-    }
-    protected override void Dispose(bool disposing)
-    {
-        if (!isDisposed)
-        {
-            if (disposing)
-            {
-                NotificationManager?.Dispose();
-                playerNotificationManager?.Dispose();
-                if (OperatingSystem.IsAndroidVersionAtLeast(26) && !OperatingSystem.IsAndroidVersionAtLeast(33))
-                {
-                    StopForeground(true);
-                }
-                StopSelf();
-            }
-            isDisposed = true;
-        }
-        base.Dispose(disposing);
-    }
+	public override StartCommandResult OnStartCommand(Intent? intent, StartCommandFlags flags, int startId)
+		=> StartCommandResult.NotSticky;
 
-    public override void OnRebind(Intent? intent)
-    {
-        base.OnRebind(intent);
-        StartForegroundServices();
-    }
+	public override void OnTaskRemoved(Intent? rootIntent)
+	{
+		base.OnTaskRemoved(rootIntent);
+		taskRemovedEventManager.HandleEvent(this, EventArgs.Empty, nameof(TaskRemoved));
 
-    [MemberNotNull(nameof(NotificationManager))]
-    static void CreateNotificationChannel(NotificationManager notificationMnaManager)
-    {
-        if (OperatingSystem.IsAndroidVersionAtLeast(26))
-        {
-            var channel = new NotificationChannel("1", "1", NotificationImportance.Low);
-            notificationMnaManager.CreateNotificationChannel(channel);
-        }
-    }
+		playerNotificationManager?.SetPlayer(null);
+		NotificationManager?.CancelAll();
+	}
 
-    [MemberNotNull(nameof(notification), nameof(NotificationManager))]
-    void StartForegroundServices()
-    {
-        NotificationManager ??= GetSystemService(NotificationService) as NotificationManager ?? throw new InvalidOperationException($"{nameof(NotificationManager)} cannot be null");
-        notification ??= new NotificationCompat.Builder(Platform.AppContext, "1");
-        notification.SetSmallIcon(Resource.Drawable.media3_notification_small_icon);
-        notification.SetAutoCancel(false);
-        notification.SetForegroundServiceBehavior(NotificationCompat.ForegroundServiceImmediate);
-        notification.SetVisibility(NotificationCompat.VisibilityPublic);
+	public override void OnDestroy()
+	{
+		base.OnDestroy();
 
-        if (OperatingSystem.IsAndroidVersionAtLeast(26))
-        {
-            ArgumentNullException.ThrowIfNull(NotificationManager);
-            CreateNotificationChannel(NotificationManager);
-        }
+		playerNotificationManager?.SetPlayer(null);
+		NotificationManager?.CancelAll();
+		if (!OperatingSystem.IsAndroidVersionAtLeast(33))
+		{
+			StopForeground(true);
+		}
 
-        if (OperatingSystem.IsAndroidVersionAtLeast(29))
-        {
-            ArgumentNullException.ThrowIfNull(notification);
-            StartForeground(1, notification.Build(), ForegroundService.TypeMediaPlayback);
-            return;
-        }
+		StopSelf();
+	}
 
-        if (OperatingSystem.IsAndroidVersionAtLeast(26))
-        {
-            ArgumentNullException.ThrowIfNull(notification);
-            StartForeground(1, notification.Build());
-        }
-    }
+	public override void OnRebind(Intent? intent)
+	{
+		base.OnRebind(intent);
+		StartForegroundServices();
+	}
 
-    [MemberNotNull(nameof(NotificationManager), nameof(notification))]
-    public void UpdateNotifications()
-    {
-        ArgumentNullException.ThrowIfNull(Player);
-        ArgumentNullException.ThrowIfNull(Session);
-        ArgumentNullException.ThrowIfNull(notification);
+	[MemberNotNull(nameof(NotificationManager), nameof(notificationBuilder))]
+	public void UpdateNotifications(in MediaSession session, in PlatformMediaElement mediaElement)
+	{
+		ArgumentNullException.ThrowIfNull(notificationBuilder);
+		ArgumentNullException.ThrowIfNull(NotificationManager);
 
-        var style = new MediaStyleNotificationHelper.MediaStyle(Session);
-        if (!OperatingSystem.IsAndroidVersionAtLeast(33))
-        {
-            SetLegacyNotifications();
-        }
-        notification.SetStyle(style);
-        NotificationManagerCompat.From(Platform.AppContext).Notify(1, notification.Build());
-        ArgumentNullException.ThrowIfNull(NotificationManager);
-    }
+		var style = new MediaStyleNotificationHelper.MediaStyle(session);
+		if (!OperatingSystem.IsAndroidVersionAtLeast(33))
+		{
+			SetLegacyNotifications(session, mediaElement);
+		}
 
-    [MemberNotNull(nameof(playerNotificationManager))]
-    public void SetLegacyNotifications()
-    {
-        ArgumentNullException.ThrowIfNull(Player);
-        ArgumentNullException.ThrowIfNull(Session);
-        playerNotificationManager ??= new PlayerNotificationManager.Builder(Platform.AppContext, 1, "1").Build();
+		notificationBuilder.SetStyle(style);
+		NotificationManagerCompat.From(Platform.AppContext)?.Notify(1, notificationBuilder.Build());
+	}
 
-        ArgumentNullException.ThrowIfNull(playerNotificationManager);
-        playerNotificationManager.SetUseFastForwardAction(true);
-        playerNotificationManager.SetUseFastForwardActionInCompactView(true);
-        playerNotificationManager.SetUseRewindAction(true);
-        playerNotificationManager.SetUseRewindActionInCompactView(true);
-        playerNotificationManager.SetUseNextAction(true);
-        playerNotificationManager.SetUseNextActionInCompactView(true);
-        playerNotificationManager.SetUsePlayPauseActions(true);
-        playerNotificationManager.SetUsePreviousAction(true);
-        playerNotificationManager.SetColor(Resource.Color.abc_primary_text_material_dark);
-        playerNotificationManager.SetUsePreviousActionInCompactView(true);
-        playerNotificationManager.SetVisibility(NotificationCompat.VisibilityPublic);
-        playerNotificationManager.SetMediaSessionToken(Session.SessionCompatToken);
-        playerNotificationManager.SetPlayer(Player);
-        playerNotificationManager.SetColorized(true);
-        playerNotificationManager.SetShowPlayButtonIfPlaybackIsSuppressed(true);
-        playerNotificationManager.SetSmallIcon(Resource.Drawable.media3_notification_small_icon);
-        playerNotificationManager.SetPriority(NotificationCompat.PriorityDefault);
-        playerNotificationManager.SetUseChronometer(true);
-    }
+	[MemberNotNull(nameof(playerNotificationManager))]
+	public void SetLegacyNotifications(in MediaSession session, in PlatformMediaElement mediaElement)
+	{
+		ArgumentNullException.ThrowIfNull(session);
+		playerNotificationManager ??= new PlayerNotificationManager.Builder(Platform.AppContext, 1, "1").Build()
+									  ?? throw new InvalidOperationException("PlayerNotificationManager cannot be null");
+
+		playerNotificationManager.SetUseFastForwardAction(true);
+		playerNotificationManager.SetUseFastForwardActionInCompactView(true);
+		playerNotificationManager.SetUseRewindAction(true);
+		playerNotificationManager.SetUseRewindActionInCompactView(true);
+		playerNotificationManager.SetUseNextAction(true);
+		playerNotificationManager.SetUseNextActionInCompactView(true);
+		playerNotificationManager.SetUsePlayPauseActions(true);
+		playerNotificationManager.SetUsePreviousAction(true);
+		playerNotificationManager.SetColor(Resource.Color.abc_primary_text_material_dark);
+		playerNotificationManager.SetUsePreviousActionInCompactView(true);
+		playerNotificationManager.SetVisibility(NotificationCompat.VisibilityPublic);
+		playerNotificationManager.SetMediaSessionToken(session.PlatformToken);
+		playerNotificationManager.SetPlayer(mediaElement);
+		playerNotificationManager.SetColorized(true);
+		playerNotificationManager.SetShowPlayButtonIfPlaybackIsSuppressed(true);
+		playerNotificationManager.SetSmallIcon(Resource.Drawable.media3_notification_small_icon);
+		playerNotificationManager.SetPriority(NotificationCompat.PriorityDefault);
+		playerNotificationManager.SetUseChronometer(true);
+	}
+
+	protected override void Dispose(bool disposing)
+	{
+		if (!isDisposed)
+		{
+			if (disposing)
+			{
+				NotificationManager?.Dispose();
+				NotificationManager = null;
+
+				playerNotificationManager?.Dispose();
+				playerNotificationManager = null;
+
+				if (!OperatingSystem.IsAndroidVersionAtLeast(33))
+				{
+					StopForeground(true);
+				}
+
+				StopSelf();
+			}
+
+			isDisposed = true;
+		}
+
+		base.Dispose(disposing);
+	}
+
+	static void CreateNotificationChannel(in NotificationManager notificationMnaManager)
+	{
+		var channel = new NotificationChannel("1", "1", NotificationImportance.Low);
+		notificationMnaManager.CreateNotificationChannel(channel);
+	}
+
+	[MemberNotNull(nameof(notificationBuilder), nameof(NotificationManager))]
+	void StartForegroundServices()
+	{
+		NotificationManager ??= GetSystemService(NotificationService) as NotificationManager ?? throw new InvalidOperationException($"{nameof(NotificationManager)} cannot be null");
+		notificationBuilder ??= new NotificationCompat.Builder(Platform.AppContext, "1");
+
+		notificationBuilder.SetSmallIcon(Resource.Drawable.media3_notification_small_icon);
+		notificationBuilder.SetAutoCancel(false);
+		notificationBuilder.SetForegroundServiceBehavior(NotificationCompat.ForegroundServiceImmediate);
+		notificationBuilder.SetVisibility(NotificationCompat.VisibilityPublic);
+
+		CreateNotificationChannel(NotificationManager);
+
+		if (OperatingSystem.IsAndroidVersionAtLeast(29))
+		{
+			if (notificationBuilder.Build() is Notification notification)
+			{
+				StartForeground(1, notification, ForegroundService.TypeMediaPlayback);
+			}
+		}
+		else
+		{
+			StartForeground(1, notificationBuilder.Build());
+		}
+	}
 }

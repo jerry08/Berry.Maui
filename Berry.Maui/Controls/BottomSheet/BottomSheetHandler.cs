@@ -40,8 +40,12 @@ public partial class BottomSheetHandler : ContentViewHandler
         handler.PlatformUpdateHandleColor(sheet);
     }
 
-    public static new CommandMapper<BottomSheet, BottomSheetHandler> CommandMapper =
-        new(ContentViewHandler.CommandMapper) { [nameof(BottomSheet.DismissAsync)] = MapDismiss };
+    public static new CommandMapper<BottomSheet, BottomSheetHandler> CommandMapper = new(
+        ContentViewHandler.CommandMapper
+    )
+    {
+        [nameof(BottomSheet.DismissAsync)] = MapDismiss,
+    };
 
     static void MapDismiss(BottomSheetHandler handler, BottomSheet view, object? request)
     {

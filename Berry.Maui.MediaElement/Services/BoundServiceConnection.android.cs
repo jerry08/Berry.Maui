@@ -1,32 +1,49 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Android.Content;
+﻿using Android.Content;
 using Android.OS;
 using Berry.Maui.Core.Views;
 
 namespace Berry.Maui.Services;
 
-class BoundServiceConnection(MediaManager mediaManager) : Java.Lang.Object, IServiceConnection
+sealed partial class BoundServiceConnection(MediaManager mediaManager) : Java.Lang.Object, IServiceConnection
 {
-    public MediaManager? Activity { get; private set; } = mediaManager;
+	readonly WeakEventManager taskRemovedEventManager = new();
 
-    public bool IsConnected { get; private set; } = false;
+	public event EventHandler MediaControlsServiceTaskRemoved
+	{
+		add => taskRemovedEventManager.AddEventHandler(value);
+		remove => taskRemovedEventManager.RemoveEventHandler(value);
+	}
 
-    public BoundServiceBinder? Binder { get; private set; } = null;
+	public MediaManager? Activity { get; } = mediaManager;
 
-    void IServiceConnection.OnServiceConnected(ComponentName? name, IBinder? service)
-    {
-        Binder = service as BoundServiceBinder;
-        IsConnected = Binder is not null;
-        Activity?.UpdatePlayer();
-    }
+	public bool IsConnected => Binder is not null;
 
-    void IServiceConnection.OnServiceDisconnected(ComponentName? name)
-    {
-        IsConnected = false;
-        Binder = null;
-    }
+	public BoundServiceBinder? Binder { get; private set; }
+
+	void HandleTaskRemoved(object? sender, EventArgs e)
+	{
+		taskRemovedEventManager.HandleEvent(this, EventArgs.Empty, nameof(MediaControlsServiceTaskRemoved));
+	}
+
+	void IServiceConnection.OnServiceConnected(ComponentName? name, IBinder? service)
+	{
+		Binder = service as BoundServiceBinder;
+
+		if (Binder is not null)
+		{
+			Binder.Service.TaskRemoved += HandleTaskRemoved;
+		}
+
+		// UpdateNotifications needs to be called as it may have been called before the service was connected
+		Activity?.UpdateNotifications();
+	}
+
+	void IServiceConnection.OnServiceDisconnected(ComponentName? name)
+	{
+		if (Binder is not null)
+		{
+			Binder.Service.TaskRemoved -= HandleTaskRemoved;
+			Binder = null;
+		}
+	}
 }

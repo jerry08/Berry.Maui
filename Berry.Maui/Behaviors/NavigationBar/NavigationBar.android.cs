@@ -13,20 +13,19 @@ namespace Berry.Maui.Behaviors;
 [SupportedOSPlatform("Android23.0")] // NavigationBar is only supported on Android 23.0+
 static partial class NavigationBar
 {
-    static readonly Lazy<bool> isSupportedHolder =
-        new(() =>
+    static readonly Lazy<bool> isSupportedHolder = new(() =>
+    {
+        if (OperatingSystem.IsAndroidVersionAtLeast((int)BuildVersionCodes.M))
         {
-            if (OperatingSystem.IsAndroidVersionAtLeast((int)BuildVersionCodes.M))
-            {
-                return true;
-            }
+            return true;
+        }
 
-            System.Diagnostics.Trace.WriteLine(
-                $"{nameof(NavigationBar)} Color + Style functionality is not supported on this version of the Android operating system. Minimum supported Android API is {BuildVersionCodes.M}"
-            );
+        System.Diagnostics.Trace.WriteLine(
+            $"{nameof(NavigationBar)} Color + Style functionality is not supported on this version of the Android operating system. Minimum supported Android API is {BuildVersionCodes.M}"
+        );
 
-            return false;
-        });
+        return false;
+    });
 
     static Activity Activity =>
         Platform.CurrentActivity

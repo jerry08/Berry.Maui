@@ -259,15 +259,14 @@ public class BorderView : UIView
                 var nFloat15 = (NFloat)Math.Max(0, nFloat8 - num9);
                 var nFloat16 = (NFloat)Math.Max(0, nFloat8 - num6);
                 var nFloat17 = (NFloat)Math.Max(nFloat15, nFloat16);
-                CGAffineTransform cGAffineTransform3 =
-                    new(
-                        (nFloat17 > 0 ? nFloat15 / nFloat17 : nFloat17),
-                        0,
-                        0,
-                        (nFloat17 > 0 ? nFloat16 / nFloat17 : nFloat17),
-                        (NFloat)(nFloat + num9 + nFloat15),
-                        (NFloat)(nFloat1 + num6 + nFloat16)
-                    );
+                CGAffineTransform cGAffineTransform3 = new(
+                    (nFloat17 > 0 ? nFloat15 / nFloat17 : nFloat17),
+                    0,
+                    0,
+                    (nFloat17 > 0 ? nFloat16 / nFloat17 : nFloat17),
+                    (NFloat)(nFloat + num9 + nFloat15),
+                    (NFloat)(nFloat1 + num6 + nFloat16)
+                );
                 cGPath1.AddArc(
                     cGAffineTransform3,
                     0,

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using Berry.Maui.Extensions;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Graphics;
-using PhoenixPortal.Behaviors;
 
 namespace Berry.Maui.Behaviors;
 

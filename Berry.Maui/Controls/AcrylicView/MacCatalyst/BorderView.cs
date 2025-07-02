@@ -178,15 +178,14 @@ public class BorderView : UIView
                 var num10 = Math.Max(0, nFloat9 - num7);
                 var num11 = Math.Max(0, nFloat9 - num6);
                 var num12 = Math.Max(num10, num11);
-                CGAffineTransform cGAffineTransform =
-                    new(
-                        (num12 > 0 ? (NFloat)(num10 / num12) : (NFloat)num12),
-                        0,
-                        0,
-                        (num12 > 0 ? (NFloat)(num11 / num12) : (NFloat)num12),
-                        (NFloat)(nFloat2 - num7 - num10),
-                        (NFloat)(nFloat1 + num6 + num11)
-                    );
+                CGAffineTransform cGAffineTransform = new(
+                    (num12 > 0 ? (NFloat)(num10 / num12) : (NFloat)num12),
+                    0,
+                    0,
+                    (num12 > 0 ? (NFloat)(num11 / num12) : (NFloat)num12),
+                    (NFloat)(nFloat2 - num7 - num10),
+                    (NFloat)(nFloat1 + num6 + num11)
+                );
                 cGPath1.AddArc(
                     cGAffineTransform,
                     0,
@@ -206,15 +205,14 @@ public class BorderView : UIView
                 var num13 = Math.Max(0, nFloat10 - num7);
                 var num14 = Math.Max(0, nFloat10 - num8);
                 var num15 = Math.Max(num13, num14);
-                CGAffineTransform cGAffineTransform1 =
-                    new(
-                        (num15 > 0 ? (NFloat)(num13 / num15) : (NFloat)num15),
-                        0,
-                        0,
-                        (num15 > 0 ? (NFloat)(num14 / num15) : (NFloat)num15),
-                        (NFloat)(nFloat2 - num7 - num13),
-                        (NFloat)(nFloat3 - num8 - num14)
-                    );
+                CGAffineTransform cGAffineTransform1 = new(
+                    (num15 > 0 ? (NFloat)(num13 / num15) : (NFloat)num15),
+                    0,
+                    0,
+                    (num15 > 0 ? (NFloat)(num14 / num15) : (NFloat)num15),
+                    (NFloat)(nFloat2 - num7 - num13),
+                    (NFloat)(nFloat3 - num8 - num14)
+                );
                 cGPath1.AddArc(
                     cGAffineTransform1,
                     0,
@@ -234,15 +232,14 @@ public class BorderView : UIView
                 var nFloat12 = (NFloat)Math.Max(0, nFloat11 - num9);
                 var nFloat13 = (NFloat)Math.Max(0, nFloat11 - num8);
                 var nFloat14 = (NFloat)Math.Max(nFloat12, nFloat13);
-                CGAffineTransform cGAffineTransform2 =
-                    new(
-                        (nFloat14 > 0 ? nFloat12 / nFloat14 : nFloat14),
-                        0,
-                        0,
-                        (nFloat14 > 0 ? nFloat13 / nFloat14 : nFloat14),
-                        (NFloat)(nFloat + num9 + nFloat12),
-                        (NFloat)(nFloat3 - num8 - nFloat13)
-                    );
+                CGAffineTransform cGAffineTransform2 = new(
+                    (nFloat14 > 0 ? nFloat12 / nFloat14 : nFloat14),
+                    0,
+                    0,
+                    (nFloat14 > 0 ? nFloat13 / nFloat14 : nFloat14),
+                    (NFloat)(nFloat + num9 + nFloat12),
+                    (NFloat)(nFloat3 - num8 - nFloat13)
+                );
                 cGPath1.AddArc(
                     cGAffineTransform2,
                     0,

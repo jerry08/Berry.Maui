@@ -1,5 +1,4 @@
-﻿using System;
-using Android.App;
+﻿using Android.App;
 using Android.Content;
 using Android.Runtime;
 using Android.Views;
@@ -8,7 +7,11 @@ using AndroidX.CoordinatorLayout.Widget;
 using AndroidX.Core.View;
 using AndroidX.Media3.UI;
 using Berry.Maui.Views;
-using Microsoft.Maui.ApplicationModel;
+
+[assembly: UsesPermission(Android.Manifest.Permission.ForegroundServiceMediaPlayback)]
+[assembly: UsesPermission(Android.Manifest.Permission.ForegroundService)]
+[assembly: UsesPermission(Android.Manifest.Permission.MediaContentControl)]
+[assembly: UsesPermission(Android.Manifest.Permission.PostNotifications)]
 
 namespace Berry.Maui.Core.Views;
 
@@ -18,8 +21,8 @@ namespace Berry.Maui.Core.Views;
 public class MauiMediaElement : CoordinatorLayout
 {
 	readonly RelativeLayout relativeLayout;
-	
-	PlayerView playerView;
+	readonly PlayerView playerView;
+
 	int defaultSystemUiVisibility;
 	bool isSystemBarVisible;
 	bool isFullScreen;
@@ -43,7 +46,7 @@ public class MauiMediaElement : CoordinatorLayout
 		this.playerView = playerView;
 		this.playerView.SetBackgroundColor(Android.Graphics.Color.Black);
 		playerView.FullscreenButtonClick += OnFullscreenButtonClick;
-		var layout = new RelativeLayout.LayoutParams(LayoutParams.WrapContent, LayoutParams.WrapContent);
+		var layout = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WrapContent, ViewGroup.LayoutParams.WrapContent);
 		layout.AddRule(LayoutRules.CenterInParent);
 		layout.AddRule(LayoutRules.CenterVertical);
 		layout.AddRule(LayoutRules.CenterHorizontal);
@@ -55,8 +58,8 @@ public class MauiMediaElement : CoordinatorLayout
 
 		AddView(relativeLayout);
 	}
-	
-    public override void OnDetachedFromWindow()
+
+	public override void OnDetachedFromWindow()
 	{
 		if (isFullScreen)
 		{
@@ -73,7 +76,7 @@ public class MauiMediaElement : CoordinatorLayout
 	protected override void OnVisibilityChanged(Android.Views.View changedView, [GeneratedEnum] ViewStates visibility)
 	{
 		base.OnVisibilityChanged(changedView, visibility);
-		if (isFullScreen && visibility == ViewStates.Visible)
+		if (isFullScreen && visibility is ViewStates.Visible)
 		{
 			SetSystemBarsVisibility();
 		}
@@ -171,13 +174,15 @@ public class MauiMediaElement : CoordinatorLayout
 					| SystemUiFlags.Immersive;
 			}
 
-			windowInsetsControllerCompat.Hide(barTypes);
-			windowInsetsControllerCompat.SystemBarsBehavior = WindowInsetsControllerCompat.BehaviorShowTransientBarsBySwipe;
+			if (windowInsetsControllerCompat is not null)
+			{
+				windowInsetsControllerCompat.Hide(barTypes);
+				windowInsetsControllerCompat.SystemBarsBehavior = WindowInsetsControllerCompat.BehaviorShowTransientBarsBySwipe;
+			}
 
 		}
 		else
 		{
-			WindowCompat.SetDecorFitsSystemWindows(currentWindow, true);
 			if (OperatingSystem.IsAndroidVersionAtLeast(30))
 			{
 				if (isSystemBarVisible)
@@ -190,8 +195,13 @@ public class MauiMediaElement : CoordinatorLayout
 				currentWindow.DecorView.SystemUiFlags = (SystemUiFlags)defaultSystemUiVisibility;
 			}
 
-			windowInsetsControllerCompat.Show(barTypes);
-			windowInsetsControllerCompat.SystemBarsBehavior = WindowInsetsControllerCompat.BehaviorDefault;
+			if (windowInsetsControllerCompat is not null)
+			{
+				windowInsetsControllerCompat.Show(barTypes);
+				windowInsetsControllerCompat.SystemBarsBehavior = WindowInsetsControllerCompat.BehaviorDefault;
+			}
+
+			WindowCompat.SetDecorFitsSystemWindows(currentWindow, true);
 		}
 	}
 
