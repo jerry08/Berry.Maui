@@ -55,9 +55,9 @@
     <Compile Remove="Handlers\MaterialEntry\Android\MaterialEntryHandler - Copy.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CSharpier.MsBuild" Version="1.0.3" PrivateAssets="all" />
+    <PackageReference Include="CSharpier.MsBuild" Version="1.2.1" PrivateAssets="all" />
     <PackageReference Include="M.BindableProperty.Generator" Version="0.11.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
-    <PackageReference Include="Sharpnado.TaskMonitor" Version="1.0.2" />
+    <PackageReference Include="Sharpnado.TaskMonitor" Version="1.1.0" />
   </ItemGroup>
 </Project>

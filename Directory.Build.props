@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Version>0.0.0-dev</Version>
-    <NetVersion>net9.0</NetVersion>
+    <NetVersion>net10.0</NetVersion>
     <Company>Berry</Company>
     <Copyright>Copyright (C) Jerry Berry</Copyright>
     <LangVersion>latest</LangVersion>

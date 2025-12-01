@@ -10,7 +10,7 @@ namespace Berry.Maui.Extensions;
 /// </summary>
 /// <remarks>For internal use by the .NET MAUI platform.</remarks>
 [EditorBrowsable(EditorBrowsableState.Never)]
-public static class TextTransformUtilites
+public static class TextTransformUtilities
 {
     /// <summary>
     /// Applies the <paramref name="textTransform"/> to <paramref name="source"/>.

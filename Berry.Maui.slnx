@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".github/workflows/nuget.yml" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="Berry.Maui.DownloadManager/Berry.Maui.DownloadManager.csproj" />
+  <Project Path="Berry.Maui.MediaElement/Berry.Maui.MediaElement.csproj" />
+  <Project Path="Berry.Maui.Sample/Berry.Maui.Sample.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="Berry.Maui/Berry.Maui.csproj" />
+</Solution>

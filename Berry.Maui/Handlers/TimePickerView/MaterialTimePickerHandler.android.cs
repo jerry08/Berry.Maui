@@ -52,11 +52,10 @@ public partial class MaterialTimePickerHandler : TimePickerHandler
         if (VirtualView is null)
             return;
 
-        var time = VirtualView.Time;
-        ShowPickerDialog(time.Hours, time.Minutes);
+        ShowPickerDialog(VirtualView.Time);
     }
 
-    void ShowPickerDialog(int hour, int minute)
+    void ShowPickerDialog(TimeSpan? time)
     {
         if (VirtualView is null || PlatformView is null)
             return;
@@ -64,6 +63,9 @@ public partial class MaterialTimePickerHandler : TimePickerHandler
         var fragmentManager = Platform.CurrentActivity?.GetFragmentManager();
         if (fragmentManager is null)
             return;
+
+        var hour = time?.Hours ?? 0;
+        var minute = time?.Minutes ?? 0;
 
         var builder = new MaterialTimePicker.Builder()
             .SetTimeFormat(Use24HourView ? TimeFormat.Clock24h : TimeFormat.Clock12h)

@@ -9,5 +9,6 @@ public static class UniqueDeviceIdentifier
         Android.Provider.Settings.Secure.GetString(
             Platform.AppContext.ContentResolver,
             Android.Provider.Settings.Secure.AndroidId
-        ) ?? throw new ArgumentNullException("Android Id is null");
+        )
+        ?? throw new ArgumentNullException("Android Id is null");
 }

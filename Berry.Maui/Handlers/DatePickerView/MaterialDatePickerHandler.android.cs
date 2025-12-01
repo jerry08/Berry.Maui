@@ -48,19 +48,19 @@ public partial class MaterialDatePickerHandler : DatePickerHandler
 
     void ShowPickerDialog()
     {
-        if (VirtualView == null)
+        if (VirtualView is null)
             return;
 
         if (_dialog != null && _dialog.IsVisible)
             return;
 
-        var date = VirtualView.Date;
-        ShowPickerDialog(date.Year, date.Month - 1, date.Day);
+        ShowPickerDialog(VirtualView.Date);
     }
 
-    void ShowPickerDialog(int year, int month, int day)
+    void ShowPickerDialog(DateTime? date)
     {
-        var date = VirtualView.Date;
+        if (VirtualView?.Date is null)
+            return;
 
         var fragmentManager = Platform.CurrentActivity?.GetFragmentManager();
         if (fragmentManager is null)
@@ -75,15 +75,14 @@ public partial class MaterialDatePickerHandler : DatePickerHandler
         //.SetCalendarConstraints(constrainsBuilder.Build());
         //.SetTitleText("Select date of birth");
 
-        builder.SetSelection(new DateTimeOffset(date).ToUnixTimeMilliseconds());
+        builder.SetSelection(new DateTimeOffset(date ?? DateTime.Today).ToUnixTimeMilliseconds());
 
         _dialog = builder.Build();
         _dialog.AddOnPositiveButtonClickListener(
             new MaterialPickerOnPositiveButtonClickListener(
                 (selection) =>
                 {
-                    if (VirtualView is not null)
-                        VirtualView.Date = DateTimeOffset.FromUnixTimeMilliseconds(selection).Date;
+                    VirtualView?.Date = DateTimeOffset.FromUnixTimeMilliseconds(selection).Date;
                 }
             )
         );

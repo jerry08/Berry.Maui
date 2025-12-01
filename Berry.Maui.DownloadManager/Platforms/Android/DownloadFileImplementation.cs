@@ -33,7 +33,7 @@ public class DownloadFileImplementation : IDownloadFile
         }
     }
 
-    public IDictionary<string, string> Headers { get; }
+    public IDictionary<string, string>? Headers { get; }
 
     private DownloadFileStatus _status;
 
@@ -49,9 +49,9 @@ public class DownloadFileImplementation : IDownloadFile
         }
     }
 
-    private string _statusDetails;
+    private string? _statusDetails;
 
-    public string StatusDetails
+    public string? StatusDetails
     {
         get { return _statusDetails; }
         set
@@ -153,7 +153,11 @@ public class DownloadFileImplementation : IDownloadFile
             }
         }
 
-        request.SetVisibleInDownloadsUi(isVisibleInDownloadsUi);
+        if (!OperatingSystem.IsAndroidVersionAtLeast(29))
+        {
+            request.SetVisibleInDownloadsUi(isVisibleInDownloadsUi);
+        }
+        
         request.SetAllowedOverMetered(allowedOverMetered);
 
         request.SetNotificationVisibility(notificationVisibility);
