@@ -75,7 +75,8 @@ public static partial class ApplicationEx
         GetActiveStatusBarNotifications(context)
             .Where(x => x is not null)
             .Select(x => x.Notification!)
-            .ToArray() ?? [];
+            .ToArray()
+        ?? [];
 
     public static StatusBarNotification[] GetActiveStatusBarNotifications(Context? context)
     {

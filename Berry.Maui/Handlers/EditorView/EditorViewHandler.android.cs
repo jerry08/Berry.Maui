@@ -1,6 +1,4 @@
 ﻿using Android.Graphics.Drawables;
-using AndroidX.AppCompat.Widget;
-using Microsoft.Maui.Controls.Compatibility.Platform.Android;
 using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Graphics;
 using Microsoft.Maui.Handlers;
@@ -10,7 +8,7 @@ namespace Berry.Maui.Handlers;
 
 public partial class EditorViewHandler : EditorHandler
 {
-    protected override AppCompatEditText CreatePlatformView()
+    protected override MauiAppCompatEditText CreatePlatformView()
     {
         var nativeView = base.CreatePlatformView();
 

@@ -38,14 +38,12 @@ public class BottomSheetViewController : UIViewController
 
         cv.TranslatesAutoresizingMaskIntoConstraints = false;
 
-        NSLayoutConstraint.ActivateConstraints(
-            [
-                cv.TopAnchor.ConstraintEqualTo(View.TopAnchor),
-                cv.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
-                cv.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
-                cv.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor),
-            ]
-        );
+        NSLayoutConstraint.ActivateConstraints([
+            cv.TopAnchor.ConstraintEqualTo(View.TopAnchor),
+            cv.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
+            cv.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
+            cv.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor),
+        ]);
 
         UpdateBackground();
         _sheet.NotifyShowing();

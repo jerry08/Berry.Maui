@@ -16,7 +16,6 @@ using Microsoft.Maui.Graphics;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 using static Android.Widget.TextView;
-using EditTextExtensions = Berry.Maui.Extensions.EditTextExtensions;
 
 namespace Berry.Maui.Handlers;
 
@@ -177,7 +176,7 @@ public class MaterialEntryHandler : ViewHandler<Entry, RelativeLayout>, IEntryHa
 
         if (handler.DataFlowDirection == DataFlowDirection.FromPlatform)
         {
-            EditTextExtensions.UpdateTextFromPlatform(handler._editText, entry);
+            handler._editText.UpdateTextFromPlatform(entry);
             return;
         }
 
