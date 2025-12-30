@@ -29,9 +29,16 @@ internal static class OkHttpClientBuilderExtensions
         var trustAllCerts = new ITrustManager[] { naiveTrustManager };
         insecureSocketFactory.Init(null, trustAllCerts, new SecureRandom());
 
-        builder.SslSocketFactory(insecureSocketFactory.SocketFactory, naiveTrustManager);
-        builder.HostnameVerifier((_, _) => true);
+        if (insecureSocketFactory.SocketFactory is not null)
+            builder.SslSocketFactory(insecureSocketFactory.SocketFactory, naiveTrustManager);
+
+        builder.HostnameVerifier(new TrustAllHostnameVerifier());
 
         return builder;
+    }
+
+    class TrustAllHostnameVerifier : Java.Lang.Object, IHostnameVerifier
+    {
+        public bool Verify(string? hostname, ISSLSession? session) => true;
     }
 }
